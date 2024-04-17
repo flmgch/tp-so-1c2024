@@ -36,7 +36,7 @@ void terminar_programa(t_log* logger, t_config* config){
     }
 }
 
-int crear_conexion(char *ip, char* puerto){
+int crear_conexion(char *ip, char* puerto, char* mensaje,t_log* log){
 	struct addrinfo hints;
 	struct addrinfo *server_info;
     int errores=0;
@@ -68,13 +68,14 @@ int crear_conexion(char *ip, char* puerto){
       exit(1);
       }
 
+   log_info(log,"Se conecto con: %s",mensaje);
+
 	freeaddrinfo(server_info);
 
 	return socketDeConexion;
 }
 
-
-int iniciar_escucha(char* PUERTO){
+int iniciar_escucha(char* PUERTO, char* mensaje,t_log* log){
 
 	struct addrinfo hints, *servinfo;
     int errores=0;
@@ -112,23 +113,25 @@ int iniciar_escucha(char* PUERTO){
       exit(1);
       }
 
+      log_info(log,"Se puso a escuchar: %s",mensaje);
+
 	freeaddrinfo(servinfo);
 
 	return socketEscucha;
 }
 
-int esperar_conexion(int socket_conexion){   
-	int socket_cliente = accept(socket_conexion, NULL, NULL);
+int esperar_conexion(int socket_conexion,char* mensaje,t_log* log){   
+	int socket= accept(socket_conexion, NULL, NULL);
 
-	if (socket_cliente < 0) {
-      fprintf(stderr, "Error en Aceptacion: %s\n", strerror(socket_cliente));
+	if (socket < 0) {
+      fprintf(stderr, "Error en Aceptacion: %s\n", strerror(socket));
       exit(1);
       }
 
-	return socket_conexion;
+   log_info(log,"Se acepto a: %s",mensaje);
+
+	return socket;
 }
 
-void liberar_conexion(int socket_cliente)
-{
-	close(socket_cliente);
-}
+
+

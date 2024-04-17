@@ -18,9 +18,9 @@ void decir_hola(char* quien);
 t_log* iniciar_logger(char* nombreLog,t_log_level level);
 t_config* iniciar_config(char* nombreConfig);
 void terminar_programa(t_log* logger, t_config* config);
-int crear_conexion(char *ip, char* puerto);
-int iniciar_escucha(char* PUERTO);
-int esperar_conexion(int socket_conexion);
-void liberar_conexion(int socket_cliente);
+int crear_conexion(char *ip, char* puerto,char* mensaje,t_log* log);
+int iniciar_escucha(char* PUERTO,char* mensaje,t_log* log);
+int esperar_conexion(int socket_conexion,char* mensaje,t_log* log);
+
 
 #endif

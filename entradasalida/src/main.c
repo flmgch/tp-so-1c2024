@@ -16,14 +16,13 @@ int main(int argc, char* argv[]) {
        puerto_memoria=config_get_string_value(config,"PUERTO_MEMORIA");
        log_info(logger,"%s,%s,%s,%s",puerto_kernel,ip_kernel,ip_memoria,puerto_memoria);
 
-     int socket_Conexion_A_Kernel=crear_conexion(ip_kernel,puerto_kernel);
-       log_info(logger,"La interfaz se conecto con el kernel");
+     int socket_Conexion_Memoria=crear_conexion(ip_kernel,puerto_kernel,"Memoria",logger);
+     int socket_Conexion_Kernel=crear_conexion(ip_memoria,puerto_memoria,"Kernel",logger);
+     
 
-     int socket_Conexion_A_Memoria=crear_conexion(ip_kernel,puerto_kernel);
-       log_info(logger,"La interfaz se conecto a memoria");
-
-     liberar_conexion(socket_Conexion_A_Kernel);
-     liberar_conexion(socket_Conexion_A_Memoria);
+     
+     close(socket_Conexion_Kernel);
+     close(socket_Conexion_Memoria);
      terminar_programa(logger,config);
     return 0;
 }

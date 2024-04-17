@@ -17,12 +17,18 @@ int main(int argc, char* argv[]) {
         log_info(logger,"%s,%s,%s,%s",ip_memoria,puerto_memoria,dispatch,interrupt);
 
 
-     int socket_CPU_A_Memoria=crear_conexion(ip_memoria,puerto_memoria);
-         log_info(logger,"El CPU se conecto con la memoria");
+     int socket_CPU_Memoria=crear_conexion(ip_memoria,puerto_memoria,"Memoria",logger);
 
-     
+     int socket_Escucha_Dispatch=iniciar_escucha(dispatch,"CPU para dispatch",logger);
+     int socket_Escucha_Interrupt=iniciar_escucha(interrupt,"CPU para interrupt",logger);
+        int socket_Dispatch=esperar_conexion(socket_Escucha_Dispatch,"Kernel",logger);
+        int socket_Interrupt=esperar_conexion(socket_Escucha_Interrupt,"Kernel",logger);
 
-     liberar_conexion(socket_CPU_A_Memoria);
+     close(socket_CPU_Memoria);
+     close(socket_Escucha_Dispatch);
+     close(socket_Dispatch);
+     close(socket_Escucha_Interrupt);
+     close(socket_Interrupt);
      terminar_programa(logger,config);
     return 0;
 }
