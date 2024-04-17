@@ -64,7 +64,7 @@ int crear_conexion(char *ip, char* puerto){
 	errores=connect(socketDeConexion, server_info->ai_addr, server_info->ai_addrlen);
 
       if (errores < 0) {
-      fprintf(stderr, "Error en Conecion: %s\n", strerror(errores));
+      fprintf(stderr, "Error en Conecion: %s\n", gai_strerror(errores));
       exit(1);
       }
 
@@ -72,6 +72,7 @@ int crear_conexion(char *ip, char* puerto){
 
 	return socketDeConexion;
 }
+
 
 int iniciar_escucha(char* PUERTO){
 
@@ -100,14 +101,14 @@ int iniciar_escucha(char* PUERTO){
 	errores=bind(socketEscucha, servinfo->ai_addr, servinfo->ai_addrlen);
 
       if (errores < 0) {
-      fprintf(stderr, "Error en Bind: %s\n", strerror(errores));
+      fprintf(stderr, "Error en Bind: %s\n", gai_strerror(errores));
       exit(1);
       }
 
     errores=listen(socketEscucha, SOMAXCONN);
 
       if (errores < 0) {
-      fprintf(stderr, "Error en Listen: %s\n", strerror(errores));
+      fprintf(stderr, "Error en Listen: %s\n", gai_strerror(errores));
       exit(1);
       }
 
