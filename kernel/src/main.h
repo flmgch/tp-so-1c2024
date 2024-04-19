@@ -3,4 +3,8 @@
 
 #include <utils/hello.h>
 
+// VARIABLES GLOBALES
+  t_log *kernel_logger;
+  t_config *kernel_config;
+
 #endif

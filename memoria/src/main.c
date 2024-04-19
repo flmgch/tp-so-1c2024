@@ -1,30 +1,29 @@
 #include <utils/hello.h>
+#include <main.h>
 
 int main(int argc, char *argv[])
 {
-  t_log *logger;
-  t_config *config;
+
   char *puerto_escucha;
-  decir_hola("Memoria");
 
-  logger = iniciar_logger("Memoria.log", LOG_LEVEL_DEBUG);
-  log_info(logger, "Soy log");
+  mem_logger = iniciar_logger("Memoria.log", LOG_LEVEL_DEBUG);
+  log_info(mem_logger, "Soy log");
 
-  config = iniciar_config("./Memoria.config");
-  puerto_escucha = config_get_string_value(config, "PUERTO_ESCUCHA");
-  log_info(logger, "%s", puerto_escucha);
+  mem_config = iniciar_config("./Memoria.config");
+  puerto_escucha = config_get_string_value(mem_config, "PUERTO_ESCUCHA");
+  log_info(mem_logger, "%s", puerto_escucha);
 
-  int socket_Escucha = iniciar_escucha(puerto_escucha, "Memoria", logger);
-  int socket_CPU = esperar_conexion(socket_Escucha, "CPU", logger);
-
-  int socket_kernel = esperar_conexion(socket_Escucha, "Kernel", logger);
-
-  int socket_interfaz = esperar_conexion(socket_Escucha, "Interfaz", logger);
+  int socket_escucha = iniciar_escucha(puerto_escucha, "Memoria", mem_logger);
+  
+  // SOCKETS ENTRANTES
+  int socket_cpu = esperar_conexion(socket_Escucha, "CPU", mem_logger);
+  int socket_kernel = esperar_conexion(socket_Escucha, "Kernel", mem_logger);
+  int socket_interfaz = esperar_conexion(socket_Escucha, "Interfaz", mem_logger);
 
   close(socket_Escucha);
   close(socket_interfaz);
   close(socket_CPU);
   close(socket_kernel);
-  terminar_programa(logger, config);
+  terminar_programa(mem_logger, mem_config);
   return 0;
 }

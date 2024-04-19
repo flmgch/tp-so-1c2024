@@ -2,33 +2,29 @@
 
 int main(int argc, char *argv[])
 {
-   t_log *logger;
-   t_config *config;
    char *dispatch, *interrupt, *ip_memoria, *puerto_memoria;
-   decir_hola("CPU");
 
-   logger = iniciar_logger("CPU.log", LOG_LEVEL_DEBUG);
-   log_info(logger, "Soy log");
+   cpu_logger = iniciar_logger("CPU.log", LOG_LEVEL_DEBUG);
+   log_info(cpu_logger, "Soy log");
 
-   config = iniciar_config("./CPU.config");
-   ip_memoria = config_get_string_value(config, "IP_MEMORIA");
-   puerto_memoria = config_get_string_value(config, "PUERTO_MEMORIA");
-   dispatch = config_get_string_value(config, "PUERTO_ESCUCHA_DISPATCH");
-   interrupt = config_get_string_value(config, "PUERTO_ESCUCHA_INTERRUPT");
-   log_info(logger, "%s,%s,%s,%s", ip_memoria, puerto_memoria, dispatch, interrupt);
+   cpu_config = iniciar_config("./CPU.config");
+   ip_memoria = config_get_string_value(cpu_config, "IP_MEMORIA");
+   puerto_memoria = config_get_string_value(cpu_config, "PUERTO_MEMORIA");
+   dispatch = config_get_string_value(cpu_config, "PUERTO_ESCUCHA_DISPATCH");
+   interrupt = config_get_string_value(cpu_config, "PUERTO_ESCUCHA_INTERRUPT");
+   log_info(cpu_logger, "%s,%s,%s,%s", ip_memoria, puerto_memoria, dispatch, interrupt);
 
-   int socket_CPU_Memoria = crear_conexion(ip_memoria, puerto_memoria, "Memoria", logger);
+   int socket_cpu_memoria = crear_conexion(ip_memoria, puerto_memoria, "Memoria", cpu_logger);
+   int socket_escucha_dispatch = iniciar_escucha(dispatch, "CPU para dispatch", cpu_logger);
+   int socket_escucha_interrupt = iniciar_escucha(interrupt, "CPU para interrupt", cpu_logger);
+   int socket_dispatch = esperar_conexion(socket_escucha_dispatch, "Kernel", cpu_logger);
+   int socket_interrupt = esperar_conexion(socket_escucha_interrupt, "Kernel", cpu_logger);
 
-   int socket_Escucha_Dispatch = iniciar_escucha(dispatch, "CPU para dispatch", logger);
-   int socket_Escucha_Interrupt = iniciar_escucha(interrupt, "CPU para interrupt", logger);
-   int socket_Dispatch = esperar_conexion(socket_Escucha_Dispatch, "Kernel", logger);
-   int socket_Interrupt = esperar_conexion(socket_Escucha_Interrupt, "Kernel", logger);
-
-   close(socket_CPU_Memoria);
-   close(socket_Escucha_Dispatch);
-   close(socket_Dispatch);
-   close(socket_Escucha_Interrupt);
-   close(socket_Interrupt);
-   terminar_programa(logger, config);
+   close(socket_cpu_memoria);
+   close(socket_escucha_dispatch);
+   close(socket_dispatch);
+   close(socket_escucha_interrupt);
+   close(socket_interrupt);
+   terminar_programa(cpu_logger, cpu_config);
    return 0;
 }
