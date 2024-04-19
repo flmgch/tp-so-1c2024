@@ -4,8 +4,6 @@
 int main(int argc, char *argv[])
 {
 
-  char *puerto_escucha;
-
   mem_logger = iniciar_logger("Memoria.log", LOG_LEVEL_DEBUG);
   log_info(mem_logger, "Soy log");
 

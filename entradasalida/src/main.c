@@ -3,8 +3,6 @@
 int main(int argc, char *argv[])
 {
 
-  char *ip_kernel, *puerto_kernel, *ip_memoria, *puerto_memoria;
-
   io_logger = iniciar_logger("EntradaYSalida.log", LOG_LEVEL_DEBUG);
   log_info(io_logger, "Soy log");
 

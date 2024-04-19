@@ -5,8 +5,6 @@
 
 int main(int argc, char *argv[])
 {
-  char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *interrupt;
-  decir_hola("Kernel");
 
   kernel_logger = iniciar_logger("Kernel.log", LOG_LEVEL_DEBUG);
   kernel_config = iniciar_config("./Kernel.config");

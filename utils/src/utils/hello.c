@@ -8,10 +8,10 @@ void decir_hola(char *quien)
 t_log *iniciar_logger(char *nombreLog, t_log_level level)
 {
   t_log *nuevo_logger;
-  nuevo_logger = log_create(nombreLog, "Tp_0", 1, level);
+  nuevo_logger = log_create(nombreLog, "LOG", 1, level);
   if (nuevo_logger == NULL)
   {
-    printf("No se creo el logger\n");
+    perror("No se creo el logger\n");
     exit(1);
   }
   return nuevo_logger;
@@ -23,7 +23,7 @@ t_config *iniciar_config(char *nombreConfig)
   nuevo_config = config_create(nombreConfig);
   if (nuevo_config == NULL)
   {
-    printf("No se pudo crear  el config\n");
+    perror("No se pudo crear  el config\n");
     exit(2);
   }
   return nuevo_config;
@@ -74,7 +74,7 @@ int crear_conexion(char *ip, char *puerto, char *mensaje, t_log *log)
 
   if (errores < 0)
   {
-    fprintf(stderr, "Error en Conecion: %s\n", gai_strerror(errores));
+    fprintf(stderr, "Error en Conexion: %s\n", gai_strerror(errores));
     exit(1);
   }
 
