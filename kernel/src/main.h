@@ -11,4 +11,7 @@
   int quantum;
   t_list *recursos, *instancias_recursos;
   
+// SOCKETS
+  int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha, socket_interfaz;
+
 #endif

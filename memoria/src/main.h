@@ -10,5 +10,7 @@ t_config *mem_config;
 char *puerto_escucha, *path_instrucciones;
 int tamanio_memoria, tamanio_pagina, retardo_respuesta;
 
+// SOCKETS
+int socket_escucha, socket_cpu, socket_kernel, socket_interfaz;
 
 #endif

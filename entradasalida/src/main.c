@@ -6,8 +6,8 @@ int main(int argc, char *argv[])
   inicializar_io();
   
   // CREAR CONEXIONES 
-  int socket_memoria = crear_conexion(ip_kernel, puerto_kernel, "Memoria", io_logger);
-  int socket_kernel = crear_conexion(ip_memoria, puerto_memoria, "Kernel", io_logger);
+  socket_memoria = crear_conexion(ip_kernel, puerto_kernel, "Memoria", io_logger);
+  socket_kernel = crear_conexion(ip_memoria, puerto_memoria, "Kernel", io_logger);
 
   close(socket_kernel);
   close(socket_memoria);

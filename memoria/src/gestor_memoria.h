@@ -9,4 +9,7 @@ extern t_config *mem_config;
 extern char *puerto_escucha, *path_instrucciones;
 extern int tamanio_memoria, tamanio_pagina, retardo_respuesta;
 
+// SOCKETS
+extern int socket_escucha, socket_cpu, socket_kernel, socket_interfaz;
+
 #endif

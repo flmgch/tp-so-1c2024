@@ -9,4 +9,7 @@ extern t_config *cpu_config;
 extern char *puerto_dispatch, *puerto_interrupt, *ip_memoria, *puerto_memoria, *algoritmo_tlb;
 extern int cantidad_entradas_tlb;
 
+// SOCKETS
+extern int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
+
 #endif

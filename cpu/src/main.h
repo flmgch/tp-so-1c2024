@@ -9,4 +9,7 @@ t_config *cpu_config;
 char *puerto_dispatch, *puerto_interrupt, *ip_memoria, *puerto_memoria, *algoritmo_tlb;
 int cantidad_entradas_tlb;
 
+// SOCKETS
+int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
+
 #endif

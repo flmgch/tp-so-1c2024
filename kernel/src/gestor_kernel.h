@@ -12,4 +12,7 @@ extern char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *
 extern int quantum;
 extern t_list *recursos, *instancias_recursos;
 
+// SOCKETS
+extern int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha, socket_interfaz;
+
 #endif
