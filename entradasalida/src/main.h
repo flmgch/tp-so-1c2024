@@ -1,7 +1,8 @@
 #ifndef ENTRADAYSALIDA_H_
 #define ENTRADAYSALIDA_H_
 
-#include <utils/hello.h>
+#include "gestor_io.h"
+#include "inicializar_io.h"
 
 // VARIABLES GLOBALES
 t_log *io_logger;
