@@ -1,7 +1,8 @@
 #ifndef MEMORIA_H_
 #define MEMORIA_H_
 
-#include <utils/hello.h>
+#include "gestor_memoria.h"
+#include "inicializar_memoria.h"
 
 // VARIABLES GLOBALES
 t_log *mem_logger;
