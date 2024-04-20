@@ -1,7 +1,7 @@
 #ifndef CPU_H_
 #define CPU_H_
 
-#include <utils/hello.h>
+#include "gestor_cpu.h"
 
 // VARIABLES GLOBALES
 t_log *cpu_logger;
