@@ -258,7 +258,8 @@ void recibir_mensaje(int socket_cliente)
 {
   int size;
   char *buffer = recibir_buffer(&size, socket_cliente);
-  log_info(logger, "Me llego el mensaje %s", buffer);
+  // TODO: MODIFICAR FUNCION PARA QUE RECIBA UN LOGGER Y ESCRIBA EN ESE MISMO
+  // log_info(logger, "Me llego el mensaje %s", buffer);
   free(buffer);
 }
 
