@@ -1,21 +1,9 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <utils/hello.h>
 #include <main.h>
 
 int main(int argc, char *argv[])
 {
-// INICIALIZAR KERNEL
-  kernel_logger = iniciar_logger("Kernel.log", LOG_LEVEL_DEBUG);
-  kernel_config = iniciar_config("./Kernel.config");
 
-//INICIALIZAR VARIABLES DE CONEXIÓN
-  puerto_escucha = config_get_string_value(kernel_config, "PUERTO_ESCUCHA");
-  ip_memoria = config_get_string_value(kernel_config, "IP_MEMORIA");
-  puerto_memoria = config_get_string_value(kernel_config, "PUERTO_MEMORIA");
-  ip_cpu = config_get_string_value(kernel_config, "IP_CPU");
-  dispatch = config_get_string_value(kernel_config, "PUERTO_CPU_DISPATCH");
-  interrupt = config_get_string_value(kernel_config, "PUERTO_CPU_INTERRUPT");
+  inicializar_kernel();
 
 //INICIALIZAR CONEXIONES
   int socket_conexion_cpu_dispatch = crear_conexion(ip_cpu, dispatch, "CPU para dispatch", kernel_logger);

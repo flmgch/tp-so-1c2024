@@ -1,7 +1,8 @@
 #ifndef KERNEL_H_
 #define KERNEL_H_
 
-#include <utils/hello.h>
+#include "gestor_kernel.h"
+#include "inicializar_kernel.h"
 
 // VARIABLES GLOBALES
   t_log *kernel_logger;
