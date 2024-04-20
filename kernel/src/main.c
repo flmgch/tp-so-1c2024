@@ -21,6 +21,8 @@ int main(int argc, char *argv[])
   int socket_conexion_cpu_dispatch = crear_conexion(ip_cpu, dispatch, "CPU para dispatch", kernel_logger);
   int socket_conexion_cpu_interrupt = crear_conexion(ip_cpu, interrupt, "CPU para interrupt", kernel_logger);
   int socket_conexion_memoria = crear_conexion(ip_memoria, puerto_memoria, "Memoria", kernel_logger);
+  
+// INICIALIZAR SERVER
   int socket_escucha_interfaz = iniciar_escucha(puerto_escucha, "Kernel", kernel_logger);
   int socket_interfaz = esperar_conexion(socket_escucha_interfaz, "Interfaz", kernel_logger);
 

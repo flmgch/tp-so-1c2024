@@ -22,8 +22,8 @@ int main(int argc, char *argv[])
    int socket_escucha_interrupt = iniciar_escucha(puerto_interrupt, "CPU para interrupt", cpu_logger);
 
    // ESPERAR CONEXIONES DE KERNEL
-   int socket_dispatch = esperar_conexion(socket_escucha_dispatch, "Kernel", cpu_logger);
-   int socket_interrupt = esperar_conexion(socket_escucha_interrupt, "Kernel", cpu_logger);
+   int socket_dispatch = esperar_conexion(socket_escucha_dispatch, "Kernel para dispatch", cpu_logger);
+   int socket_interrupt = esperar_conexion(socket_escucha_interrupt, "Kernel para interrupt", cpu_logger);
 
    close(socket_cpu_memoria);
    close(socket_escucha_dispatch);
