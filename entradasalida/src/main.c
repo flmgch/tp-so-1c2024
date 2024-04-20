@@ -7,7 +7,9 @@ int main(int argc, char *argv[])
   
   // CREAR CONEXIONES 
   socket_memoria = crear_conexion(ip_kernel, puerto_kernel, "Memoria", io_logger);
+  handshake_cliente(socket_memoria, io_logger);
   socket_kernel = crear_conexion(ip_memoria, puerto_memoria, "Kernel", io_logger);
+  handshake_cliente(socket_kernel, io_logger);
 
   close(socket_kernel);
   close(socket_memoria);

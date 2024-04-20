@@ -10,8 +10,11 @@ int main(int argc, char *argv[])
 
   // ESPERAR CONEXIONES ENTRANTES
   socket_cpu = esperar_conexion(socket_escucha, "CPU", mem_logger);
+  handshake_servidor(socket_cpu);
   socket_kernel = esperar_conexion(socket_escucha, "Kernel", mem_logger);
+  handshake_servidor(socket_kernel);
   socket_interfaz = esperar_conexion(socket_escucha, "Interfaz", mem_logger);
+  handshake_servidor(socket_interfaz);
 
   close(socket_escucha);
   close(socket_interfaz);

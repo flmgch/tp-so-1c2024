@@ -50,6 +50,7 @@ void agregar_a_paquete(t_paquete *paquete, void *valor, int tamanio);
 void enviar_paquete(t_paquete *paquete, int socket_cliente);
 void liberar_conexion(int socket_cliente);
 void eliminar_paquete(t_paquete *paquete);
+void handshake_cliente(int socket_conexion, t_log *log);
 
 // FUNCIONES SERVER
 void *recibir_buffer(int *, int);
@@ -58,5 +59,6 @@ void recibir_mensaje(int);
 int recibir_operacion(int);
 int iniciar_escucha(char *PUERTO, char *mensaje, t_log *log);
 int esperar_conexion(int socket_conexion, char *mensaje, t_log *log);
+void handshake_servidor(int socket_conexion);
 
 #endif

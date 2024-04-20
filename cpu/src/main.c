@@ -8,12 +8,15 @@ int main(int argc, char *argv[])
 
    // INICIALIZAR CONEXIONES
    int socket_memoria = crear_conexion(ip_memoria, puerto_memoria, "Memoria", cpu_logger);
+   handshake_cliente(socket_memoria, cpu_logger);
    int socket_escucha_dispatch = iniciar_escucha(puerto_dispatch, "CPU para dispatch", cpu_logger);
    int socket_escucha_interrupt = iniciar_escucha(puerto_interrupt, "CPU para interrupt", cpu_logger);
 
    // ESPERAR CONEXIONES DE KERNEL
    int socket_kernel_dispatch = esperar_conexion(socket_escucha_dispatch, "Kernel para dispatch", cpu_logger);
+   handshake_servidor(socket_kernel_dispatch);
    int socket_kernel_interrupt = esperar_conexion(socket_escucha_interrupt, "Kernel para interrupt", cpu_logger);
+   handshake_servidor(socket_kernel_interrupt);
 
    close(socket_memoria);
    close(socket_escucha_dispatch);
