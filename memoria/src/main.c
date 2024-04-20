@@ -3,17 +3,21 @@
 
 int main(int argc, char *argv[])
 {
-
+  // INICIALIZAR MEMORIA
   mem_logger = iniciar_logger("Memoria.log", LOG_LEVEL_DEBUG);
-  log_info(mem_logger, "Soy log");
-
   mem_config = iniciar_config("./Memoria.config");
-  puerto_escucha = config_get_string_value(mem_config, "PUERTO_ESCUCHA");
-  log_info(mem_logger, "%s", puerto_escucha);
 
+  // INICIALIZAR VARIABLES GLOBALES (CONFIG)
+  puerto_escucha = config_get_string_value(mem_config, "PUERTO_ESCUCHA");
+  path_instrucciones = config_get_string_value(mem_config, "PATH_INSTRUCCIONES");
+  tamanio_memoria = config_get_int_value(mem_config, "TAM_MEMORIA");
+  tamanio_pagina = config_get_int_value(mem_config, "TAM_PAGINA");
+  retardo_respuesta = config_get_int_value(mem_config, "RETARDO_RESPUESTA");
+
+  // INICIALIZAR SERVIDOR
   int socket_escucha = iniciar_escucha(puerto_escucha, "Memoria", mem_logger);
-  
-  // SOCKETS ENTRANTES
+
+  // ESPERAR CONEXIONES ENTRANTES
   int socket_cpu = esperar_conexion(socket_escucha, "CPU", mem_logger);
   int socket_kernel = esperar_conexion(socket_escucha, "Kernel", mem_logger);
   int socket_interfaz = esperar_conexion(socket_escucha, "Interfaz", mem_logger);

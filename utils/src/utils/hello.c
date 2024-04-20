@@ -52,7 +52,6 @@ int crear_conexion(char *ip, char *puerto, char *mensaje, t_log *log)
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
-  hints.ai_flags = AI_PASSIVE;
 
   errores = getaddrinfo(ip, puerto, &hints, &server_info);
 
