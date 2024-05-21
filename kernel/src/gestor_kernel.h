@@ -2,8 +2,6 @@
 #define GESTOR_KERNEL_H_
 
 #include <utils/hello.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 // VARIABLES GLOBALES
 extern t_log *kernel_logger;

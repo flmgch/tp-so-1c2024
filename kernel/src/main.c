@@ -2,14 +2,16 @@
 
 int main(int argc, char *argv[])
 {
-
+  // INICIALIZAR ESTRUCTURAS DE KERNEL
   inicializar_kernel();
 
-//INICIALIZAR CONEXIONES
+  //  INICIALIZAR CONEXIONES
   socket_conexion_cpu_dispatch = crear_conexion(ip_cpu, dispatch, "CPU para dispatch", kernel_logger);
   handshake_cliente(socket_conexion_cpu_dispatch, kernel_logger);
+
   socket_conexion_cpu_interrupt = crear_conexion(ip_cpu, interrupt, "CPU para interrupt", kernel_logger);
   handshake_cliente(socket_conexion_cpu_interrupt, kernel_logger);
+
   socket_conexion_memoria = crear_conexion(ip_memoria, puerto_memoria, "Memoria", kernel_logger);
   handshake_cliente(socket_conexion_memoria, kernel_logger);
 
@@ -18,11 +20,33 @@ int main(int argc, char *argv[])
   socket_interfaz = esperar_conexion(socket_escucha, "Interfaz", kernel_logger);
   handshake_servidor(socket_interfaz);
 
-  close(socket_conexion_cpu_interrupt);
-  close(socket_escucha);
-  close(socket_interfaz);
-  close(socket_conexion_memoria);
-  close(socket_conexion_cpu_dispatch);
-  terminar_programa(kernel_logger, kernel_config);
+  // ATENDER CPU - DISPATCH
+  pthread_t hilo_cpu_dispatch;
+  pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_cpu_dispatch, NULL);
+  pthread_detach(hilo_cpu_dispatch);
+
+  // ATENDER CPU - INTERRUPT
+  pthread_t hilo_cpu_interrupt;
+  pthread_create(&hilo_cpu_interrupt, NULL, (void *)atender_cpu_interrupt, NULL);
+  pthread_detach(hilo_cpu_interrupt);
+
+  // ATENDER MEMORIA
+  pthread_t hilo_memoria;
+  pthread_create(&hilo_memoria, NULL, (void *)atender_memoria, NULL);
+  pthread_detach(hilo_memoria);
+
+  // ATENDER INTERFAZ
+  pthread_t hilo_interfaz;
+  pthread_create(&hilo_interfaz, NULL, (void *)atender_interfaz, NULL);
+  pthread_join(hilo_interfaz, NULL);
+
+  // TODO: INICIAR CONSOLA INTERACTIVA
+
+  // close(socket_escucha);
+  // close(socket_interfaz);
+  // close(socket_conexion_memoria);
+  // close(socket_conexion_cpu_dispatch);
+  // close(socket_conexion_cpu_interrupt);
+  // terminar_programa(kernel_logger, kernel_config);
   return 0;
 }

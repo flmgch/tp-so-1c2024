@@ -3,6 +3,10 @@
 
 #include "gestor_kernel.h"
 #include "inicializar_kernel.h"
+#include "kernel_cpu_dispatch.h"
+#include "kernel_cpu_interrupt.h"
+#include "kernel_memoria.h"
+#include "kernel_interfaz.h"
 
 // VARIABLES GLOBALES
   t_log *kernel_logger;

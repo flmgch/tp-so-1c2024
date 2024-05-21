@@ -3,12 +3,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <pthread.h>
 #include <signal.h>
 #include <unistd.h>
-#include <sys/socket.h>
 #include <netdb.h>
 #include <string.h>
 #include <assert.h>
+#include <sys/socket.h>
+
 #include <commons/log.h>
 #include <commons/string.h>
 #include <commons/config.h>
