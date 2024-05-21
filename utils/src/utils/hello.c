@@ -122,18 +122,64 @@ void enviar_mensaje(char *mensaje, int socket_cliente)
   eliminar_paquete(paquete);
 }
 
-void crear_buffer(t_paquete *paquete)
+t_buffer *crear_buffer(void)
 {
-  paquete->buffer = malloc(sizeof(t_buffer));
-  paquete->buffer->size = 0;
-  paquete->buffer->stream = NULL;
+  t_buffer *buffer = malloc(sizeof(t_buffer));
+  buffer->size = 0;
+  buffer->stream = NULL;
+  return buffer;
+}
+
+void destruir_buffer(t_buffer *buffer)
+{
+  if (buffer->stream != NULL)
+  {
+    free(buffer->stream);
+  }
+  free(buffer);
+}
+
+void agregar_a_buffer(t_buffer *buffer, void *datos, int tamanio_datos)
+{
+  // SI EL BUFFER ESTA VACIO, AGREGO AL PRINCIPIO
+  if (buffer->size == 0)
+  {
+    buffer->stream = malloc(sizeof(int) + tamanio_datos);
+    memcpy(buffer->stream, &tamanio_datos, sizeof(int));
+    memcpy(buffer->stream + sizeof(int), datos, tamanio_datos);
+  }
+  // SI NO ESTA VACIO, SE AGREGA DESPUES DE LO QUE YA TIENE
+  else
+  {
+    buffer->stream = realloc(buffer->stream, buffer->size + sizeof(int) + tamanio_datos);
+    memcpy(buffer->stream + buffer->size, &tamanio_datos, sizeof(int));
+    memcpy(buffer->stream + buffer->size + sizeof(int), datos, tamanio_datos);
+  }
+
+  buffer->size += sizeof(int);
+  buffer->size += tamanio_datos;
+}
+
+void agregar_int_a_buffer(t_buffer *buffer, int valor)
+{
+  agregar_a_buffer(buffer, &valor, sizeof(int));
+}
+
+void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor)
+{
+  agregar_a_buffer(buffer, &valor, sizeof(u_int32_t));
+}
+
+void agregar_string_a_buffer(t_buffer *buffer, char *string)
+{
+  agregar_a_buffer(buffer, string, strlen(string) + 1);
 }
 
 t_paquete *crear_paquete(void)
 {
   t_paquete *paquete = malloc(sizeof(t_paquete));
   paquete->codigo_operacion = PAQUETE;
-  crear_buffer(paquete);
+  crear_buffer();
   return paquete;
 }
 
@@ -263,7 +309,7 @@ void handshake_cliente(int socket_conexion, t_log *log)
   }
   else
   {
-    perror("Error al realizar Hanshake");
+    perror("Error al realizar Handshake");
     exit(1);
   }
 }

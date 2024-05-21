@@ -11,8 +11,10 @@ int main(int argc, char *argv[])
   socket_kernel = crear_conexion(ip_memoria, puerto_memoria, "Kernel", io_logger);
   handshake_cliente(socket_kernel, io_logger);
 
-  close(socket_kernel);
-  close(socket_memoria);
-  terminar_programa(io_logger, io_config);
+
+  // sleep(1000);
+  // close(socket_kernel);
+  // close(socket_memoria);
+  // terminar_programa(io_logger, io_config);
   return 0;
 }

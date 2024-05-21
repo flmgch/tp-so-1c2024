@@ -16,10 +16,10 @@ int main(int argc, char *argv[])
   socket_interfaz = esperar_conexion(socket_escucha, "Interfaz", mem_logger);
   handshake_servidor(socket_interfaz);
 
-  close(socket_escucha);
-  close(socket_interfaz);
-  close(socket_cpu);
-  close(socket_kernel);
-  terminar_programa(mem_logger, mem_config);
+  // close(socket_escucha);
+  // close(socket_interfaz);
+  // close(socket_cpu);
+  // close(socket_kernel);
+  // terminar_programa(mem_logger, mem_config);
   return 0;
 }

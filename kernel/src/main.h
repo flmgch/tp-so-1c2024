@@ -7,15 +7,22 @@
 #include "kernel_cpu_interrupt.h"
 #include "kernel_memoria.h"
 #include "kernel_interfaz.h"
+#include "consola.h"
 
 // VARIABLES GLOBALES
   t_log *kernel_logger;
   t_config *kernel_config;
+  int identificador_pid = 1;
+  int contador_pcbs = 1;
+  pthread_mutex_t mutex_pid;
+
+// VALORES DEL CONFIG
   char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *interrupt, *algoritmo_planificacion, *grado_multiprogramacion;
   int quantum;
   t_list *recursos, *instancias_recursos;
-  
+
 // SOCKETS
   int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha, socket_interfaz;
+
 
 #endif

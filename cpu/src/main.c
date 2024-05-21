@@ -18,11 +18,11 @@ int main(int argc, char *argv[])
    int socket_kernel_interrupt = esperar_conexion(socket_escucha_interrupt, "Kernel para interrupt", cpu_logger);
    handshake_servidor(socket_kernel_interrupt);
 
-   close(socket_memoria);
-   close(socket_escucha_dispatch);
-   close(socket_kernel_dispatch);
-   close(socket_escucha_interrupt);
-   close(socket_kernel_interrupt);
-   terminar_programa(cpu_logger, cpu_config);
+   // close(socket_memoria);
+   // close(socket_escucha_dispatch);
+   // close(socket_kernel_dispatch);
+   // close(socket_escucha_interrupt);
+   // close(socket_kernel_interrupt);
+   // terminar_programa(cpu_logger, cpu_config);
    return 0;
 }
