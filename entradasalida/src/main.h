@@ -3,6 +3,8 @@
 
 #include "gestor_io.h"
 #include "inicializar_io.h"
+#include "interfaz_memoria.h"
+#include "interfaz_kernel.h"
 
 // VARIABLES GLOBALES
 t_log *io_logger;
