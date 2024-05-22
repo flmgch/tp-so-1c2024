@@ -1,5 +1,8 @@
 #include "main.h"
 #include "inicializar_cpu.h"
+#include "cpu_memoria.h"
+#include "cpu_kernel_dispatch.h"
+#include "cpu_kernel_interrupt.h"
 
 int main(int argc, char *argv[])
 {
@@ -17,6 +20,24 @@ int main(int argc, char *argv[])
    handshake_servidor(socket_kernel_dispatch);
    int socket_kernel_interrupt = esperar_conexion(socket_escucha_interrupt, "Kernel para interrupt", cpu_logger);
    handshake_servidor(socket_kernel_interrupt);
+
+   // ATENDER MEMORIA
+
+   pthread_t hilo_memoria;
+   pthread_create(&hilo_memoria, NULL, (void *)atender_memoria, NULL);
+   pthread_detach(hilo_memoria);
+
+   // ATENDER KERNEL-DISPATCH
+
+   pthread_t hilo_kernel_dispatch;
+   pthread_create(&hilo_kernel_dispatch, NULL, (void *)atender_kernel_dispatch, NULL);
+   pthread_detach(hilo_kernel_dispatch);
+
+   // ATENDER KERNEL-INTERRUPT
+
+   pthread_t hilo_kernel_interrupt;
+   pthread_create(&hilo_kernel_interrupt, NULL, (void *)atender_kernel_interrupt, NULL);
+   pthread_join(hilo_kernel_interrupt, NULL);
 
    // close(socket_memoria);
    // close(socket_escucha_dispatch);

@@ -16,6 +16,24 @@ int main(int argc, char *argv[])
   socket_interfaz = esperar_conexion(socket_escucha, "Interfaz", mem_logger);
   handshake_servidor(socket_interfaz);
 
+  // ATENDER CPU
+
+  pthread_t hilo_cpu;
+  pthread_create(&hilo_cpu, NULL, (void *)atender_cpu, NULL);
+  pthread_detach(hilo_cpu);
+
+  // ATENDER KERNEL
+
+  pthread_t hilo_kernel;
+  pthread_create(&hilo_kernel, NULL, (void *)atender_kernel, NULL);
+  pthread_detach(hilo_kernel);
+
+  // ATENDER INTERFAZ
+
+  pthread_t hilo_interfaz;
+  pthread_create(&hilo_interfaz, NULL, (void *)atender_interfaz, NULL);
+  pthread_join(hilo_interfaz, NULL);
+
   // close(socket_escucha);
   // close(socket_interfaz);
   // close(socket_cpu);
