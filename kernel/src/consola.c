@@ -9,7 +9,6 @@ void inicializar_consola()
     {
         if (!validar_instruccion(leido))
         {
-            log_error(kernel_logger, "ERROR: Comando de consola NO reconocido");
             free(leido);
             leido = readline("> ");
             continue; // Salta y continua con el resto de la iteracion

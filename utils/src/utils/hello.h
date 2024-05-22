@@ -66,17 +66,22 @@ void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor);
 void agregar_string_a_buffer(t_buffer *buffer, char *string);
 
 t_paquete *crear_paquete(void);
+t_paquete *crear_super_paquete(op_code cop, t_buffer * buffer);
+
 void agregar_a_paquete(t_paquete *paquete, void *valor, int tamanio);
 void enviar_paquete(t_paquete *paquete, int socket_cliente);
+void * serializar_paquete(t_paquete *paquete);
 void eliminar_paquete(t_paquete *paquete);
 
 void handshake_cliente(int socket_conexion, t_log *log);
 // void liberar_conexion(int socket_cliente);
 
 // FUNCIONES SERVER
-void *recibir_buffer(int *, int);
-t_list *recibir_paquete(int);
-void recibir_mensaje(int);
+
+t_buffer *recibir_buffer(int socket_cliente);
+void *extraer_de_buffer(t_buffer *buffer);
+char *extraer_string_de_buffer(t_buffer *buffer);
+
 int recibir_operacion(int);
 
 int iniciar_escucha(char *PUERTO, char *mensaje, t_log *log);
@@ -84,4 +89,7 @@ int esperar_conexion(int socket_conexion, char *mensaje, t_log *log);
 
 void handshake_servidor(int socket_conexion);
 
+// void *recibir_buffer(int *, int);
+// void recibir_mensaje(int);
+// t_list *recibir_paquete(int);
 #endif
