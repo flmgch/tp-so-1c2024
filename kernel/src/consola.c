@@ -2,6 +2,7 @@
 
 void inicializar_consola()
 {
+    log_info(kernel_logger, "CONSOLA INICIALIZADA");
     char *leido;
     leido = readline("> ");
 

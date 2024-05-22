@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   pthread_create(&hilo_interfaz, NULL, (void *)atender_interfaz, NULL);
   pthread_detach(hilo_interfaz);
 
-  // TODO: INICIAR CONSOLA INTERACTIVA
+  // INICIAR CONSOLA INTERACTIVA
   inicializar_consola();
 
   // close(socket_escucha);
