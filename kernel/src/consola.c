@@ -40,11 +40,27 @@ bool validar_instruccion(char *leido)
     }
     else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0)
     {
-        resultado_validacion = true;
+        if (planif_iniciada == true)
+        {
+            resultado_validacion = true;
+        }
+        else
+        {
+            resultado_validacion = false;
+            printf("La planificacion ya ha sido pausada previamente \n");
+        }
     }
     else if (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0)
     {
-        resultado_validacion = true;
+        if (planif_iniciada == false)
+        {
+            resultado_validacion = true;
+        }
+        else
+        {
+            resultado_validacion = false;
+            printf("La planificacion ya ha sido iniciada previamente \n");
+        }
     }
     else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0)
     {
@@ -90,10 +106,14 @@ void atender_instruccion(char *leido)
     else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0)
     {
         //  TODO
+        planif_iniciada = false;
+        printf("La planificacion ha sido pausada. \n");
     }
     else if (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0)
     {
         //  TODO
+        planif_iniciada = true;
+        printf("La planificacion ha sido iniciada. \n");
     }
     else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
     {
@@ -102,8 +122,8 @@ void atender_instruccion(char *leido)
         
         strcpy(comando, comando_consola[1]); 
         grado_multiprogramacion = atoi(comando);
-        log_info(kernel_logger, "El grado de multiprogramacion ahora es de %d", grado_multiprogramacion); 
-        
+        printf("El grado de multiprogramacion ahora es de %d\n", grado_multiprogramacion);
+
         free(comando);
     }
     else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0)

@@ -167,8 +167,8 @@ void agregar_int_a_buffer(t_buffer *buffer, int valor)
   agregar_a_buffer(buffer, &valor, sizeof(int));
 }
 
-void agregar_lista_a_buffer(t_buffer *buffer, t_list valor){
-  agregar_a_buffer(buffer, &valor, sizeof(t_list));
+void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor){
+  agregar_a_buffer(buffer, &valor, list_size(valor));
 }
 
 void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor)

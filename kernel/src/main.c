@@ -5,6 +5,13 @@ int main(int argc, char *argv[])
   // INICIALIZAR ESTRUCTURAS DE KERNEL
   inicializar_kernel();
 
+  // INICIALIZAR COLAS
+  cola_new = list_create();
+  cola_ready = list_create();
+  cola_execute = list_create();
+  cola_block = list_create();
+  cola_exit = list_create();
+
   //  INICIALIZAR CONEXIONES
   socket_conexion_cpu_dispatch = crear_conexion(ip_cpu, dispatch, "CPU para dispatch", kernel_logger);
   handshake_cliente(socket_conexion_cpu_dispatch, kernel_logger);
