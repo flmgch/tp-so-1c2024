@@ -330,13 +330,15 @@ void handshake_cliente(int socket_conexion, t_log *log)
 int recibir_operacion(int socket_cliente)
 {
   int cod_op;
-  if (recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0)
-    return cod_op;
-  else
+  cod_op = recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL);
+
+  if (cod_op < 0)
   {
-    close(socket_cliente);
-    return -1;
+    perror("Error en el recv");
+    exit(EXIT_FAILURE);
   }
+
+  return cod_op;
 }
 
 t_buffer *recibir_buffer(int socket_cliente)
