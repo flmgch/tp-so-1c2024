@@ -2,7 +2,7 @@
 
 void atender_cpu()
 {
-
+    bool control_key = 1;
     while (control_key)
     {
         int cod_op = recibir_operacion(socket_cpu);
@@ -12,9 +12,6 @@ void atender_cpu()
             //
             break;
         case PAQUETE:
-            //
-            break;
-        case ACCESO_ESPACIO_USUARIO_CPU:
             //
             break;
         case -1:

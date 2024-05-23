@@ -11,7 +11,8 @@ t_log *cpu_logger;
 t_config *cpu_config;
 char *puerto_dispatch, *puerto_interrupt, *ip_memoria, *puerto_memoria, *algoritmo_tlb;
 int cantidad_entradas_tlb;
-bool control_key = 1;
+t_buffer* un_buffer;
+t_pcb* pcb;
 
 // SOCKETS
 int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;

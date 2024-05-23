@@ -2,7 +2,7 @@
 
 void atender_memoria()
 {
-
+    bool control_key = 1;
     while (control_key)
     {
         int cod_op = recibir_operacion(socket_memoria);

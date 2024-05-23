@@ -1,4 +1,4 @@
-#include "main.h"
+#include <main.h>
 
 int main(int argc, char *argv[])
 {
@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   // ATENDER MEMORIA
   pthread_t hilo_memoria;
   pthread_create(&hilo_memoria, NULL, (void *)atender_memoria, NULL);
-  pthread_detach(hilo_memoria);
+  pthread_join(hilo_memoria, NULL);
 
   // sleep(1000);
   // close(socket_kernel);

@@ -2,7 +2,7 @@
 
 void atender_interfaz()
 {
-
+    bool control_key = 1;
     while (control_key)
     {
         int cod_op = recibir_operacion(socket_interfaz);
@@ -12,9 +12,6 @@ void atender_interfaz()
             //
             break;
         case PAQUETE:
-            //
-            break;
-        case ACCESO_ESPACIO_USUARIO_IO:
             //
             break;
         case -1:

@@ -2,7 +2,7 @@
 
 void atender_kernel()
 {
-
+    bool control_key = 1;
     while (control_key)
     {
         int cod_op = recibir_operacion(socket_kernel);
@@ -15,16 +15,9 @@ void atender_kernel()
             //
             break;
         case CREAR_PROCESO:
-            //
-            break;
-        case TERMINAR_PROCESO:
-            //
-            break;
-        case AMPLIACION_PROCESO:
-            //
-            break;
-        case REDUCCION_PROCESO:
-            //
+           un_buffer=recibir_buffer(socket_kernel);
+           atender_crear_proceso(un_buffer);
+
             break;
         case -1:
             log_error(mem_logger, "Se desconecto kernel");

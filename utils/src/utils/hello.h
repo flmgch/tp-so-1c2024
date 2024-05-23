@@ -24,7 +24,17 @@ typedef enum
     MENSAJE,
     PAQUETE,
     HANDSHAKE,
-    RESPUESTA_HANDSHAKE
+    RESPUESTA_HANDSHAKE,
+    //MEMORIA
+    CREAR_PROCESO,
+    TERMINAR_PROCESO,
+    ACESO_TABLA_PAGINAS,
+    AMPLIACION_PROCESO,
+    REDUCCION_PROCESO,
+    ACCESO_ESPACIO_USUARIO_CPU,
+    ACCESO_ESPACIO_USUARIO_IO,
+    //CPU
+    RECIBIR_PCB
 } op_code;
 
 typedef struct
@@ -64,6 +74,7 @@ void agregar_a_buffer(t_buffer *buffer, void *datos, int tamanio_datos);
 void agregar_int_a_buffer(t_buffer *buffer, int valor);
 void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor);
 void agregar_string_a_buffer(t_buffer *buffer, char *string);
+void agregar_lista_a_buffer(t_buffer *buffer, t_list valor);
 
 t_paquete *crear_paquete(void);
 t_paquete *crear_super_paquete(op_code cop, t_buffer * buffer);
@@ -81,6 +92,9 @@ void handshake_cliente(int socket_conexion, t_log *log);
 t_buffer *recibir_buffer(int socket_cliente);
 void *extraer_de_buffer(t_buffer *buffer);
 char *extraer_string_de_buffer(t_buffer *buffer);
+u_int32_t extraer_uint32_de_buffer(t_buffer *buffer);
+int extraer_int_de_buffer(t_buffer *buffer);
+t_list *extraer_lista_de_buffer(t_buffer *buffer);
 
 int recibir_operacion(int);
 

@@ -8,8 +8,8 @@ extern t_log *cpu_logger;
 extern t_config *cpu_config;
 extern char *puerto_dispatch, *puerto_interrupt, *ip_memoria, *puerto_memoria, *algoritmo_tlb;
 extern int cantidad_entradas_tlb;
-extern control_key;
-
+extern t_buffer* un_buffer;
+extern t_pcb* pcb;
 // SOCKETS
 extern int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
 

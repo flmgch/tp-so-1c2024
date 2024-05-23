@@ -2,7 +2,7 @@
 
 void atender_kernel_dispatch()
 {
-
+    bool control_key = 1;
     while (control_key)
     {
         int cod_op = recibir_operacion(socket_kernel_dispatch);
@@ -14,6 +14,9 @@ void atender_kernel_dispatch()
         case PAQUETE:
             //
             break;
+        case RECIBIR_PCB:
+           un_buffer=recibir_buffer(socket_kernel_dispatch);
+           atender_recibir_pcb(un_buffer);
         case -1:
             log_error(cpu_logger, "Se desconecto kernel-dispatch");
             control_key = 0;

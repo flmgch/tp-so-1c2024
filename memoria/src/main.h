@@ -12,7 +12,8 @@ t_log *mem_logger;
 t_config *mem_config;
 char *puerto_escucha, *path_instrucciones;
 int tamanio_memoria, tamanio_pagina, retardo_respuesta;
-bool control_key = 1;
+t_buffer* un_buffer;
+char* path;
 
 // SOCKETS
 int socket_escucha, socket_cpu, socket_kernel, socket_interfaz;

@@ -167,6 +167,10 @@ void agregar_int_a_buffer(t_buffer *buffer, int valor)
   agregar_a_buffer(buffer, &valor, sizeof(int));
 }
 
+void agregar_lista_a_buffer(t_buffer *buffer, t_list valor){
+  agregar_a_buffer(buffer, &valor, sizeof(t_list));
+}
+
 void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor)
 {
   agregar_a_buffer(buffer, &valor, sizeof(u_int32_t));
@@ -219,25 +223,6 @@ void eliminar_paquete(t_paquete *paquete)
   free(paquete);
 }
 
-void handshake_cliente(int socket_conexion, t_log *log)
-{
-
-  int32_t handshake = 1;
-  int32_t result;
-
-  send(socket_conexion, &handshake, sizeof(int32_t), 0);
-  recv(socket_conexion, &result, sizeof(int32_t), MSG_WAITALL);
-
-  if (result == 0)
-  {
-    log_info(log, "Handshake OK");
-  }
-  else
-  {
-    perror("Error al realizar Handshake");
-    exit(1);
-  }
-}
 /* ------------------------------------- FUNCIONES DEL SERVER ------------------------------------------------ */
 
 int iniciar_escucha(char *PUERTO, char *mensaje, t_log *log)
@@ -322,26 +307,37 @@ void handshake_servidor(int socket_conexion)
   }
 }
 
+void handshake_cliente(int socket_conexion, t_log *log)
+{
+
+  int32_t handshake = 1;
+  int32_t result;
+
+  send(socket_conexion, &handshake, sizeof(int32_t), 0);
+  recv(socket_conexion, &result, sizeof(int32_t), MSG_WAITALL);
+
+  if (result == 0)
+  {
+    log_info(log, "Handshake OK");
+  }
+  else
+  {
+    perror("Error al realizar Handshake");
+    exit(1);
+  }
+}
 
 int recibir_operacion(int socket_cliente)
 {
   int cod_op;
-  cod_op = recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL);
-
-  if(cod_op < 0) {
-    perror("Error en el recv");
-    exit(EXIT_FAILURE);
+  if (recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0)
+    return cod_op;
+  else
+  {
+    close(socket_cliente);
+    return -1;
   }
-
-  return cod_op;
-  // if (recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0)
-  //   return cod_op;
-  // else
-  // {
-  //   close(socket_cliente);
-  //   return -1;
 }
-
 
 t_buffer *recibir_buffer(int socket_cliente)
 {
@@ -431,6 +427,12 @@ char *extraer_string_de_buffer(t_buffer *buffer)
 {
   char *string = extraer_de_buffer(buffer);
   return string;
+}
+
+t_list *extraer_lista_de_buffer(t_buffer *buffer)
+{
+  t_list *lista = extraer_de_buffer(buffer);
+  return lista;
 }
 // void *recibir_buffer(int *size, int socket_cliente)
 // {
