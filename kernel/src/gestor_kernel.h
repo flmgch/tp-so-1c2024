@@ -11,8 +11,8 @@ extern int contador_pcbs;
 extern pthread_mutex_t mutex_pid;
 
 // VALORES DEL CONFIG
-extern char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *interrupt, *algoritmo_planificacion, *grado_multiprogramacion;
-extern int quantum;
+extern char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *interrupt, *algoritmo_planificacion;
+extern int quantum, grado_multiprogramacion;
 extern t_list *recursos, *instancias_recursos;
 
 // SOCKETS

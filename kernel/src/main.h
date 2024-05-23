@@ -17,8 +17,8 @@
   pthread_mutex_t mutex_pid;
 
 // VALORES DEL CONFIG
-  char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *interrupt, *algoritmo_planificacion, *grado_multiprogramacion;
-  int quantum;
+  char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *interrupt, *algoritmo_planificacion;
+  int quantum, grado_multiprogramacion;
   t_list *recursos, *instancias_recursos;
 
 // SOCKETS

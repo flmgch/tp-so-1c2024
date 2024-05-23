@@ -24,7 +24,8 @@ void inicializar_configs()
     interrupt = config_get_string_value(kernel_config, "PUERTO_CPU_INTERRUPT");
     // INICIALIZAR VARIABLES DE KERNEL
     algoritmo_planificacion = config_get_string_value(kernel_config, "ALGORITMO_PLANIFICACION");
+    quantum = config_get_int_value (kernel_config, "QUANTUM");
     // recursos = config_get_string_value(kernel_config, "RECURSOS");
     // instancias_recursos = config_get_string_value(kernel_config, "INSTANCIAS_RECURSOS");
-    grado_multiprogramacion = config_get_string_value(kernel_config, "GRADO_MULTIPROGRAMACION");
+    grado_multiprogramacion = config_get_int_value(kernel_config, "GRADO_MULTIPROGRAMACION");
 };

@@ -2,21 +2,22 @@
 
 void inicializar_consola()
 {
+    log_info(kernel_logger, "CONSOLA INICIALIZADA");
     char *leido;
-    leido = readline("> ");
+    leido = readline("> Ingrese un comando: ");
 
     while (strcmp(leido, "\0") != 0)
     {
         if (!validar_instruccion(leido))
         {
             free(leido);
-            leido = readline("> ");
+            leido = readline("> Ingrese un comando: ");
             continue; // Salta y continua con el resto de la iteracion
         }
 
         atender_instruccion(leido);
         free(leido);
-        leido = readline("> ");
+        leido = readline("> Ingrese un comando:  ");
     }
     free(leido);
 }
@@ -96,7 +97,14 @@ void atender_instruccion(char *leido)
     }
     else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
     {
-        agregar_int_a_buffer(un_buffer, (intptr_t)comando_consola[1]); // [valor]
+        size_t comando_length = strlen(comando_consola[1] + 1);
+        char *comando = malloc(comando_length);
+        
+        strcpy(comando, comando_consola[1]); 
+        grado_multiprogramacion = atoi(comando);
+        log_info(kernel_logger, "El grado de multiprogramacion ahora es de %d", grado_multiprogramacion); 
+        
+        free(comando);
     }
     else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0)
     {
