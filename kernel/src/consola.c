@@ -40,15 +40,7 @@ bool validar_instruccion(char *leido)
     }
     else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0)
     {
-        if (planif_iniciada == true)
-        {
-            resultado_validacion = true;
-        }
-        else
-        {
-            resultado_validacion = false;
-            printf("La planificacion ya ha sido pausada previamente \n");
-        }
+        resultado_validacion = true;
     }
     else if (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0)
     {
@@ -64,7 +56,15 @@ bool validar_instruccion(char *leido)
     }
     else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0)
     {
-        resultado_validacion = true;
+        if (planif_iniciada == true)
+        {
+            resultado_validacion = true;
+        }
+        else
+        {
+            resultado_validacion = false;
+            printf("La planificacion ya ha sido pausada previamente \n");
+        }
     }
     else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
     {

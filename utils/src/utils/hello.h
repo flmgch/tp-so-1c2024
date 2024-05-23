@@ -74,7 +74,7 @@ void agregar_a_buffer(t_buffer *buffer, void *datos, int tamanio_datos);
 void agregar_int_a_buffer(t_buffer *buffer, int valor);
 void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor);
 void agregar_string_a_buffer(t_buffer *buffer, char *string);
-void agregar_lista_a_buffer(t_buffer *buffer, t_list valor);
+void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor);
 
 t_paquete *crear_paquete(void);
 t_paquete *crear_super_paquete(op_code cop, t_buffer * buffer);
