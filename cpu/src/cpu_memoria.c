@@ -14,6 +14,11 @@ void atender_memoria()
         case PAQUETE:
             //
             break;
+        case ENVIAR_INSTRUCCIONES:
+            t_buffer *un_buffer = recibir_buffer(un_buffer);
+            atender_instrucciones(un_buffer);
+            destruir_buffer(un_buffer);
+            break;
         case -1:
             log_error(cpu_logger, "Se desconecto memoria");
             control_key = 0;
