@@ -15,7 +15,7 @@ void atender_memoria()
             //
             break;
         case ENVIAR_INSTRUCCIONES:
-            t_buffer *un_buffer = recibir_buffer(un_buffer);
+            t_buffer *un_buffer = recibir_buffer(socket_memoria);
             atender_instrucciones(un_buffer);
             destruir_buffer(un_buffer);
             break;
