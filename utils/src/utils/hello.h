@@ -80,6 +80,37 @@ typedef struct
     t_list *registros_cpu;
 } t_pcb;
 
+typedef enum{
+	IO_BLOCK,
+}motivo_block;
+
+typedef enum{
+	SUCCESS,
+	SEG_FAULT,
+	OUT_OF_MEMORY,
+	RECURSO_INEXISTENTE,
+}motivo_exit;
+
+typedef enum{
+	NEW,
+	READY,
+	EXEC,
+	BLOCK,
+	FINISH_EXIT,
+	FINISH_ERROR,
+	UNKNOWN_STATE
+} estado_proceso;
+typedef struct{
+    int pid;
+    int program_counter;
+    t_list *instrucciones;
+    t_list *tabla_de_segmentos;
+    estado_proceso estado;
+    motivo_exit motivo_exit;
+    motivo_block motivo_block;
+    t_registros* registros;
+}t_contexto_ejecucion;
+
 // FUNCIONES COMPARTIDAS
 
 void decir_hola(char *quien);
