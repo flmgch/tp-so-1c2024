@@ -2,6 +2,7 @@
 
 void atender_kernel()
 {
+    t_buffer *un_buffer;
     bool control_key = 1;
     while (control_key)
     {
@@ -17,8 +18,8 @@ void atender_kernel()
         case CREAR_PROCESO:
            un_buffer=recibir_buffer(socket_kernel);
            atender_crear_proceso(un_buffer);
-
-            break;
+           destruir_buffer(un_buffer);
+           break;
         case -1:
             log_error(mem_logger, "Se desconecto kernel");
             control_key = 0;

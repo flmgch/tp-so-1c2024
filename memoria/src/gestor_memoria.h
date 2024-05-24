@@ -8,8 +8,9 @@ extern t_log *mem_logger;
 extern t_config *mem_config;
 extern char *puerto_escucha, *path_instrucciones;
 extern int tamanio_memoria, tamanio_pagina, retardo_respuesta;
-extern t_buffer* un_buffer;
 extern char* path;
+extern t_list *lista_de_instrucciones;
+extern int contador;
 
 // SOCKETS
 extern int socket_escucha, socket_cpu, socket_kernel, socket_interfaz;

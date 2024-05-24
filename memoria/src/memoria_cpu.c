@@ -2,6 +2,7 @@
 
 void atender_cpu()
 {
+    t_buffer *un_buffer;
     bool control_key = 1;
     while (control_key)
     {
@@ -13,6 +14,11 @@ void atender_cpu()
             break;
         case PAQUETE:
             //
+            break;
+        case ENVIAR_INSTRUCCIONES:
+            un_buffer = recibir_buffer(socket_cpu);
+            atender_program_counter(un_buffer);
+            destruir_buffer(un_buffer);
             break;
         case -1:
             log_error(mem_logger, "Se desconecto CPU");

@@ -2,6 +2,7 @@
 #define MEMORIA_CPU_
 
 #include "gestor_memoria.h"
+#include "program_counter.h"
 
 void atender_cpu();
 

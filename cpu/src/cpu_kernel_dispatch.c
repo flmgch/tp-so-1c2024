@@ -2,6 +2,7 @@
 
 void atender_kernel_dispatch()
 {
+    t_buffer *un_buffer;
     bool control_key = 1;
     while (control_key)
     {
@@ -17,6 +18,7 @@ void atender_kernel_dispatch()
         case RECIBIR_PCB:
            un_buffer=recibir_buffer(socket_kernel_dispatch);
            atender_recibir_pcb(un_buffer);
+           destruir_buffer(un_buffer);
         case -1:
             log_error(cpu_logger, "Se desconecto kernel-dispatch");
             control_key = 0;
