@@ -39,6 +39,27 @@ typedef enum
     RECIBIR_INSTRUCCION
 } op_code;
 
+typedef struct {
+    uint32_t pc;  // Program Counter
+    uint8_t ax;   // Registro Numérico de propósito general
+    uint8_t bx;   // Registro Numérico de propósito general
+    uint8_t cx;   // Registro Numérico de propósito general
+    uint8_t dx;   // Registro Numérico de propósito general
+    uint32_t eax; // Registro Numérico de propósito general
+    uint32_t ebx; // Registro Numérico de propósito general
+    uint32_t ecx; // Registro Numérico de propósito general
+    uint32_t edx; // Registro Numérico de propósito general
+    uint32_t si;  // Dirección lógica de memoria desde donde copiar un string.
+    uint32_t di;  // Dirección lógica de memoria a donde copiar un string.
+} t_registros;
+
+
+typedef struct 
+{
+    uint32_t pc 
+} t_registros;
+
+
 typedef struct
 {
     int size;
