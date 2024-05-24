@@ -8,7 +8,6 @@ extern t_log *kernel_logger;
 extern t_config *kernel_config;
 extern int identificador_pid;
 extern int contador_pcbs;
-extern pthread_mutex_t mutex_pid;
 extern bool planif_iniciada;
 
 // VALORES DEL CONFIG
@@ -21,5 +20,25 @@ extern int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_c
 
 // LISTAS DE PLANIFICACION
 extern t_list *cola_new, *cola_ready, *cola_execute, *cola_block, *cola_exit;
+
+// TODO LISTAS DE MANEJO DE IO
+extern t_list *cola_block_io;
+extern t_list *cola_block_fs;
+
+// SEMAFOROS
+extern pthread_mutex_t mutex_pid;
+extern pthread_mutex_t mutex_cola_new;
+extern pthread_mutex_t mutex_cola_ready;
+extern pthread_mutex_t mutex_cola_exec;
+extern pthread_mutex_t mutex_cola_block;
+extern pthread_mutex_t mutex_cola_block_io;
+extern pthread_mutex_t mutex_cola_block_fs;
+extern pthread_mutex_t mutex_cola_exit;
+extern sem_t sem_multiprogramacion;
+extern sem_t sem_new;
+extern sem_t sem_ready;
+extern sem_t sem_exec;
+extern sem_t sem_block_return;
+extern sem_t sem_exit;
 
 #endif

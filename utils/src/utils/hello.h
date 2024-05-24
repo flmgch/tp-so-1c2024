@@ -12,6 +12,7 @@
 #include <string.h>
 #include <assert.h>
 #include <sys/socket.h>
+#include <semaphore.h>
 
 #include <commons/log.h>
 #include <commons/string.h>
@@ -39,8 +40,8 @@ typedef enum
     RECIBIR_INSTRUCCION
 } op_code;
 
-typedef struct {
-    uint32_t pc;  // Program Counter
+typedef struct
+{
     uint8_t ax;   // Registro Numérico de propósito general
     uint8_t bx;   // Registro Numérico de propósito general
     uint8_t cx;   // Registro Numérico de propósito general
@@ -52,13 +53,6 @@ typedef struct {
     uint32_t si;  // Dirección lógica de memoria desde donde copiar un string.
     uint32_t di;  // Dirección lógica de memoria a donde copiar un string.
 } t_registros;
-
-
-typedef struct 
-{
-    uint32_t pc 
-} t_registros;
-
 
 typedef struct
 {
@@ -74,10 +68,10 @@ typedef struct
 
 typedef struct
 {
-    u_int32_t process_id;
+    u_int32_t pid;
     u_int32_t program_counter;
     u_int32_t quantum;
-    t_list *registros_cpu;
+    t_registros *registros_cpu;
 } t_pcb;
 
 typedef enum{
@@ -149,6 +143,7 @@ char *extraer_string_de_buffer(t_buffer *buffer);
 u_int32_t extraer_uint32_de_buffer(t_buffer *buffer);
 int extraer_int_de_buffer(t_buffer *buffer);
 t_list *extraer_lista_de_buffer(t_buffer *buffer);
+t_registros *extraer_registros_de_buffer(t_buffer *buffer);
 
 int recibir_operacion(int);
 

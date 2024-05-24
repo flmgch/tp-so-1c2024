@@ -9,13 +9,13 @@
 #include "kernel_interfaz.h"
 #include "consola.h"
 #include "planificador.h"
+#include "estados.h"
 
 // VARIABLES GLOBALES
   t_log *kernel_logger;
   t_config *kernel_config;
   int identificador_pid = 1;
   int contador_pcbs = 1;
-  pthread_mutex_t mutex_pid;
   bool planif_iniciada = false;
 
 // VALORES DEL CONFIG
@@ -28,5 +28,25 @@
 
 // LISTAS DE PLANIFICACION
   t_list *cola_new, *cola_ready, *cola_execute, *cola_block, *cola_exit;
+
+// TODO LISTAS DE MANEJO DE IO
+  t_list *cola_block_io;
+  t_list *cola_block_fs;
+
+// SEMAFOROS
+  pthread_mutex_t mutex_pid;
+  pthread_mutex_t mutex_cola_new;
+  pthread_mutex_t mutex_cola_ready;
+  pthread_mutex_t mutex_cola_exec;
+  pthread_mutex_t mutex_cola_block;
+  pthread_mutex_t mutex_cola_block_io;
+  pthread_mutex_t mutex_cola_block_fs;
+  pthread_mutex_t mutex_cola_exit;
+  sem_t sem_multiprogramacion;
+  sem_t sem_new;
+  sem_t sem_ready;
+  sem_t sem_exec;
+  sem_t sem_block_return;
+  sem_t sem_exit;
 
 #endif

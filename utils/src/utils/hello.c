@@ -436,6 +436,11 @@ t_list *extraer_lista_de_buffer(t_buffer *buffer)
   t_list *lista = extraer_de_buffer(buffer);
   return lista;
 }
+
+t_registros *extraer_registros_de_buffer(t_buffer *buffer){
+  t_registros *registros = extraer_de_buffer(buffer);
+  return registros;
+}
 // void *recibir_buffer(int *size, int socket_cliente)
 // {
 //   void *buffer;
