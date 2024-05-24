@@ -2,15 +2,17 @@
 
 void abrir_archivo(const char *file)
 {
-    FILE *pseudocodiogo = fopen(file, "rb");
+    FILE *pseudocodiogo = fopen(file, "r");
     if (pseudocodiogo != NULL)
     {
-        char *instruccion;
+        char instruccion[35];
         lista_de_instrucciones = list_create();
-        while ((fread(&instruccion, (strlen(instruccion) + 1), 1, pseudocodiogo)) == 1)
+        while (!feof(pseudocodiogo))
         {
-            list_add_in_index(lista_de_instrucciones, contador, instruccion);
-            contador++;
+            fgets(instruccion, 35, pseudocodiogo);
+            log_info(mem_logger, "%s", instruccion);
+            list_add_in_index(lista_de_instrucciones, posicion, instruccion);
+            posicion++;
         }
     }
     else

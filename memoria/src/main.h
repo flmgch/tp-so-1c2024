@@ -12,9 +12,8 @@ t_log *mem_logger;
 t_config *mem_config;
 char *puerto_escucha, *path_instrucciones;
 int tamanio_memoria, tamanio_pagina, retardo_respuesta;
-char* path;
 t_list *lista_de_instrucciones;
-int contador = 0;
+int posicion = 0, pid, size;
 
 // SOCKETS
 int socket_escucha, socket_cpu, socket_kernel, socket_interfaz;
