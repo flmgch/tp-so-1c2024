@@ -79,6 +79,15 @@ typedef struct
     t_registros *registros_cpu;
 } t_pcb;
 
+typedef struct
+{
+    char *recurso;
+    int id;
+    int instancias;
+    t_list *cola_block_asignada;
+    pthread_mutex_t mutex_asignado;
+} t_recurso;
+
 typedef enum{
 	IO_BLOCK,
 }motivo_block;
@@ -102,8 +111,6 @@ typedef enum{
 typedef struct{
     int pid;
     int program_counter;
-    t_list *instrucciones;
-    t_list *tabla_de_segmentos;
     estado_proceso estado;
     motivo_exit motivo_exit;
     motivo_block motivo_block;

@@ -11,6 +11,7 @@ int main(int argc, char *argv[])
   cola_execute = list_create();
   cola_block = list_create();
   cola_exit = list_create();
+  lista_recursos = inicializar_recursos();
 
   //  INICIALIZAR CONEXIONES
   socket_conexion_cpu_dispatch = crear_conexion(ip_cpu, dispatch, "CPU para dispatch", kernel_logger);
