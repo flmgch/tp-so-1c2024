@@ -13,6 +13,9 @@ int main(int argc, char *argv[])
   cola_exit = list_create();
   lista_recursos = inicializar_recursos();
 
+  // INICIAR VARIABLES PARA TESTS
+  inicializar_tests();
+
   //  INICIALIZAR CONEXIONES
   socket_conexion_cpu_dispatch = crear_conexion(ip_cpu, dispatch, "CPU para dispatch", kernel_logger);
   handshake_cliente(socket_conexion_cpu_dispatch, kernel_logger);
@@ -58,4 +61,38 @@ int main(int argc, char *argv[])
   // close(socket_conexion_cpu_interrupt);
   // terminar_programa(kernel_logger, kernel_config);
   return 0;
+}
+
+void inicializar_tests() {
+  // Inicialización de los registros para los PCB
+  registros1 = (t_registros){1, 2, 3, 4, 100, 200, 300, 400, 500, 600};
+  registros2 = (t_registros){5, 6, 7, 8, 150, 250, 350, 450, 550, 650};
+  registros3 = (t_registros){9, 10, 11, 12, 175, 275, 375, 475, 575, 675};
+
+  // Ejemplo 1
+  pcb1.pid = 1;
+  pcb1.program_counter = 100;
+  pcb1.estado = NEW;
+  pcb1.motivo_block = IO_BLOCK;
+  pcb1.motivo_exit = SUCCESS;
+  pcb1.registros_cpu = &registros1;
+  pcb1.quantum_remanente = 5;
+
+  // Ejemplo 2
+  pcb2.pid = 2;
+  pcb2.program_counter = 200;
+  pcb2.estado = EXEC;
+  pcb2.motivo_block = IO_BLOCK;
+  pcb2.motivo_exit = SEG_FAULT;
+  pcb2.registros_cpu = &registros2;
+  pcb2.quantum_remanente = 10;
+
+  // Ejemplo 3
+  pcb3.pid = 3;
+  pcb3.program_counter = 300;
+  pcb3.estado = BLOCK;
+  pcb3.motivo_block = IO_BLOCK;
+  pcb3.motivo_exit = OUT_OF_MEMORY;
+  pcb3.registros_cpu = &registros3;
+  pcb3.quantum_remanente = 15;
 }

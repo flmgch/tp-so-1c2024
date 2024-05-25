@@ -43,4 +43,12 @@ extern sem_t sem_exec;
 extern sem_t sem_block_return;
 extern sem_t sem_exit;
 
+// STRUCTS PARA TESTS
+extern t_registros registros1;
+extern t_registros registros2;
+extern t_registros registros3;
+extern t_pcb pcb1;
+extern t_pcb pcb2;
+extern t_pcb pcb3;
+
 #endif

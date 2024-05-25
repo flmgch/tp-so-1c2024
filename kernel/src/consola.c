@@ -96,7 +96,10 @@ void atender_instruccion(char *leido)
     }
     else if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0)
     {
-        agregar_string_a_buffer(un_buffer, comando_consola[1]); // [path]
+        agregar_uint32_a_buffer(un_buffer, pcb1.pid);
+        char *path = malloc(strlen(comando_consola[1]) + 1);
+        strcpy(path, comando_consola[1]);
+        agregar_string_a_buffer(un_buffer, path); // [path]
         t_paquete *paquete = crear_super_paquete(CREAR_PROCESO, un_buffer);
         enviar_paquete(paquete, socket_conexion_memoria);
         eliminar_paquete(paquete);

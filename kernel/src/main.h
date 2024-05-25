@@ -51,4 +51,13 @@
   sem_t sem_block_return;
   sem_t sem_exit;
 
+// STRUCTS PARA TESTS
+t_registros registros1;
+t_registros registros2;
+t_registros registros3;
+t_pcb pcb1;
+t_pcb pcb2;
+t_pcb pcb3;
+void inicializar_tests();
+
 #endif
