@@ -10,7 +10,7 @@ extern char *puerto_dispatch, *puerto_interrupt, *ip_memoria, *puerto_memoria, *
 extern int cantidad_entradas_tlb;
 extern t_pcb* pcb;
 extern t_registros* registros;
-bool flag_execute;
+extern bool flag_execute;
 
 // SOCKETS
 extern int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;

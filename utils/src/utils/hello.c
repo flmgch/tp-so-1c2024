@@ -458,7 +458,7 @@ u_int32_t extraer_uint32_de_buffer(t_buffer *buffer)
   return valor;
 }
 
-u_int8_t extraer_uint32_de_buffer(t_buffer *buffer)
+u_int8_t extraer_uint8_de_buffer(t_buffer *buffer)
 {
   u_int8_t *int8 = extraer_de_buffer(buffer);
   u_int8_t valor = *int8;
@@ -493,36 +493,23 @@ t_registros* extraer_registros_de_buffer(t_buffer* buffer) {
     return registros;
 }
 
-estado_proceso *extraer_estado_proceso_de_buffer(t_buffer *buffer)
+estado_proceso extraer_estado_proceso_de_buffer(t_buffer *buffer)
 {
-  estado_proceso *estado = extraer_de_buffer(buffer);
+  estado_proceso estado = extraer_int_de_buffer(buffer);
   return estado;
 }
 
-motivo_block *extraer_motivo_block_de_buffer(t_buffer *buffer)
+motivo_block extraer_motivo_block_de_buffer(t_buffer *buffer)
 {
-  motivo_block *block = extraer_de_buffer(buffer);
+  motivo_block block = extraer_int_de_buffer(buffer);
   return block;
 }
 
-motivo_exit *extraer_motivo_exit_de_buffer(t_buffer *buffer)
+motivo_exit extraer_motivo_exit_de_buffer(t_buffer *buffer)
 {
-  motivo_exit *exit = extraer_de_buffer(buffer);
+  motivo_exit exit = extraer_int_de_buffer(buffer);
   return exit;
 }
-/*t_registros *extraer_registros_de_buffer(t_buffer *buffer){
-  t_registros *registros = extraer_de_buffer(buffer);
-  return registros;
-<<<<<<< HEAD
-} */
-
-
-// void *recibir_buffer(int *size, int socket_cliente)
-// {
-//   void *buffer;
-=======
-}
->>>>>>> 4c803303acfc65c37eee0855488a2a76684576bf
 
 char *estado_to_string(estado_proceso estado)
 {

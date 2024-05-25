@@ -29,11 +29,15 @@ const char* instruccion_to_string(cod_instruccion codigo) {
 void decode(u_int32_t dir_instruccion){
     t_instruccion instruccion = solicitar_instruccion(dir_instruccion);
 
-    log_info(cpu_logger,  "PID: %d - Ejecutando: %s - %s %s %s %s %s ",pcb->process_id,instruccion_to_string(instruccion.codigo_instruccion), instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);
+    log_info(cpu_logger,  "PID: %d - Ejecutando: %s - %s %s %s %s %s ",pcb->pid,instruccion_to_string(instruccion.codigo_instruccion), instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);
     switch(instruccion.codigo_instruccion){
 		case SET:
 			ejecutar_set(instruccion.param1, instruccion.param2);
 			break;
+        case MOV_IN:
+            break;
+        case MOV_OUT:
+            break;
         case SUM:
             ejecutar_sum(instruccion.param1, instruccion.param2);
             break;
@@ -51,7 +55,7 @@ void decode(u_int32_t dir_instruccion){
 
 void fetch (){ 
     u_int32_t instruccion_a_ejecutar = pcb->program_counter;
-    log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pcb->process_id, instruccion_a_ejecutar);
+    log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pcb->pid, instruccion_a_ejecutar);
 
     decode(instruccion_a_ejecutar);
     pcb->program_counter += 1;

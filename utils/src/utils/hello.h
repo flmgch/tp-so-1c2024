@@ -12,6 +12,7 @@
 #include <string.h>
 #include <assert.h>
 #include <sys/socket.h>
+#include <semaphore.h>
 
 #include <commons/log.h>
 #include <commons/string.h>
@@ -58,17 +59,12 @@ typedef enum
     PAQUETE,
     HANDSHAKE,
     RESPUESTA_HANDSHAKE,
-<<<<<<< HEAD
-    // MEMORIA
-    CREAR_PROCESO,
-=======
     // KERNEL - CPU
     ENVIO_PCB,
     // KERNEL - MEMORIA
     CREAR_PROCESO,
     // KERNEL - IO
     // MEMORIA QUE TODAVIA NO SE USA
->>>>>>> 4c803303acfc65c37eee0855488a2a76684576bf
     TERMINAR_PROCESO,
     ACESO_TABLA_PAGINAS,
     AMPLIACION_PROCESO,
@@ -76,15 +72,9 @@ typedef enum
     ACCESO_ESPACIO_USUARIO_CPU,
     ACCESO_ESPACIO_USUARIO_IO,
     ENVIAR_INSTRUCCIONES,
-<<<<<<< HEAD
-    // CPU
-    RECIBIR_PCB,
-    RECIBIR_INSTRUCCION
-=======
     // MEMORIA-KERNEL
     // MEMORIA-CPU
     RECIBIR_INSTRUCCION,
->>>>>>> 4c803303acfc65c37eee0855488a2a76684576bf
 } op_code;
 
 typedef struct {
@@ -194,13 +184,14 @@ void agregar_motivo_exit_a_buffer(t_buffer *buffer, motivo_exit motivo);
 
 void *extraer_de_buffer(t_buffer *buffer);
 char *extraer_string_de_buffer(t_buffer *buffer);
+u_int8_t extraer_uint8_de_buffer(t_buffer *buffer);
 u_int32_t extraer_uint32_de_buffer(t_buffer *buffer);
 int extraer_int_de_buffer(t_buffer *buffer);
 t_list *extraer_lista_de_buffer(t_buffer *buffer);
 t_registros* extraer_registros_de_buffer(t_buffer* buffer);
-motivo_exit *extraer_motivo_exit_de_buffer(t_buffer *buffer);
-estado_proceso *extraer_estado_proceso_de_buffer(t_buffer *buffer);
-motivo_block *extraer_motivo_block_de_buffer(t_buffer *buffer);
+motivo_exit extraer_motivo_exit_de_buffer(t_buffer *buffer);
+estado_proceso extraer_estado_proceso_de_buffer(t_buffer *buffer);
+motivo_block extraer_motivo_block_de_buffer(t_buffer *buffer);
 
 // FUNCIONES PAQUETE
 

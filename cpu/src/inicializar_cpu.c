@@ -28,6 +28,6 @@ void inicializar_config()
 }
 
 void inicializar_variables(){
-	registros = inicializar_registros();
+	// registros = inicializar_registros();
 	flag_execute = true;
 }

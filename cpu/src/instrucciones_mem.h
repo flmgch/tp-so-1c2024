@@ -3,6 +3,6 @@
 
 #include "gestor_cpu.h"
 
-void atender_instrucciones(t_buffer *buffer);
+char *atender_instrucciones(t_buffer *buffer);
 
 #endif
