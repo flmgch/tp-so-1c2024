@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "gestor_cpu.h": "c",
+        "inicializar_cpu.h": "c",
+        "instrucciones_mem.h": "c",
+        "solicitar_instruccion.h": "c"
+    }
+}

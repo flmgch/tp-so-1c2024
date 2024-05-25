@@ -425,6 +425,14 @@ u_int32_t extraer_uint32_de_buffer(t_buffer *buffer)
   return valor;
 }
 
+u_int8_t extraer_uint32_de_buffer(t_buffer *buffer)
+{
+  u_int8_t *int8 = extraer_de_buffer(buffer);
+  u_int8_t valor = *int8;
+  free(int8);
+  return valor;
+}
+
 char *extraer_string_de_buffer(t_buffer *buffer)
 {
   char *string = extraer_de_buffer(buffer);
@@ -437,10 +445,27 @@ t_list *extraer_lista_de_buffer(t_buffer *buffer)
   return lista;
 }
 
-t_registros *extraer_registros_de_buffer(t_buffer *buffer){
+t_registros* extraer_registros_de_buffer(t_buffer* buffer) {
+    t_registros* registros = malloc(sizeof(t_registros));
+    registros->ax = extraer_uint8_de_buffer(buffer);
+    registros->bx = extraer_uint8_de_buffer(buffer);
+    registros->cx = extraer_uint8_de_buffer(buffer);
+    registros->dx = extraer_uint8_de_buffer(buffer);
+    registros->eax = extraer_uint32_de_buffer(buffer);
+    registros->ebx = extraer_uint32_de_buffer(buffer);
+    registros->ecx = extraer_uint32_de_buffer(buffer);
+    registros->edx = extraer_uint32_de_buffer(buffer);
+    registros->si= extraer_uint32_de_buffer(buffer);
+    registros->di = extraer_uint32_de_buffer(buffer);
+    return registros;
+}
+
+/*t_registros *extraer_registros_de_buffer(t_buffer *buffer){
   t_registros *registros = extraer_de_buffer(buffer);
   return registros;
-}
+} */
+
+
 // void *recibir_buffer(int *size, int socket_cliente)
 // {
 //   void *buffer;

@@ -12,7 +12,6 @@
 #include <string.h>
 #include <assert.h>
 #include <sys/socket.h>
-#include <semaphore.h>
 
 #include <commons/log.h>
 #include <commons/string.h>
@@ -20,16 +19,47 @@
 #include <commons/collections/list.h>
 
 // TIPOS DE DATOS
+typedef enum {
+    SET,
+    MOV_IN, 
+    MOV_OUT, 
+    SUM, 
+    SUB,
+    JNZ, 
+    RESIZE,
+    COPY_STRING,
+    WAIT,
+    SIGNAL, 
+    IO_GEN_SLEEP,
+    IO_STDIN_READ,
+    IO_STDOUT_WRITE,
+    IO_FS_CREATE,
+    IO_FS_DELETE,
+    IO_FS_TRUNCATE,
+    IO_FS_WRITE,
+    IO_FS_READ,
+    EXIT,
+    UNKNOWN
+} cod_instruccion;
+
+typedef struct 
+{
+    cod_instruccion codigo_instruccion;
+    char param1[20];
+    char param2[20];
+    char param3[20];
+    char param4[20];
+    char param5[20];
+}t_instruccion;
+
 typedef enum
 {
     MENSAJE,
     PAQUETE,
     HANDSHAKE,
     RESPUESTA_HANDSHAKE,
-    // KERNEL - CPU
-    // KERNEL - MEMORIA
-    // KERNEL - IO
-    // MEMORIA QUE TODAVIA NO SE USA
+    // MEMORIA
+    CREAR_PROCESO,
     TERMINAR_PROCESO,
     ACESO_TABLA_PAGINAS,
     AMPLIACION_PROCESO,
@@ -37,16 +67,12 @@ typedef enum
     ACCESO_ESPACIO_USUARIO_CPU,
     ACCESO_ESPACIO_USUARIO_IO,
     ENVIAR_INSTRUCCIONES,
-    // MEMORIA-KERNEL
-    CREAR_PROCESO,
-    // MEMORIA-CPU
-    RECIBIR_INSTRUCCION,
-    // CPU-KERNEL
-    RECIBIR_PCB
+    // CPU
+    RECIBIR_PCB,
+    RECIBIR_INSTRUCCION
 } op_code;
 
-typedef struct
-{
+typedef struct {
     uint8_t ax;   // Registro Numérico de propósito general
     uint8_t bx;   // Registro Numérico de propósito general
     uint8_t cx;   // Registro Numérico de propósito general
@@ -73,42 +99,12 @@ typedef struct
 
 typedef struct
 {
-    u_int32_t pid;
+    u_int32_t process_id;
     u_int32_t program_counter;
     u_int32_t quantum;
     t_registros *registros_cpu;
 } t_pcb;
 
-typedef enum{
-	IO_BLOCK,
-}motivo_block;
-
-typedef enum{
-	SUCCESS,
-	SEG_FAULT,
-	OUT_OF_MEMORY,
-	RECURSO_INEXISTENTE,
-}motivo_exit;
-
-typedef enum{
-	NEW,
-	READY,
-	EXEC,
-	BLOCK,
-	FINISH_EXIT,
-	FINISH_ERROR,
-	UNKNOWN_STATE
-} estado_proceso;
-typedef struct{
-    int pid;
-    int program_counter;
-    t_list *instrucciones;
-    t_list *tabla_de_segmentos;
-    estado_proceso estado;
-    motivo_exit motivo_exit;
-    motivo_block motivo_block;
-    t_registros* registros;
-}t_contexto_ejecucion;
 
 // FUNCIONES COMPARTIDAS
 
@@ -148,7 +144,7 @@ char *extraer_string_de_buffer(t_buffer *buffer);
 u_int32_t extraer_uint32_de_buffer(t_buffer *buffer);
 int extraer_int_de_buffer(t_buffer *buffer);
 t_list *extraer_lista_de_buffer(t_buffer *buffer);
-t_registros *extraer_registros_de_buffer(t_buffer *buffer);
+t_registros* extraer_registros_de_buffer(t_buffer* buffer);
 
 int recibir_operacion(int);
 

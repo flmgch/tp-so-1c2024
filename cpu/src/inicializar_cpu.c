@@ -4,6 +4,7 @@ void inicializar_cpu()
 {
     inicializar_logger();
     inicializar_config();
+    inicializar_variables();
 }
 
 void inicializar_logger()
@@ -24,4 +25,9 @@ void inicializar_config()
     puerto_memoria = config_get_string_value(cpu_config, "PUERTO_MEMORIA");
     puerto_dispatch = config_get_string_value(cpu_config, "PUERTO_ESCUCHA_DISPATCH");
     puerto_interrupt = config_get_string_value(cpu_config, "PUERTO_ESCUCHA_INTERRUPT");
+}
+
+void inicializar_variables(){
+	registros = inicializar_registros();
+	flag_execute = true;
 }

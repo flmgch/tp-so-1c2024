@@ -12,12 +12,7 @@ void atender_memoria()
             //
             break;
         case PAQUETE:
-            //
-            break;
-        case ENVIAR_INSTRUCCIONES:
-            t_buffer *un_buffer = recibir_buffer(socket_memoria);
-            atender_instrucciones(un_buffer);
-            destruir_buffer(un_buffer);
+ 
             break;
         case -1:
             log_error(cpu_logger, "Se desconecto memoria");

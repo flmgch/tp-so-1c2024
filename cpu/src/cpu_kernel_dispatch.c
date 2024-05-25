@@ -19,6 +19,8 @@ void atender_kernel_dispatch()
            un_buffer=recibir_buffer(socket_kernel_dispatch);
            atender_recibir_pcb(un_buffer);
            destruir_buffer(un_buffer);
+           log_info(cpu_logger, "Recibí el contexto del proceso %d y se inicia el ciclo de instruccion", pcb->process_id);
+           ejecutar_proceso();
         case -1:
             log_error(cpu_logger, "Se desconecto kernel-dispatch");
             control_key = 0;
