@@ -1,16 +1,18 @@
 #include "inicializar_io.h"
 
-void inicializar_io(){
-    inicializar_logger();
-    inicializar_config();
+void inicializar_io(char *nombre_interfaz, char* archivo_configuracion){
+    inicializar_logger(nombre_interfaz);
+    inicializar_config(archivo_configuracion);
 }
 
-void inicializar_logger() {
-    io_logger = iniciar_logger("EntradaYSalida.log", LOG_LEVEL_DEBUG);
+void inicializar_logger(char *nombre_interfaz) {
+    char log_filename[100];
+    snprintf(log_filename, sizeof(log_filename), "%s.log", nombre_interfaz);
+    io_logger = iniciar_logger(log_filename, LOG_LEVEL_DEBUG);
 }
 
-void inicializar_config() {
-    io_config = iniciar_config("./EntradaYSalida.config");
+void inicializar_config(char *archivo_configuracion) {
+    io_config = iniciar_config(archivo_configuracion);
 
     // INICIALIZAR VARIABLES GLOBALES (CONFIG)
     tipo_interfaz = config_get_string_value(io_config, "TIPO_INTERFAZ");
