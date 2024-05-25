@@ -17,7 +17,9 @@ void atender_kernel()
             break;
         case CREAR_PROCESO:
            un_buffer = recibir_buffer(socket_kernel);
-           atender_crear_proceso(un_buffer);
+           t_proceso *proceso = atender_crear_proceso(un_buffer);
+           list_add(lista_de_procesos, proceso);
+           free(proceso);
            destruir_buffer(un_buffer);
            break;
         case -1:

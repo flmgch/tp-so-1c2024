@@ -156,6 +156,13 @@ typedef struct
     u_int32_t quantum_remanente;
 } t_pcb;
 
+typedef struct
+{
+    uint32_t pid;
+    char *path;
+    t_list *listas;
+} t_proceso;
+
 // UTILIDADES
 
 void decir_hola(char *quien);
@@ -191,6 +198,9 @@ u_int32_t extraer_uint32_de_buffer(t_buffer *buffer);
 int extraer_int_de_buffer(t_buffer *buffer);
 t_list *extraer_lista_de_buffer(t_buffer *buffer);
 t_registros* extraer_registros_de_buffer(t_buffer* buffer);
+motivo_exit *extraer_motivo_exit_de_buffer(t_buffer *buffer);
+estado_proceso *extraer_estado_proceso_de_buffer(t_buffer *buffer);
+motivo_block *extraer_motivo_block_de_buffer(t_buffer *buffer);
 
 // FUNCIONES PAQUETE
 

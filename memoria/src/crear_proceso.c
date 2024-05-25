@@ -1,14 +1,15 @@
 #include "crear_proceso.h"
 
-void atender_crear_proceso(t_buffer *buffer)
+t_proceso *atender_crear_proceso(t_buffer *buffer)
 {
-    pid = extraer_int_de_buffer(buffer);
-    char *path = extraer_string_de_buffer(buffer);
-    size = extraer_int_de_buffer(buffer);
+    t_proceso *proceso;
 
-    char *archivo = strcat(path_instrucciones, path);
+    proceso->pid = extraer_uint32_de_buffer(buffer);
+    proceso->path = extraer_string_de_buffer(buffer);
 
-    abrir_archivo(archivo);
+    char *archivo = strcat(path_instrucciones, proceso->path);
 
-    free(path);
+    proceso->listas = abrir_archivo(archivo);
+
+    return proceso;
 };

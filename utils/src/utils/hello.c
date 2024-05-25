@@ -493,6 +493,23 @@ t_registros* extraer_registros_de_buffer(t_buffer* buffer) {
     return registros;
 }
 
+estado_proceso *extraer_estado_proceso_de_buffer(t_buffer *buffer)
+{
+  estado_proceso *estado = extraer_de_buffer(buffer);
+  return estado;
+}
+
+motivo_block *extraer_motivo_block_de_buffer(t_buffer *buffer)
+{
+  motivo_block *block = extraer_de_buffer(buffer);
+  return block;
+}
+
+motivo_exit *extraer_motivo_exit_de_buffer(t_buffer *buffer)
+{
+  motivo_exit *exit = extraer_de_buffer(buffer);
+  return exit;
+}
 /*t_registros *extraer_registros_de_buffer(t_buffer *buffer){
   t_registros *registros = extraer_de_buffer(buffer);
   return registros;

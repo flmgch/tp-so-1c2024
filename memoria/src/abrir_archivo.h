@@ -3,6 +3,6 @@
 
 #include "gestor_memoria.h"
 
-void abrir_archivo(const char *file);
+t_list *abrir_archivo(const char *file);
 
 #endif

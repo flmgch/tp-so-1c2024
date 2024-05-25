@@ -8,8 +8,7 @@ extern t_log *mem_logger;
 extern t_config *mem_config;
 extern char *puerto_escucha, *path_instrucciones;
 extern int tamanio_memoria, tamanio_pagina, retardo_respuesta;
-extern t_list *lista_de_instrucciones;
-extern int posicion, pid, size;
+extern t_list *lista_de_procesos;
 ;
 
 // SOCKETS
