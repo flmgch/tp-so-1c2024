@@ -171,14 +171,47 @@ void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor){
   agregar_a_buffer(buffer, &valor, list_size(valor));
 }
 
+void agregar_uint8_a_buffer(t_buffer *buffer, u_int8_t valor)
+{
+  agregar_a_buffer(buffer, &valor, sizeof(u_int8_t));
+}
+
 void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor)
 {
   agregar_a_buffer(buffer, &valor, sizeof(u_int32_t));
 }
 
+void agregar_registros_a_buffer(t_buffer *buffer, t_registros* registros) {
+  agregar_uint8_a_buffer(buffer, registros->ax);
+  agregar_uint8_a_buffer(buffer, registros->bx);
+  agregar_uint8_a_buffer(buffer, registros->cx);
+  agregar_uint8_a_buffer(buffer, registros->dx);
+  agregar_uint32_a_buffer(buffer, registros->eax);
+  agregar_uint32_a_buffer(buffer, registros->ebx);
+  agregar_uint32_a_buffer(buffer, registros->ecx);
+  agregar_uint32_a_buffer(buffer, registros->edx);
+  agregar_uint32_a_buffer(buffer, registros->si);
+  agregar_uint32_a_buffer(buffer, registros->di);
+}
+
 void agregar_string_a_buffer(t_buffer *buffer, char *string)
 {
-  agregar_a_buffer(buffer, string, strlen(string) + 1);
+  agregar_a_buffer(buffer, &string, strlen(string) + 1);
+}
+
+void agregar_estado_a_buffer(t_buffer *buffer, estado_proceso estado)
+{
+  agregar_a_buffer(buffer, &estado, sizeof(estado_proceso));
+}
+
+void agregar_motivo_block_a_buffer(t_buffer *buffer, motivo_block motivo)
+{
+  agregar_a_buffer(buffer, &motivo, sizeof(motivo_block));
+}
+
+void agregar_motivo_exit_a_buffer(t_buffer *buffer, motivo_exit motivo)
+{
+  agregar_a_buffer(buffer, &motivo, sizeof(motivo_exit));
 }
 
 t_paquete *crear_paquete(void)
@@ -441,44 +474,46 @@ t_registros *extraer_registros_de_buffer(t_buffer *buffer){
   t_registros *registros = extraer_de_buffer(buffer);
   return registros;
 }
-// void *recibir_buffer(int *size, int socket_cliente)
-// {
-//   void *buffer;
 
-//   recv(socket_cliente, size, sizeof(int), MSG_WAITALL);
-//   buffer = malloc(*size);
-//   recv(socket_cliente, buffer, *size, MSG_WAITALL);
+char *estado_to_string(estado_proceso estado)
+{
+  switch (estado)
+  {
+  case NEW:
+    return "NEW";
+    break;
+  case READY:
+    return "READY";
+    break;
+  case BLOCK:
+    return "BLOCK";
+    break;
+  case EXEC:
+    return "EXEC";
+    break;
+  case FINISH_EXIT:
+    return "EXIT";
+    break;
+  case FINISH_ERROR:
+    return "EXIT_ERROR";
+    break;
+  default:
+    return "UNKNOWN";
+    break;
+  }
+}
 
-//   return buffer;
-// }
-
-// void recibir_mensaje(int socket_cliente)
-// {
-// int size;
-// char *buffer = recibir_buffer(&size, socket_cliente);
-// TODO: MODIFICAR FUNCION PARA QUE RECIBA UN LOGGER Y ESCRIBA EN ESE MISMO
-// log_info(logger, "Me llego el mensaje %s", buffer);
-//   free(buffer);
-// }
-
-// t_list *recibir_paquete(int socket_cliente)
-// {
-//   int size;
-//   int desplazamiento = 0;
-//   void *buffer;
-//   t_list *valores = list_create();
-//   int tamanio;
-
-//   // buffer = recibir_buffer(&size, socket_cliente);
-//   while (desplazamiento < size)
-//   {
-//     memcpy(&tamanio, buffer + desplazamiento, sizeof(int));
-//     desplazamiento += sizeof(int);
-//     char *valor = malloc(tamanio);
-//     memcpy(valor, buffer + desplazamiento, tamanio);
-//     desplazamiento += tamanio;
-//     list_add(valores, valor);
-//   }
-//   free(buffer);
-//   return valores;
-// }
+void enviar_pcb(t_pcb *pcb, int socket_servidor)
+{
+  t_buffer *buffer = crear_buffer();
+  agregar_int_a_buffer(buffer, pcb->pid);
+  agregar_int_a_buffer(buffer, pcb->program_counter);
+  agregar_estado_a_buffer(buffer, pcb->estado);
+  agregar_motivo_block_a_buffer(buffer, pcb->motivo_block);
+  agregar_motivo_exit_a_buffer(buffer, pcb->motivo_exit);
+  agregar_registros_a_buffer(buffer, pcb->registros_cpu);
+  agregar_uint32_a_buffer(buffer, pcb->quantum_remanente);
+  t_paquete *paquete = crear_super_paquete(ENVIO_PCB, buffer);
+  enviar_paquete(paquete, socket_servidor);
+  eliminar_paquete(paquete);
+}

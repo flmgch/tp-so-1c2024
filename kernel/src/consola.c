@@ -1,4 +1,5 @@
 #include "consola.h"
+#include "planificador.h"
 
 void inicializar_consola()
 {
@@ -115,6 +116,7 @@ void atender_instruccion(char *leido)
     {
         //  TODO
         planif_iniciada = true;
+        planificar();
         printf("La planificacion ha sido iniciada. \n");
     }
     else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
