@@ -539,6 +539,23 @@ char *estado_to_string(estado_proceso estado)
   }
 }
 
+char *motivo_exit_to_string(motivo_exit motivo)
+{
+  switch (motivo)
+  {
+  case SUCCESS:
+    return "SUCCESS";
+  case SEG_FAULT:
+    return "SEG_FAULT";
+  case OUT_OF_MEMORY:
+    return "OUT_OF_MEMORY";
+  case RECURSO_INEXISTENTE:
+    return "RECURSO_INEXISTENTE";
+  default:
+    return "INDETERMINADO";
+  }
+}
+
 void enviar_pcb(t_pcb *pcb, int socket_servidor)
 {
   t_buffer *buffer = crear_buffer();

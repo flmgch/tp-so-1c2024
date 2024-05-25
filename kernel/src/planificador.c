@@ -1,7 +1,10 @@
 #include "planificador.h"
 
 void planificar() {
+    planificar_largo_plazo();
+    log_info(kernel_logger, "La planificacion de LARGO PLAZO ha sido iniciada");
     planificar_corto_plazo();
+    log_info(kernel_logger, "La planificacion de CORTO PLAZO ha sido iniciada");
 }
 
 void planificar_corto_plazo()
@@ -79,5 +82,72 @@ void dispatch_pcb(t_pcb *pcb)
     enviar_pcb(pcb, socket_conexion_cpu_dispatch);
 }
 
-// t_pcb *obtener_pcb_RR();
-// t_pcb *obtener_pcb_VRR();
+// TODO t_pcb *obtener_pcb_RR();
+// TODO t_pcb *obtener_pcb_VRR();
+
+void planificar_largo_plazo()
+{
+    pthread_t hilo_new;
+    pthread_t hilo_exit;
+    pthread_t hilo_block;
+    pthread_create(&hilo_exit, NULL, (void *)exit_pcb, NULL);
+    pthread_create(&hilo_new, NULL, (void *)new_pcb, NULL);
+    pthread_create(&hilo_block, NULL, (void *)block_pcb, NULL);
+    pthread_detach(hilo_exit);
+    pthread_detach(hilo_new);
+    pthread_detach(hilo_block);
+}
+
+void exit_pcb()
+{
+    while (1)
+    {
+        sem_wait(&sem_exit);
+        t_pcb *pcb = remover_pcb(cola_exit, &mutex_cola_exit);
+        char *motivo = motivo_exit_to_string(pcb->motivo_exit);
+        log_info(kernel_logger, "Finaliza el proceso %d - Motivo: %s", pcb->pid, motivo);
+
+        // ENVIAR PID A MEMORIA
+        t_buffer *buffer = crear_buffer();
+        agregar_uint32_a_buffer(buffer, pcb->pid);
+        t_paquete *paquete = crear_super_paquete(FINALIZAR_PROCESO, buffer);
+        enviar_paquete(paquete, socket_conexion_memoria);
+        free(pcb);
+        free(buffer);
+        free(paquete);
+        sem_post(&sem_multiprogramacion);
+    }
+}
+
+void pasar_a_ready(t_pcb *pcb)
+{
+    pthread_mutex_lock(&mutex_cola_ready);
+    cambiar_estado(pcb, READY);
+    list_add(cola_ready, pcb);
+    log_info(kernel_logger, "Se pasa el proceso:%d de NEW a READY", pcb->pid);
+    pthread_mutex_unlock(&mutex_cola_ready);
+}
+
+void new_pcb()
+{
+    while (1)
+    {
+        sem_wait(&sem_new);
+        t_pcb *pcb = remover_pcb(cola_new, &mutex_cola_new);
+        sem_wait(&sem_multiprogramacion);
+        pasar_a_ready(pcb);
+        sem_post(&sem_ready);
+    }
+}
+
+
+void block_pcb()
+{
+    while (1)
+    {
+        sem_wait(&sem_block_return);
+        t_pcb *pcb = remover_pcb(cola_block, &mutex_cola_block);
+        pasar_a_ready(pcb);
+        sem_post(&sem_ready);
+    }
+}

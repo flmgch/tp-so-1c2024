@@ -63,6 +63,7 @@ typedef enum
     ENVIO_PCB,
     // KERNEL - MEMORIA
     CREAR_PROCESO,
+    FINALIZAR_PROCESO,
     // KERNEL - IO
     // MEMORIA QUE TODAVIA NO SE USA
     TERMINAR_PROCESO,
@@ -160,6 +161,7 @@ t_log *iniciar_logger(char *nombreLog, t_log_level level);
 t_config *iniciar_config(char *nombreConfig);
 void terminar_programa(t_log *logger, t_config *config);
 char *estado_to_string(estado_proceso estado);
+char *motivo_exit_to_string(motivo_exit motivo);
 
 // FUNCIONES CLIENTE
 int crear_conexion(char *ip, char *puerto, char *mensaje, t_log *log);
