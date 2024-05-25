@@ -4,6 +4,6 @@
 #include "gestor_memoria.h"
 #include "abrir_archivo.h"
 
-void atender_crear_proceso();
+void atender_crear_proceso(t_buffer *buffer);
 
 #endif

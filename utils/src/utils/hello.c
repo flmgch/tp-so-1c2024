@@ -330,7 +330,7 @@ void handshake_cliente(int socket_conexion, t_log *log)
 int recibir_operacion(int socket_cliente)
 {
   int cod_op;
-  cod_op = recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL);
+  recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL);
 
   if (cod_op < 0)
   {
