@@ -7,6 +7,7 @@ void atender_kernel()
     while (control_key)
     {
         int cod_op = recibir_operacion(socket_kernel);
+        printf("Me llego el codigo: %d", cod_op);
         switch (cod_op)
         {
         case MENSAJE:

@@ -90,7 +90,7 @@ int crear_conexion(char *ip, char *puerto, char *mensaje, t_log *log)
 void *serializar_paquete(t_paquete *paquete)
 {
 
-  int tamanio_stream = paquete->buffer->size + 2*sizeof(int);
+  int tamanio_stream = paquete->buffer->size + sizeof(int) + sizeof(op_code);
   void *stream = malloc(tamanio_stream);
   int desplazamiento = 0;
 
@@ -196,7 +196,7 @@ t_paquete *crear_super_paquete(op_code cop, t_buffer *buffer){
   return paquete;
 }
 
-    void agregar_a_paquete(t_paquete *paquete, void *valor, int tamanio)
+void agregar_a_paquete(t_paquete *paquete, void *valor, int tamanio)
 {
   paquete->buffer->stream = realloc(paquete->buffer->stream, paquete->buffer->size + tamanio + sizeof(int));
 
@@ -208,7 +208,7 @@ t_paquete *crear_super_paquete(op_code cop, t_buffer *buffer){
 
 void enviar_paquete(t_paquete *paquete, int socket_cliente)
 {
-  int bytes = paquete->buffer->size + 2 * sizeof(int);
+  int bytes = paquete->buffer->size + sizeof(int) + sizeof(op_code);
   void *a_enviar = serializar_paquete(paquete);
 
   send(socket_cliente, a_enviar, bytes, 0);

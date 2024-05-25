@@ -87,7 +87,6 @@ bool validar_instruccion(char *leido)
 void atender_instruccion(char *leido)
 {
     char **comando_consola = string_split(leido, " ");
-    // pthread_t un hilo
     t_buffer *un_buffer = crear_buffer();
 
     if (strcmp(comando_consola[0], "EJECUTAR_SCRIPT") == 0)
@@ -97,6 +96,9 @@ void atender_instruccion(char *leido)
     else if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0)
     {
         agregar_string_a_buffer(un_buffer, comando_consola[1]); // [path]
+        t_paquete *paquete = crear_super_paquete(CREAR_PROCESO, un_buffer);
+        enviar_paquete(paquete, socket_conexion_memoria);
+        eliminar_paquete(paquete);
         // f_iniciar_proceso(un_buffer);
     }
     else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0)

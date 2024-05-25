@@ -3,9 +3,9 @@
 
 #include "gestor_kernel.h"
 
+void pasar_a_new(t_pcb *pcb);
 void pasar_a_ready(t_pcb *pcb);
-void ingresarANew(t_pcb *pcb);
-void Aready();
-t_pcb *obtenerSiguienteAready();
+// void Aready();
+// t_pcb *obtenerSiguienteAready();
 
 #endif
