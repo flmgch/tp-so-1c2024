@@ -58,8 +58,17 @@ typedef enum
     PAQUETE,
     HANDSHAKE,
     RESPUESTA_HANDSHAKE,
+<<<<<<< HEAD
     // MEMORIA
     CREAR_PROCESO,
+=======
+    // KERNEL - CPU
+    ENVIO_PCB,
+    // KERNEL - MEMORIA
+    CREAR_PROCESO,
+    // KERNEL - IO
+    // MEMORIA QUE TODAVIA NO SE USA
+>>>>>>> 4c803303acfc65c37eee0855488a2a76684576bf
     TERMINAR_PROCESO,
     ACESO_TABLA_PAGINAS,
     AMPLIACION_PROCESO,
@@ -67,9 +76,15 @@ typedef enum
     ACCESO_ESPACIO_USUARIO_CPU,
     ACCESO_ESPACIO_USUARIO_IO,
     ENVIAR_INSTRUCCIONES,
+<<<<<<< HEAD
     // CPU
     RECIBIR_PCB,
     RECIBIR_INSTRUCCION
+=======
+    // MEMORIA-KERNEL
+    // MEMORIA-CPU
+    RECIBIR_INSTRUCCION,
+>>>>>>> 4c803303acfc65c37eee0855488a2a76684576bf
 } op_code;
 
 typedef struct {
@@ -99,46 +114,77 @@ typedef struct
 
 typedef struct
 {
-    u_int32_t process_id;
+    char *recurso;
+    int id;
+    int instancias;
+    t_list *cola_block_asignada;
+    pthread_mutex_t mutex_asignado;
+} t_recurso;
+
+typedef enum
+{
+    IO_BLOCK,
+} motivo_block;
+
+typedef enum
+{
+    SUCCESS,
+    SEG_FAULT,
+    OUT_OF_MEMORY,
+    RECURSO_INEXISTENTE,
+} motivo_exit;
+
+typedef enum
+{
+    NEW,
+    READY,
+    EXEC,
+    BLOCK,
+    FINISH_EXIT,
+    FINISH_ERROR,
+    UNKNOWN_STATE
+} estado_proceso;
+
+typedef struct
+{
+    u_int32_t pid;
     u_int32_t program_counter;
-    u_int32_t quantum;
+    estado_proceso estado;
+    motivo_block motivo_block;
+    motivo_exit motivo_exit;
     t_registros *registros_cpu;
+    u_int32_t quantum_remanente;
 } t_pcb;
 
-
-// FUNCIONES COMPARTIDAS
+// UTILIDADES
 
 void decir_hola(char *quien);
 t_log *iniciar_logger(char *nombreLog, t_log_level level);
 t_config *iniciar_config(char *nombreConfig);
 void terminar_programa(t_log *logger, t_config *config);
+char *estado_to_string(estado_proceso estado);
 
 // FUNCIONES CLIENTE
 int crear_conexion(char *ip, char *puerto, char *mensaje, t_log *log);
-void enviar_mensaje(char *mensaje, int socket_cliente);
+void handshake_cliente(int socket_conexion, t_log *log);
 
+// FUNCIONES SERVER
+int iniciar_escucha(char *PUERTO, char *mensaje, t_log *log);
+int esperar_conexion(int socket_conexion, char *mensaje, t_log *log);
+void handshake_servidor(int socket_conexion);
+
+// FUNCIONES BUFFER
 t_buffer *crear_buffer(void);
-void destruir_buffer(t_buffer *buffer);
+
 void agregar_a_buffer(t_buffer *buffer, void *datos, int tamanio_datos);
 void agregar_int_a_buffer(t_buffer *buffer, int valor);
+void agregar_uint8_a_buffer(t_buffer *buffer, u_int8_t valor);
 void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor);
 void agregar_string_a_buffer(t_buffer *buffer, char *string);
 void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor);
+void agregar_motivo_block_a_buffer(t_buffer *buffer, motivo_block motivo);
+void agregar_motivo_exit_a_buffer(t_buffer *buffer, motivo_exit motivo);
 
-t_paquete *crear_paquete(void);
-t_paquete *crear_super_paquete(op_code cop, t_buffer * buffer);
-
-void agregar_a_paquete(t_paquete *paquete, void *valor, int tamanio);
-void enviar_paquete(t_paquete *paquete, int socket_cliente);
-void * serializar_paquete(t_paquete *paquete);
-void eliminar_paquete(t_paquete *paquete);
-
-void handshake_cliente(int socket_conexion, t_log *log);
-// void liberar_conexion(int socket_cliente);
-
-// FUNCIONES SERVER
-
-t_buffer *recibir_buffer(int socket_cliente);
 void *extraer_de_buffer(t_buffer *buffer);
 char *extraer_string_de_buffer(t_buffer *buffer);
 u_int32_t extraer_uint32_de_buffer(t_buffer *buffer);
@@ -146,14 +192,38 @@ int extraer_int_de_buffer(t_buffer *buffer);
 t_list *extraer_lista_de_buffer(t_buffer *buffer);
 t_registros* extraer_registros_de_buffer(t_buffer* buffer);
 
+// FUNCIONES PAQUETE
+
+t_paquete *crear_paquete(void);
+t_paquete *crear_super_paquete(op_code cop, t_buffer *buffer);
+
+void agregar_a_paquete(t_paquete *paquete, void *valor, int tamanio);
+void *serializar_paquete(t_paquete *paquete);
+
+// FUNCIONES ENVIAR
+void enviar_mensaje(char *mensaje, int socket_cliente);
+void enviar_paquete(t_paquete *paquete, int socket_cliente);
+void enviar_pcb(t_pcb *pcb, int socket_servidor);
+
+// FUNCIONES PAQUETE
+
+t_paquete *crear_paquete(void);
+t_paquete *crear_super_paquete(op_code cop, t_buffer *buffer);
+
+void agregar_a_paquete(t_paquete *paquete, void *valor, int tamanio);
+void *serializar_paquete(t_paquete *paquete);
+
+// FUNCIONES ENVIAR
+void enviar_mensaje(char *mensaje, int socket_cliente);
+void enviar_paquete(t_paquete *paquete, int socket_cliente);
+void enviar_pcb(t_pcb *pcb, int socket_servidor);
+
+// FUNCIONES RECIBIR
 int recibir_operacion(int);
+t_buffer *recibir_buffer(int socket_cliente);
 
-int iniciar_escucha(char *PUERTO, char *mensaje, t_log *log);
-int esperar_conexion(int socket_conexion, char *mensaje, t_log *log);
+// FUNCIONES ELIMINAR
+void destruir_buffer(t_buffer *buffer);
+void eliminar_paquete(t_paquete *paquete);
 
-void handshake_servidor(int socket_conexion);
-
-// void *recibir_buffer(int *, int);
-// void recibir_mensaje(int);
-// t_list *recibir_paquete(int);
 #endif

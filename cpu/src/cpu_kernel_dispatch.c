@@ -15,7 +15,7 @@ void atender_kernel_dispatch()
         case PAQUETE:
             //
             break;
-        case RECIBIR_PCB:
+        case ENVIO_PCB:
            un_buffer=recibir_buffer(socket_kernel_dispatch);
            atender_recibir_pcb(un_buffer);
            destruir_buffer(un_buffer);

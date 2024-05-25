@@ -1,4 +1,5 @@
 #include "consola.h"
+#include "planificador.h"
 
 void inicializar_consola()
 {
@@ -115,13 +116,14 @@ void atender_instruccion(char *leido)
     {
         //  TODO
         planif_iniciada = true;
+        planificar();
         printf("La planificacion ha sido iniciada. \n");
     }
     else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
     {
         size_t comando_length = strlen(comando_consola[1] + 1);
         char *comando = malloc(comando_length);
-        
+        // TODO: ACTUALIZAR VALOR MAXIMO DEL sem_multiprogramacion cuando se actualiza la var global
         strcpy(comando, comando_consola[1]); 
         grado_multiprogramacion = atoi(comando);
         printf("El grado de multiprogramacion ahora es de %d\n", grado_multiprogramacion);

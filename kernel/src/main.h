@@ -21,7 +21,9 @@
 // VALORES DEL CONFIG
   char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *interrupt, *algoritmo_planificacion;
   int quantum, grado_multiprogramacion;
-  t_list *recursos, *instancias_recursos;
+  char **recursos;
+  int *instancias_recursos;
+  t_list *lista_recursos;
 
 // SOCKETS
   int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha, socket_interfaz;

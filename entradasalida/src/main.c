@@ -2,21 +2,13 @@
 
 int main(int argc, char *argv[])
 {
-  char *nombre_interfaz = argv[1];
-  char *archivo_configuracion = argv[2];
-
-  if (argc < 3) {
-    fprintf(stderr, "Uso: %s <nombre_interfaz> <archivo_configuracion>\n", argv[0]);
-    return EXIT_FAILURE;
-  }
-
   // INICIALIZAR IO
-  inicializar_io(nombre_interfaz, archivo_configuracion);
+  inicializar_io();
 
   // INICIALIZAR CONEXIONES
-  socket_memoria = crear_conexion(ip_memoria, puerto_memoria, "Memoria", io_logger);
+  socket_memoria = crear_conexion(ip_kernel, puerto_memoria, "Memoria", io_logger);
   handshake_cliente(socket_memoria, io_logger);
-  socket_kernel = crear_conexion(ip_kernel, puerto_kernel, "Kernel", io_logger);
+  socket_kernel = crear_conexion(ip_memoria, puerto_kernel, "Kernel", io_logger);
   handshake_cliente(socket_kernel, io_logger);
 
   // ATENDER KERNEL

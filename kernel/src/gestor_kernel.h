@@ -13,7 +13,9 @@ extern bool planif_iniciada;
 // VALORES DEL CONFIG
 extern char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *interrupt, *algoritmo_planificacion;
 extern int quantum, grado_multiprogramacion;
-extern t_list *recursos, *instancias_recursos;
+extern char **recursos;
+extern int *instancias_recursos;
+extern t_list *lista_recursos;
 
 // SOCKETS
 extern int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha, socket_interfaz;
