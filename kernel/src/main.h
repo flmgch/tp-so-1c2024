@@ -9,7 +9,6 @@
 #include "kernel_interfaz.h"
 #include "consola.h"
 #include "planificador.h"
-#include "estados.h"
 
 // VARIABLES GLOBALES
   t_log *kernel_logger;

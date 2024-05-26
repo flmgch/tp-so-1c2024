@@ -92,22 +92,25 @@ void atender_instruccion(char *leido)
 
     if (strcmp(comando_consola[0], "EJECUTAR_SCRIPT") == 0)
     {
-        agregar_string_a_buffer(un_buffer, comando_consola[1]); // [path]
+        // agregar_string_a_buffer(un_buffer, comando_consola[1]); // [path]
     }
     else if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0)
     {
-        agregar_uint32_a_buffer(un_buffer, pcb1.pid);
-        char *path = malloc(strlen(comando_consola[1]) + 1);
-        strcpy(path, comando_consola[1]);
-        agregar_string_a_buffer(un_buffer, path); // [path]
-        t_paquete *paquete = crear_super_paquete(CREAR_PROCESO, un_buffer);
+        agregar_string_a_buffer(un_buffer, comando_consola[1]); // [path]
+
+        char *path = extraer_string_de_buffer(un_buffer);
+        destruir_buffer(un_buffer);
+        // ENVIAR A MEMORIA
+        t_buffer *a_enviar = crear_buffer();
+        agregar_string_a_buffer(a_enviar, path);
+        agregar_uint32_a_buffer(a_enviar, pcb1.pid);
+        t_paquete *paquete = crear_super_paquete(CREAR_PROCESO, a_enviar);
         enviar_paquete(paquete, socket_conexion_memoria);
         eliminar_paquete(paquete);
-        // f_iniciar_proceso(un_buffer);
     }
     else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0)
     {
-        agregar_int_a_buffer(un_buffer, (intptr_t)comando_consola[1]); // [pid]
+        // agregar_int_a_buffer(un_buffer, (intptr_t)comando_consola[1]); // [pid]
     }
     else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0)
     {

@@ -168,7 +168,7 @@ void agregar_int_a_buffer(t_buffer *buffer, int valor)
 }
 
 void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor){
-  agregar_a_buffer(buffer, &valor, list_size(valor));
+  agregar_a_buffer(buffer, valor, list_size(valor));
 }
 
 void agregar_uint8_a_buffer(t_buffer *buffer, u_int8_t valor)
@@ -196,7 +196,7 @@ void agregar_registros_a_buffer(t_buffer *buffer, t_registros* registros) {
 
 void agregar_string_a_buffer(t_buffer *buffer, char *string)
 {
-  agregar_a_buffer(buffer, &string, strlen(string) + 1);
+  agregar_a_buffer(buffer, string, strlen(string) + 1);
 }
 
 void agregar_estado_a_buffer(t_buffer *buffer, estado_proceso estado)
