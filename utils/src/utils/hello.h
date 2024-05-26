@@ -65,6 +65,10 @@ typedef enum
     CREAR_PROCESO,
     FINALIZAR_PROCESO,
     // KERNEL - IO
+    GENERICA,
+    STDIN,
+    STDOUT,
+    DIALFS,
     // MEMORIA QUE TODAVIA NO SE USA
     TERMINAR_PROCESO,
     ACESO_TABLA_PAGINAS,
@@ -153,6 +157,33 @@ typedef struct
     char *path;
     t_list *listas;
 } t_proceso;
+
+typedef enum
+{
+    IO_GEN_SLEEP,
+    IO_STDIN_READ,
+    IO_STDOUT_WRITE,
+    IO_FS_CREATE,
+    IO_FS_DELETE,
+    IO_FS_TRUNCATE,
+    IO_FS_WRITE,
+    IO_FS_READ
+} instrucciones;
+
+typedef struct
+{
+    u_int32_t pid;
+    char *tipo_interfaz;
+    char *nombre_interfaz;
+    char *archivo_configuracion;
+    int unidades_trabajo;
+    int tiempo_unidad_trabajo;
+    char *ip_kernel;
+    char *puerto_kernel;
+    char *ip_memoria;
+    char *puerto_memoria;
+    instrucciones *conjunto_instrucciones;
+} interfaz; // Lo necesario para manipular lo que me mande el Kernel
 
 // UTILIDADES
 
