@@ -54,7 +54,7 @@ t_pcb *pcb_segun_algoritmo()
     }
     else
     {
-        log_error(kernel_logger, "No se reconocio el algoritmo de planifacion");
+        log_error(kernel_logger, "No se reconocio el algoritmo de planificacion");
         exit(EXIT_FAILURE);
     }
 }
