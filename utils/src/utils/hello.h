@@ -119,14 +119,16 @@ typedef struct
 typedef enum
 {
     IO_BLOCK,
+    NONE_BLOCK
 } motivo_block;
 
 typedef enum
 {
     SUCCESS,
-    SEG_FAULT,
-    OUT_OF_MEMORY,
+    ERROR,
+    FIN_PROCESO,
     RECURSO_INEXISTENTE,
+    NONE_EXIT
 } motivo_exit;
 
 typedef enum
@@ -160,14 +162,14 @@ typedef struct
 
 typedef enum
 {
-    IO_GEN_SLEEP,
-    IO_STDIN_READ,
-    IO_STDOUT_WRITE,
-    IO_FS_CREATE,
-    IO_FS_DELETE,
-    IO_FS_TRUNCATE,
-    IO_FS_WRITE,
-    IO_FS_READ
+    GEN_SLEEP,
+    STDIN_READ,
+    STDOUT_WRITE,
+    FS_CREATE,
+    FS_DELETE,
+    FS_TRUNCATE,
+    FS_WRITE,
+    FS_READ
 } instrucciones;
 
 typedef struct
@@ -210,6 +212,7 @@ void agregar_a_buffer(t_buffer *buffer, void *datos, int tamanio_datos);
 void agregar_int_a_buffer(t_buffer *buffer, int valor);
 void agregar_uint8_a_buffer(t_buffer *buffer, u_int8_t valor);
 void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor);
+void agregar_registros_a_buffer(t_buffer *buffer, t_registros* registros);
 void agregar_string_a_buffer(t_buffer *buffer, char *string);
 void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor);
 void agregar_motivo_block_a_buffer(t_buffer *buffer, motivo_block motivo);

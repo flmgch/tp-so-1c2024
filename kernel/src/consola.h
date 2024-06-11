@@ -6,8 +6,8 @@
 void inicializar_consola();
 bool validar_instruccion(char *leido);
 void atender_instruccion(char *leido);
-void iniciar_proceso(t_buffer *buffer);
+t_pcb *crear_pcb(int pid);
+void inicializar_registros_pcb(t_pcb *pcb);
 int asignar_pid();
-
 
 #endif

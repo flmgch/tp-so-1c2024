@@ -83,7 +83,7 @@ void inicializar_tests() {
   pcb2.program_counter = 200;
   pcb2.estado = EXEC;
   pcb2.motivo_block = IO_BLOCK;
-  pcb2.motivo_exit = SEG_FAULT;
+  pcb2.motivo_exit = NONE_EXIT;
   pcb2.registros_cpu = &registros2;
   pcb2.quantum_remanente = 10;
 
@@ -92,7 +92,7 @@ void inicializar_tests() {
   pcb3.program_counter = 300;
   pcb3.estado = BLOCK;
   pcb3.motivo_block = IO_BLOCK;
-  pcb3.motivo_exit = OUT_OF_MEMORY;
+  pcb3.motivo_exit = NONE_EXIT;
   pcb3.registros_cpu = &registros3;
   pcb3.quantum_remanente = 15;
 }

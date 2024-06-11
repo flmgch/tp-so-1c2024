@@ -7,7 +7,6 @@
 extern t_log *kernel_logger;
 extern t_config *kernel_config;
 extern int identificador_pid;
-extern int contador_pcbs;
 extern bool planif_iniciada;
 
 // VALORES DEL CONFIG

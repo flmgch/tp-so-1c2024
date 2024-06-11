@@ -14,7 +14,6 @@
   t_log *kernel_logger;
   t_config *kernel_config;
   int identificador_pid = 1;
-  int contador_pcbs = 1;
   bool planif_iniciada = false;
 
 // VALORES DEL CONFIG

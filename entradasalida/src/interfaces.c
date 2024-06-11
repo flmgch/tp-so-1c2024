@@ -2,7 +2,7 @@
 
 void atender_generica(t_buffer *buffer)
 {
-    interfaz* una_interfaz;
+    interfaz* una_interfaz = malloc(sizeof(interfaz));
     una_interfaz->pid = extraer_int_de_buffer(buffer);
     una_interfaz->tipo_interfaz = extraer_string_de_buffer(buffer);
     una_interfaz->nombre_interfaz = extraer_string_de_buffer(buffer);

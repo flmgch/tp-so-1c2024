@@ -124,7 +124,7 @@ void pasar_a_ready(t_pcb *pcb)
     pthread_mutex_lock(&mutex_cola_ready);
     cambiar_estado(pcb, READY);
     list_add(cola_ready, pcb);
-    log_info(kernel_logger, "Se pasa el proceso:%d de NEW a READY", pcb->pid);
+    log_info(kernel_logger, "Se pasa el proceso: %d de NEW a READY", pcb->pid);
     pthread_mutex_unlock(&mutex_cola_ready);
 }
 

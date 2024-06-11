@@ -10,6 +10,7 @@ void planificar();
 void planificar_corto_plazo();
 void planificar_largo_plazo();
 
+void agregar_pcb(t_list *list, t_pcb *pcb, pthread_mutex_t *mutex);
 void pasar_a_ready(t_pcb *pcb);
 void block_pcb();
 void new_pcb();

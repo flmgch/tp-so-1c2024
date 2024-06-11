@@ -18,7 +18,7 @@ void inicializar_consola()
 
         atender_instruccion(leido);
         free(leido);
-        leido = readline("> Ingrese un comando:  ");
+        leido = readline("> Ingrese un comando: ");
     }
     free(leido);
 }
@@ -96,14 +96,24 @@ void atender_instruccion(char *leido)
     }
     else if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0)
     {
-        agregar_string_a_buffer(un_buffer, comando_consola[1]); // [path]
+        // CREAR PCB
+        int pid = asignar_pid();
+        t_pcb *pcb = crear_pcb(pid);
+        
+        // AGREGAR PCB A NEW
+        log_info(kernel_logger, "Se crea el proceso %d en NEW", pid);
+        agregar_pcb(cola_new, pcb, &mutex_cola_new);
+        sem_post(&sem_new);
 
+        // TOMAR PATH DE CONSOLA
+        agregar_string_a_buffer(un_buffer, comando_consola[1]); // [path]
         char *path = extraer_string_de_buffer(un_buffer);
         destruir_buffer(un_buffer);
-        // ENVIAR A MEMORIA
+
+        // ENVIAR A MEMORIA PATH Y PID
         t_buffer *a_enviar = crear_buffer();
         agregar_string_a_buffer(a_enviar, path);
-        agregar_uint32_a_buffer(a_enviar, pcb1.pid);
+        agregar_uint32_a_buffer(a_enviar, pcb->pid);
         t_paquete *paquete = crear_super_paquete(CREAR_PROCESO, a_enviar);
         enviar_paquete(paquete, socket_conexion_memoria);
         eliminar_paquete(paquete);
@@ -142,10 +152,6 @@ void atender_instruccion(char *leido)
     }
 }
 
-void iniciar_proceso(t_buffer *buffer)
-{
-}
-
 int asignar_pid()
 {
     int valor_pid;
@@ -156,4 +162,39 @@ int asignar_pid()
     pthread_mutex_unlock(&mutex_pid);
 
     return valor_pid;
+}
+
+t_pcb *crear_pcb(int pid)
+{
+    // CREACION DE PCB CON VALORES EN 0
+
+    t_pcb *pcb = malloc(sizeof(t_pcb));
+
+    pcb->pid = pid;
+    pcb->program_counter = 0;
+    pcb->estado = NEW;
+    pcb->motivo_block = NONE_BLOCK;
+    pcb->motivo_exit = NONE_EXIT;
+    pcb->quantum_remanente = 0;
+
+    t_registros *registros = malloc(sizeof(t_registros));
+    pcb->registros_cpu = registros;
+    inicializar_registros_pcb(pcb);
+    
+    return pcb;
+}
+
+void inicializar_registros_pcb(t_pcb *pcb)
+{
+
+    pcb->registros_cpu->ax = 0;
+    pcb->registros_cpu->bx = 0;
+    pcb->registros_cpu->cx = 0;
+    pcb->registros_cpu->dx = 0;
+    pcb->registros_cpu->eax = 0;
+    pcb->registros_cpu->ebx = 0;
+    pcb->registros_cpu->ecx = 0;
+    pcb->registros_cpu->edx = 0;
+    pcb->registros_cpu->si = 0;
+    pcb->registros_cpu->di = 0;
 }
