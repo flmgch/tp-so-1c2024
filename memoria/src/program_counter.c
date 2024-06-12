@@ -20,13 +20,24 @@ void atender_program_counter(t_buffer *buffer)
 
 t_proceso *encontrar_proceso(t_list *lista, uint32_t pid_cpu)
 {
-    int soy_proceso_buscado(t_proceso * proceso)
+    t_proceso *proceso_buscado = malloc(sizeof(t_proceso));
+
+    bool auxiliar_busqueda(void *elemento)
     {
-        return proceso->pid == pid_cpu;
+        return soy_proceso_buscado(elemento, pid_cpu);
     }
 
-    return list_find(lista, (void *)soy_proceso_buscado);
+    proceso_buscado = list_find(lista, auxiliar_busqueda);
+
+    return proceso_buscado;
 };
+
+bool soy_proceso_buscado(void *elemento, uint32_t pid_cpu)
+{
+    t_proceso *proceso_buscado = malloc(sizeof(t_proceso));
+    proceso_buscado = (t_proceso *)elemento;
+    return proceso_buscado->pid == pid_cpu;
+}
 
 void enviar_instruccion(char *instruccion)
 {

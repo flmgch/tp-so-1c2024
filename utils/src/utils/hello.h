@@ -154,11 +154,26 @@ typedef struct
     u_int32_t quantum_remanente;
 } t_pcb;
 
+typedef enum
+{
+    LSB_FIRST,
+    MSB_FIRST
+} bit_numbering_t;
+
+typedef struct
+{
+    char *bitarray;
+    size_t size;
+    bit_numbering_t mode;
+} t_bitarray;
+
 typedef struct
 {
     uint32_t pid;
     char *path;
     t_list *listas;
+    int size;
+    t_list *tabla_paginas;
 } t_proceso;
 
 typedef enum

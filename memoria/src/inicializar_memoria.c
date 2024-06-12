@@ -4,6 +4,8 @@ void inicializar_memoria()
 {
     inicializar_logger();
     inicializar_config();
+    inicializar_espacio_usuario();
+    lista_de_procesos = list_create();
 }
 
 void inicializar_logger()
@@ -21,4 +23,27 @@ void inicializar_config()
     tamanio_memoria = config_get_int_value(mem_config, "TAM_MEMORIA");
     tamanio_pagina = config_get_int_value(mem_config, "TAM_PAGINA");
     retardo_respuesta = config_get_int_value(mem_config, "RETARDO_RESPUESTA");
+}
+
+void inicializar_espacio_usuario()
+{
+    espacio_usuario = malloc(tamanio_memoria);
+    int cantidad_marcos = tamanio_memoria / tamanio_pagina;
+    int tam = calcular_tamanio(cantidad_marcos);
+    bitmap_espacio_usuario = malloc(tam);
+    bitmap = bitarray_create_with_mode(bitmap_espacio_usuario, tam, LSB_FIRST);
+}
+
+int calcular_tamanio(int marcos)
+{
+    int tam;
+    if (marcos % 8 == 0)
+    {
+        tam = marcos / 8;
+    }
+    else
+    {
+        tam = marcos / 8 + 1;
+    }
+    return tam;
 }
