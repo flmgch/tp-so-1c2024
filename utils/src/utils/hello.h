@@ -61,6 +61,7 @@ typedef enum
     RESPUESTA_HANDSHAKE,
     // KERNEL - CPU
     ENVIO_PCB,
+    CAMBIAR_ESTADO,
     // KERNEL - MEMORIA
     CREAR_PROCESO,
     FINALIZAR_PROCESO,
@@ -125,12 +126,12 @@ typedef enum
 typedef enum
 {
     SUCCESS,
-    ERROR,
-    FIN_PROCESO,
-    RECURSO_INEXISTENTE,
+    INTERRUPTED_BY_USER,
+    INVALID_RESOURCE,
+    INVALID_INTERFACE,
+    OUT_OF_MEMORY,
     NONE_EXIT
 } motivo_exit;
-
 typedef enum
 {
     NEW,
@@ -228,22 +229,9 @@ t_registros* extraer_registros_de_buffer(t_buffer* buffer);
 motivo_exit extraer_motivo_exit_de_buffer(t_buffer *buffer);
 estado_proceso extraer_estado_proceso_de_buffer(t_buffer *buffer);
 motivo_block extraer_motivo_block_de_buffer(t_buffer *buffer);
+t_pcb *extraer_pcb_de_buffer(t_buffer *buffer);
 
 // FUNCIONES PAQUETE
-
-t_paquete *crear_paquete(void);
-t_paquete *crear_super_paquete(op_code cop, t_buffer *buffer);
-
-void agregar_a_paquete(t_paquete *paquete, void *valor, int tamanio);
-void *serializar_paquete(t_paquete *paquete);
-
-// FUNCIONES ENVIAR
-void enviar_mensaje(char *mensaje, int socket_cliente);
-void enviar_paquete(t_paquete *paquete, int socket_cliente);
-void enviar_pcb(t_pcb *pcb, int socket_servidor);
-
-// FUNCIONES PAQUETE
-
 t_paquete *crear_paquete(void);
 t_paquete *crear_super_paquete(op_code cop, t_buffer *buffer);
 

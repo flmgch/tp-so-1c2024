@@ -493,6 +493,19 @@ t_registros* extraer_registros_de_buffer(t_buffer* buffer) {
     return registros;
 }
 
+t_pcb *extraer_pcb_de_buffer(t_buffer *buffer)
+{
+  t_pcb *pcb = malloc(sizeof(t_pcb));
+  pcb->pid = extraer_int_de_buffer(buffer);
+  pcb->program_counter = extraer_int_de_buffer(buffer);
+  pcb->estado = extraer_estado_proceso_de_buffer(buffer);
+  pcb->motivo_block = extraer_motivo_block_de_buffer(buffer);
+  pcb->motivo_exit = extraer_motivo_exit_de_buffer(buffer);
+  pcb->registros_cpu = extraer_registros_de_buffer(buffer);
+  pcb->quantum_remanente = extraer_uint32_de_buffer(buffer);
+  return pcb;
+}
+
 estado_proceso extraer_estado_proceso_de_buffer(t_buffer *buffer)
 {
   estado_proceso estado = extraer_int_de_buffer(buffer);
@@ -545,10 +558,14 @@ char *motivo_exit_to_string(motivo_exit motivo)
   {
   case SUCCESS:
     return "SUCCESS";
-  case FIN_PROCESO:
-    return "FIN_PROCESO";
-  case RECURSO_INEXISTENTE:
-    return "RECURSO_INEXISTENTE";
+  case INTERRUPTED_BY_USER:
+    return "INTERRUPTED_BY_USER";
+  case INVALID_RESOURCE:
+    return "INVALID_RESOURCE";
+  case INVALID_INTERFACE:
+    return "INVALID_INTERFACE";
+  case OUT_OF_MEMORY:
+    return "OUT_OF_MEMORY";
   case NONE_EXIT:
     return "NONE_EXIT";
   default:
