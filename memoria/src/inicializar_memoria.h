@@ -6,5 +6,6 @@
 void inicializar_memoria();
 void inicializar_logger();
 void inicializar_config();
-
+void inicializar_espacio_usuario();
+int calcular_tamanio(int marcos);
 #endif

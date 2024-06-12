@@ -11,6 +11,8 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
     char *archivo = strcat(path_instrucciones, proceso->path);
 
     proceso->listas = abrir_archivo(archivo);
+    proceso->size = 0;
+    proceso->tabla_paginas = list_create();
 
     return proceso;
 };
