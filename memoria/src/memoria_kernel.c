@@ -18,12 +18,14 @@ void atender_kernel()
             //
             break;
         case CREAR_PROCESO:
-           un_buffer = recibir_buffer(socket_kernel);
-           t_proceso *proceso = atender_crear_proceso(un_buffer);
+           t_buffer *buffer_crear_proceso = crear_buffer();
+           buffer_crear_proceso  = recibir_buffer(socket_kernel);
+           t_proceso *proceso = atender_crear_proceso(buffer_crear_proceso);
            pthread_mutex_lock(&mutex_lista_procesos);
            list_add(lista_de_procesos, proceso);
            free(proceso);
            pthread_mutex_unlock(&mutex_lista_procesos);
+           destruir_buffer(buffer_crear_proceso);
            break;
         case FINALIZAR_PROCESO:
             un_buffer = recibir_buffer(socket_kernel);
