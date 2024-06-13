@@ -3,6 +3,7 @@
 
 #include "gestor_memoria.h"
 #include "program_counter.h"
+#include "acceso_tablas_paginas.h"
 
 void atender_cpu();
 

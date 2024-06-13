@@ -2,10 +2,13 @@
 
 void atender_interfaz()
 {
+
     bool control_key = 1;
     while (control_key)
     {
+        t_buffer *un_buffer = crear_buffer();
         int cod_op = recibir_operacion(socket_interfaz);
+        usleep(retardo_respuesta);
         switch (cod_op)
         {
         case MENSAJE:
@@ -22,5 +25,6 @@ void atender_interfaz()
             log_warning(mem_logger, "Operacion desconocida de interfaz");
             break;
         }
+        destruir_buffer(un_buffer);
     }
 };

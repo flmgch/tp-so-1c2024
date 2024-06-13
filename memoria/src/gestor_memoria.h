@@ -16,4 +16,9 @@ extern t_bitarray *bitmap;
 // SOCKETS
 extern int socket_escucha, socket_cpu, socket_kernel, socket_interfaz;
 
+// SEMAFOROS Y MUTEX
+extern pthread_mutex_t mutex_bitmap;
+extern pthread_mutex_t mutex_espacio_usuario;
+extern pthread_mutex_t mutex_lista_procesos;
+
 #endif

@@ -13,10 +13,18 @@ t_config *mem_config;
 char *puerto_escucha, *path_instrucciones;
 int tamanio_memoria, tamanio_pagina, retardo_respuesta;
 t_list *lista_de_procesos;
+
+// ESPACIOS MEMORIA
 void *espacio_usuario;
 void *bitmap_espacio_usuario;
 t_bitarray *bitmap;
+
 // SOCKETS
 int socket_escucha, socket_cpu, socket_kernel, socket_interfaz;
+
+// SEMAFOROS Y MUTEX
+pthread_mutex_t mutex_lista_procesos;
+pthread_mutex_t mutex_bitmap;
+pthread_mutex_t mutex_espacio_usuario;
 
 #endif

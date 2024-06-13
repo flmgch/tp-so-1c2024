@@ -4,6 +4,7 @@ void inicializar_memoria()
 {
     inicializar_logger();
     inicializar_config();
+    inicializar_semaforos();
     inicializar_espacio_usuario();
     lista_de_procesos = list_create();
 }
@@ -46,4 +47,25 @@ int calcular_tamanio(int marcos)
         tam = marcos / 8 + 1;
     }
     return tam;
+}
+
+void inicializar_semaforos()
+{
+    pthread_mutex_init(&mutex_lista_procesos, NULL);
+    pthread_mutex_init(&mutex_bitmap, NULL);
+    pthread_mutex_init(&mutex_espacio_usuario, NULL);
+}
+
+void borrar_espacio_usuario()
+{
+    free(espacio_usuario);
+    free(bitmap_espacio_usuario);
+    free(bitmap);
+}
+
+void borrar_semaforos()
+{
+    pthread_mutex_destroy(&mutex_bitmap);
+    pthread_mutex_destroy(&mutex_espacio_usuario);
+    pthread_mutex_destroy(&mutex_lista_procesos);
 }

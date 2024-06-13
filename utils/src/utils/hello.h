@@ -71,16 +71,18 @@ typedef enum
     STDOUT,
     DIALFS,
     // MEMORIA QUE TODAVIA NO SE USA
-    TERMINAR_PROCESO,
-    ACESO_TABLA_PAGINAS,
     AMPLIACION_PROCESO,
     REDUCCION_PROCESO,
     ACCESO_ESPACIO_USUARIO_CPU,
     ACCESO_ESPACIO_USUARIO_IO,
-    ENVIAR_INSTRUCCIONES,
     // MEMORIA-KERNEL
     // MEMORIA-CPU
     RECIBIR_INSTRUCCION,
+    ENIVIAR_FRAME,
+    // CPU-MEMORIA
+    ACCESO_TABLA_PAGINAS,
+    ENVIAR_INSTRUCCIONES
+    // CPU-KERNEL
 } op_code;
 
 typedef struct {
@@ -173,8 +175,14 @@ typedef struct
     char *path;
     t_list *listas;
     int size;
-    t_list *tabla_paginas;
+    t_list *filas_tabla_paginas;
 } t_proceso;
+
+typedef struct
+{
+    int frame;
+    int bit_precencia;
+} tabla_de_paginas;
 
 typedef enum
 {

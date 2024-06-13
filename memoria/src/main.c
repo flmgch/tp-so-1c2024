@@ -34,10 +34,13 @@ int main(int argc, char *argv[])
   pthread_create(&hilo_interfaz, NULL, (void *)atender_interfaz, NULL);
   pthread_join(hilo_interfaz, NULL);
 
-  // close(socket_escucha);
-  // close(socket_interfaz);
-  // close(socket_cpu);
-  // close(socket_kernel);
-  // terminar_programa(mem_logger, mem_config);
+  // borrar_espacio_usuario();
+  // borrar_semaforos();
+  // list_destroy(lista_de_procesos);
+  //  close(socket_escucha);
+  //  close(socket_interfaz);
+  //  close(socket_cpu);
+  //  close(socket_kernel);
+  //  terminar_programa(mem_logger, mem_config);
   return 0;
 }

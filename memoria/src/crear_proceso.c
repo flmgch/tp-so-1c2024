@@ -12,7 +12,7 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
 
     proceso->listas = abrir_archivo(archivo);
     proceso->size = 0;
-    proceso->tabla_paginas = list_create();
+    proceso->filas_tabla_paginas = list_create();
 
     return proceso;
 };
