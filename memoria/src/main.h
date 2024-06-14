@@ -15,6 +15,8 @@ int tamanio_memoria, tamanio_pagina, retardo_respuesta;
 t_list *lista_de_procesos;
 
 // ESPACIOS MEMORIA
+int cantidad_de_marcos_libres;
+int cantidad_marcos;
 void *espacio_usuario;
 void *bitmap_espacio_usuario;
 t_bitarray *bitmap;

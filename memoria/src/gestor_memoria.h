@@ -9,6 +9,10 @@ extern t_config *mem_config;
 extern char *puerto_escucha, *path_instrucciones;
 extern int tamanio_memoria, tamanio_pagina, retardo_respuesta;
 extern t_list *lista_de_procesos;
+
+// ESPACIO USUARIO
+extern int cantidad_de_marcos_libres;
+extern int cantidad_marcos;
 extern void *espacio_usuario;
 extern void *bitmap_espacio_usuario;
 extern t_bitarray *bitmap;

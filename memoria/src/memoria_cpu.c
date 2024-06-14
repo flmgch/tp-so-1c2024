@@ -24,6 +24,10 @@ void atender_cpu()
             un_buffer = recibir_buffer(socket_cpu);
             atender_acceso_tabla_paginas(un_buffer);
             break;
+        case AJUSTAR_TAMANIO:
+            un_buffer = recibir_buffer(socket_cpu);
+            atender_acceso_tabla_paginas(un_buffer);
+            break;
         case -1:
             log_error(mem_logger, "Se desconecto CPU");
             control_key = 0;
@@ -34,4 +38,4 @@ void atender_cpu()
         }
         destruir_buffer(un_buffer);
     }
-};
+}
