@@ -43,10 +43,6 @@ typedef enum {
     UNKNOWN
 } cod_instruccion;
 
-typedef struct {
-    uint32_t numero_pagina;   
-    uint32_t desplazamiento;  
-} t_direccion_logica;
 
 typedef struct 
 {
@@ -69,7 +65,6 @@ typedef enum
     CAMBIAR_ESTADO,
     ATENDER_WAIT,
     ATENDER_SIGNAL,
-    OP_IO_GEN_SLEEP,
     // KERNEL - MEMORIA
     CREAR_PROCESO,
     FINALIZAR_PROCESO,
@@ -89,8 +84,9 @@ typedef enum
     ENIVIAR_FRAME,
         // CPU-MEMORIA
     ACCESO_TABLA_PAGINAS,
-    ENVIAR_INSTRUCCIONES
+    ENVIAR_INSTRUCCIONES,
     // CPU-KERNEL
+    OP_IO_GEN_SLEEP
 } op_code;
 
 typedef struct {
@@ -178,6 +174,13 @@ typedef struct
     int frame;
     int bit_precencia;
 } tabla_de_paginas;
+
+typedef struct {
+    uint32_t pid;        
+    int pagina; 
+    int marco;
+    int ultimo_acceso; //para el lru
+} tlb_entrada_t;
 
 typedef enum
 {

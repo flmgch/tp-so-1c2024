@@ -18,4 +18,10 @@ bool flag_execute;
 // SOCKETS
 int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
 
+// TLB
+tlb_entrada_t* tlb;  
+int tlb_proximo_reemplazo; 
+int tlb_entradas;
+int contador_acceso;
+
 #endif

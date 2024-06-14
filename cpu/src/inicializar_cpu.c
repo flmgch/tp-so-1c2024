@@ -31,3 +31,10 @@ void inicializar_variables(){
 	// registros = inicializar_registros();
 	flag_execute = true;
 }
+
+void inicializar_tlb() {
+    tlb = (tlb_entrada_t*)malloc(cantidad_entradas_tlb * sizeof(tlb_entrada_t));
+    tlb_proximo_reemplazo = 0; 
+    tlb_entradas = 0;
+    contador_acceso = 0; //para el lru
+}
