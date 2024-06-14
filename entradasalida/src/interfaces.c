@@ -16,11 +16,7 @@ void atender_generica(t_buffer *buffer)
     usleep(una_interfaz->unidades_trabajo * una_interfaz->tiempo_unidad_trabajo * 1000);
     log_info(io_logger, "Finalizado IO_GEN_SLEEP a la interfaz %s", una_interfaz->nombre_interfaz);
 
-    free(una_interfaz->tipo_interfaz);
-    free(una_interfaz->nombre_interfaz);
-    free(una_interfaz->archivo_configuracion);
-    free(una_interfaz->ip_kernel);
-    free(una_interfaz->puerto_kernel);
+    free(una_interfaz);
 }
 
 void atender_stdin(t_buffer *buffer)

@@ -5,14 +5,14 @@ void atender_kernel()
     bool control_key = 1;
     while (control_key)
     {
+        t_buffer *un_buffer = crear_buffer();
         int cod_op = recibir_operacion(socket_kernel);
         switch (cod_op)
         {
-        case MENSAJE:
-            //
-            break;
-        case PAQUETE:
-            //
+        case GENERICA:
+            un_buffer = recibir_buffer(socket_kernel);
+            atender_generica(un_buffer);
+            destruir_buffer(un_buffer);
             break;
         case -1:
             log_error(io_logger, "Se desconecto Kernel");

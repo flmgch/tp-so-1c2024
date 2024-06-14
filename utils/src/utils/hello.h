@@ -183,18 +183,6 @@ typedef struct {
     int ultimo_acceso; //para el lru
 } tlb_entrada_t;
 
-typedef enum
-{
-    GEN_SLEEP,
-    STDIN_READ,
-    STDOUT_WRITE,
-    FS_CREATE,
-    FS_DELETE,
-    FS_TRUNCATE,
-    FS_WRITE,
-    FS_READ
-} instrucciones;
-
 typedef struct
 {
     u_int32_t pid;
@@ -207,7 +195,7 @@ typedef struct
     char *puerto_kernel;
     char *ip_memoria;
     char *puerto_memoria;
-    instrucciones *conjunto_instrucciones;
+    cod_instruccion *instrucciones;
 } interfaz; // Lo necesario para manipular lo que me mande el Kernel
 
 // UTILIDADES
