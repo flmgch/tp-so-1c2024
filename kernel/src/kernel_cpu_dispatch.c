@@ -19,25 +19,36 @@ void atender_cpu_dispatch() {
             t_buffer *buffer = recibir_buffer(socket_conexion_cpu_dispatch);
             t_pcb *contexto_recibido = extraer_pcb_de_buffer(buffer);
             log_info(kernel_logger, "Recibi un PCB que me envio el CPU");
-            destruir_buffer(buffer);
 
             // ACTUALIZO EL PCB QUE ESTABA EN EXEC
             t_pcb *pcb = remover_pcb(cola_execute, &mutex_cola_exec);
             pcb = contexto_recibido;
-
+            int cop = extraer_int_de_buffer(buffer);
             // RECIBO OTRO COP PARA SABER QUE TENGO QUE HACER CON EL PCB
-            recv(socket_conexion_cpu_dispatch, &cod_op, sizeof(op_code), 0);
-            switch (cod_op)
+            
+            switch (cop)
             {
             case CAMBIAR_ESTADO:
                 log_info(kernel_logger, "Recibi un aviso de cambio de estado");
-                t_buffer *buffer = recibir_buffer(socket_conexion_cpu_dispatch);
                 estado_proceso nuevo_estado = extraer_estado_proceso_de_buffer(buffer);
                 procesar_cambio_estado(pcb, nuevo_estado);
                 sem_post(&sem_exec);
-                destruir_buffer(buffer);
                 break;
+            case ATENDER_WAIT:
+                log_info(kernel_logger, "Recibi un aviso de atender WAIT");
+				char* recurso_wait = extraer_string_de_buffer(buffer);
+				atender_wait(pcb, recurso_wait);
+				free(recurso_wait);
+				break;
+			case ATENDER_SIGNAL:
+                log_info(kernel_logger, "Recibi un aviso de atender SIGNAL");
+				char* recurso_signal = extraer_string_de_buffer(buffer);
+				atender_signal(pcb, recurso_signal);
+				free(recurso_signal);
+				break;
             }
+            destruir_buffer(buffer);
+            break;
         case -1:
             log_error(kernel_logger, "Se desconecto CPU - Dispatch");
             control_key = 0;
@@ -73,4 +84,88 @@ void procesar_cambio_estado(t_pcb *pcb, estado_proceso estado_nuevo)
         log_error(kernel_logger, "Cambio de estado no reconocido");
         break;
     }
+}
+
+void atender_wait(t_pcb *pcb, char *recurso)
+{
+	t_recurso *recursobuscado = buscar_recurso(recurso);
+
+    // ! SI DA ERROR EL RECURSO
+	if (recursobuscado->id == -1)
+	{
+		log_error(kernel_logger, "No existe el recurso solicitado: %s", recurso);
+		pcb->motivo_exit = INVALID_RESOURCE;
+		agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+		sem_post(&sem_exit);
+		sem_post(&sem_exec);
+	}
+	else
+	{
+		recursobuscado->instancias--;
+		log_info(kernel_logger, "PID: %d - Wait: %s - Instancias: %d", pcb->pid, recurso, recursobuscado->instancias);
+
+        // ! SI NO HAY SUFICIENTES INSTANCIAS DEL RECURSO DISPONIBLES
+		if (recursobuscado->instancias < 0)
+		{
+			cambiar_estado(pcb, BLOCK);
+			log_info(kernel_logger, "PID: %d - Bloqueado por: %s", pcb->pid, recurso);
+            // TODO Calcular quantum remanente del proceso para usarlo en VRR
+			// calcular_estimacion(pcb);
+			agregar_pcb(recursobuscado->cola_block_asignada, pcb, &recursobuscado->mutex_asignado);
+			sem_post(&sem_exec);
+		}
+        // SI SALE TODO BIEN, VUELVE A MANDAR EL PCB AL CPU
+		else
+		{
+			dispatch_pcb(pcb);
+		}
+	}
+}
+
+t_recurso *buscar_recurso(char *recurso)
+{
+	int longitudLista = list_size(lista_recursos);
+	t_recurso *recursobuscado;
+	for (int i = 0; i < longitudLista; i++)
+	{
+		recursobuscado = list_get(lista_recursos, i);
+		if (strcmp(recursobuscado->recurso, recurso) == 0)
+		{
+			return recursobuscado;
+		}
+	}
+    // ! SI NO ENCUENTRA EL RECURSO, PONE ID = -1
+	recursobuscado->id = -1;
+	return recursobuscado;
+}
+
+void atender_signal(t_pcb *pcb, char *recurso)
+{
+	t_recurso *recursobuscado = buscar_recurso(recurso);
+
+    // ! SI DA ERROR EL RECURSO
+	if (recursobuscado->id == -1)
+	{
+		log_error(kernel_logger, "No existe el recurso solicitado: %s", recurso);
+		pcb->motivo_exit = INVALID_RESOURCE;
+		agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+		sem_post(&sem_exit);
+		sem_post(&sem_exec);
+	}
+	else
+	{
+		recursobuscado->instancias++;
+		log_info(kernel_logger, "PID: %d - Signal: %s - Instancias: %d", pcb->pid, recurso, recursobuscado->instancias);
+
+        // DESBLOQUEA AL PRIMER PROCESO DE LA COLA DE BLOQUEADOS DEL RECURSO SI CORRESPONDE
+		if (recursobuscado->instancias <= 0)
+		{
+			t_pcb *pcb_bloqueado = remover_pcb(recursobuscado->cola_block_asignada, &recursobuscado->mutex_asignado);
+			agregar_pcb(cola_block, pcb_bloqueado, &mutex_cola_block);
+			sem_post(&sem_block_return);
+		}
+
+        // MANDA EL PROCESO RECIBIDO A EXEC
+		dispatch_pcb(pcb);
+	}
 }
