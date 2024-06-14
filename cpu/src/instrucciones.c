@@ -1,4 +1,5 @@
 #include "instrucciones.h"
+#include "instrucciones_mem.h"
 
 void* obtener_registro(char registro[20]) {
     if (strcmp(registro, "AX") == 0) {

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <math.h>
 #include <readline/readline.h>
 #include <pthread.h>
 #include <signal.h>

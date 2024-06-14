@@ -14,6 +14,7 @@ int cantidad_entradas_tlb;
 t_pcb* pcb;
 t_registros *registros;
 bool flag_execute;
+int tamanio_pagina = 32;
 
 // SOCKETS
 int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;

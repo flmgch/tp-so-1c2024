@@ -1,4 +1,5 @@
 #include "cpu_kernel_dispatch.h"
+#include "ciclo_instrucciones.h"
 
 void atender_kernel_dispatch()
 {

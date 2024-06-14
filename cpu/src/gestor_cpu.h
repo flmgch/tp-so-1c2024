@@ -11,7 +11,7 @@ extern int cantidad_entradas_tlb;
 extern t_pcb* pcb;
 extern t_registros* registros;
 extern bool flag_execute;
-extern int tamanio_pagina = 32;
+extern int tamanio_pagina;
 
 // SOCKETS
 extern int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;

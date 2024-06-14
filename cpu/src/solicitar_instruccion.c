@@ -63,18 +63,18 @@ t_instruccion solicitar_instruccion(u_int32_t direccion_instruccion){
     eliminar_paquete(paquete);
     free(un_buffer);
         //recibir instruccion en foma de string
-    t_buffer *un_buffer;
+    t_buffer *otro_buffer = crear_buffer();
     char* string;
     int cod_op = recibir_operacion(socket_memoria);
     if (cod_op == RECIBIR_INSTRUCCION){
-        un_buffer=recibir_buffer(socket_memoria);
-        string = atender_instrucciones(un_buffer);
+        otro_buffer=recibir_buffer(socket_memoria);
+        string = atender_instrucciones(otro_buffer);
     }
     else{
         log_warning(cpu_logger, "Operacion desconocida: No es una instruccion");
         exit(EXIT_FAILURE);
     }
-    destruir_buffer(un_buffer);
+    destruir_buffer(otro_buffer);
 
     t_instruccion instruccion = formular_instruccion(string);
     free(string);

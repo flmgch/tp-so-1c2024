@@ -1,4 +1,6 @@
 #include "traduccion.h"
+#include "tlb.h"
+#include "consultar_memoria.h"
 
 uint32_t traducir_direccion_logica (uint32_t direccion_logica){
     int  numero_pagina = floor(direccion_logica / tamanio_pagina);
@@ -15,7 +17,7 @@ int obtener_marco(int numero_pagina,int desplazamiento){
     if (index_tlb != -1) {
         // tlb Hit
         log_info(cpu_logger, "PID: %d - TLB HIT - Pagina: %d",pcb->pid,numero_pagina);
-        log_cpu(cpu_logger, "PID: %d - OBTENER MARCO - Página: %d - Marco: %d",pcb->pid, numero_pagina, tlb[index_tlb].marco);
+        log_info(cpu_logger, "PID: %d - OBTENER MARCO - Página: %d - Marco: %d",pcb->pid, numero_pagina, tlb[index_tlb].marco);
         return tlb[index_tlb].marco;
     } else {
         // tlb Miss

@@ -1,5 +1,6 @@
 #include "ciclo_instrucciones.h"
 #include "solicitar_instruccion.h"
+#include "instrucciones.h"
 
 const char* instruccion_to_string(cod_instruccion codigo) {
     switch (codigo) {
@@ -46,23 +47,24 @@ void decode(u_int32_t dir_instruccion){
         case IO_GEN_SLEEP:
             ejecutar_io_gen_sleep(instruccion.param1, instruccion.param2);
             break;
-                case MOV_IN:
-            ejecutar_mov_in(instruccion.param1, instruccion.param2);
+        case MOV_IN:
+            // ! DESCOMENTAR TODAS LAS FUNCIONES DE ABAJO CUANDO ESTEN IMPLEMENTADAS
+            // ejecutar_mov_in(instruccion.param1, instruccion.param2);
             break;
         case MOV_OUT:
-            ejecutar_mov_out(instruccion.param1, instruccion.param2);
+            // ejecutar_mov_out(instruccion.param1, instruccion.param2);
             break;
         case RESIZE:
-            ejecutar_resize(instruccion.param1);
+            // ejecutar_resize(instruccion.param1);
             break;
         case COPY_STRING:
-            ejecutar_copy_string(instruccion.param1);
+            // ejecutar_copy_string(instruccion.param1);
             break;
         case IO_STDIN_READ:
-            ejecutar_io_stdin_read(instruccion.param1, instruccion.param2, instruccion.param3);
+            // ejecutar_io_stdin_read(instruccion.param1, instruccion.param2, instruccion.param3);
             break;
         case IO_STDOUT_WRITE:
-            ejecutar_io_stdout_write(instruccion.param1, instruccion.param2, instruccion.param3);
+            // ejecutar_io_stdout_write(instruccion.param1, instruccion.param2, instruccion.param3);
             break;
         case EXIT:
             ejecutar_exit();

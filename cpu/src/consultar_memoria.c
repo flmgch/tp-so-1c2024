@@ -9,18 +9,18 @@ int consultar_memoria(uint32_t pid,int numero_pagina){
     eliminar_paquete(paquete);
     free(un_buffer);
     
-    t_buffer *un_buffer;
+    t_buffer *otro_buffer;
     int marco;
     int cod_op = recibir_operacion(socket_memoria);
     if (cod_op == ENIVIAR_FRAME){
-        un_buffer=recibir_buffer(socket_memoria);
-        marco = recibir_marco(un_buffer);
+        otro_buffer=recibir_buffer(socket_memoria);
+        marco = recibir_marco(otro_buffer);
     }
     else{
         log_warning(cpu_logger, "Operacion desconocida: No es un marco");
         exit(EXIT_FAILURE);
     }
-    destruir_buffer(un_buffer);
+    destruir_buffer(otro_buffer);
 
     return marco;
 
