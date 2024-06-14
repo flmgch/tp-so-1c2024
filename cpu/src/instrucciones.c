@@ -55,8 +55,8 @@ void ejecutar_set(char registro[20], char valor[20]) {
 
 
 void ejecutar_sum(char registro_destino[20] , char registro_origen[20] ){
-    void* puntero_destino = obtener_registro(registro_destino);
-    void* puntero_origen = obtener_registro(registro_destino);
+    void* puntero_destino = obtener_registro(registro_destino); //void* : direccion de ALGO, 
+    void* puntero_origen = obtener_registro(registro_origen);
 
 
     if (puntero_destino != NULL && puntero_origen != NULL) {
@@ -74,7 +74,7 @@ void ejecutar_sum(char registro_destino[20] , char registro_origen[20] ){
 
 void ejecutar_sub(char registro_destino[20] , char registro_origen[20] ){
         void* puntero_destino = obtener_registro(registro_destino);
-    void* puntero_origen = obtener_registro(registro_destino);
+    void* puntero_origen = obtener_registro(registro_origen);
 
 
     if (puntero_destino != NULL && puntero_origen != NULL) {
@@ -111,5 +111,17 @@ void ejecutar_jnz(char registro[20] , char instruccion[20]){
 }
 
 void ejecutar_io_gen_sleep(char interfaz[20] , char unidades_de_trabajo[20] ){
-    
+    t_buffer *un_buffer = crear_buffer();
+    t_paquete *paquete = crear_super_paquete(OP_IO_GEN_SLEEP, un_buffer);
+    agregar_uint32_a_buffer(un_buffer, atoi(unidades_de_trabajo));
+    agregar_string_a_buffer(un_buffer, interfaz);
+
+    enviar_paquete(paquete, socket_kernel_dispatch);
+    eliminar_paquete(paquete);
+    destruir_buffer(un_buffer);
 }
+
+void ejecutar_exit (){
+    enviar_pcb(pcb,socket_kernel_dispatch);
+}
+

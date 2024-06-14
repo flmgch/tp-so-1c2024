@@ -43,6 +43,11 @@ typedef enum {
     UNKNOWN
 } cod_instruccion;
 
+typedef struct {
+    uint32_t numero_pagina;   
+    uint32_t desplazamiento;  
+} t_direccion_logica;
+
 typedef struct 
 {
     cod_instruccion codigo_instruccion;
@@ -64,6 +69,7 @@ typedef enum
     CAMBIAR_ESTADO,
     ATENDER_WAIT,
     ATENDER_SIGNAL,
+    OP_IO_GEN_SLEEP,
     // KERNEL - MEMORIA
     CREAR_PROCESO,
     FINALIZAR_PROCESO,
@@ -81,7 +87,7 @@ typedef enum
     // MEMORIA-CPU
     RECIBIR_INSTRUCCION,
     ENIVIAR_FRAME,
-    // CPU-MEMORIA
+        // CPU-MEMORIA
     ACCESO_TABLA_PAGINAS,
     ENVIAR_INSTRUCCIONES
     // CPU-KERNEL
@@ -124,7 +130,7 @@ typedef struct
 typedef enum
 {
     IO_BLOCK,
-    NONE_BLOCK
+     NONE_BLOCK
 } motivo_block;
 
 typedef enum
@@ -243,7 +249,22 @@ estado_proceso extraer_estado_proceso_de_buffer(t_buffer *buffer);
 motivo_block extraer_motivo_block_de_buffer(t_buffer *buffer);
 t_pcb *extraer_pcb_de_buffer(t_buffer *buffer);
 
+
 // FUNCIONES PAQUETE
+
+t_paquete *crear_paquete(void);
+t_paquete *crear_super_paquete(op_code cop, t_buffer *buffer);
+
+void agregar_a_paquete(t_paquete *paquete, void *valor, int tamanio);
+void *serializar_paquete(t_paquete *paquete);
+
+// FUNCIONES ENVIAR
+void enviar_mensaje(char *mensaje, int socket_cliente);
+void enviar_paquete(t_paquete *paquete, int socket_cliente);
+void enviar_pcb(t_pcb *pcb, int socket_servidor);
+
+// FUNCIONES PAQUETE
+
 t_paquete *crear_paquete(void);
 t_paquete *crear_super_paquete(op_code cop, t_buffer *buffer);
 
