@@ -22,6 +22,7 @@
   char **recursos;
   int *instancias_recursos;
   t_list *lista_recursos;
+  t_list *lista_io_conectadas;
 
 // SOCKETS
   int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha, socket_interfaz;
@@ -42,6 +43,7 @@
   pthread_mutex_t mutex_cola_block_io;
   pthread_mutex_t mutex_cola_block_fs;
   pthread_mutex_t mutex_cola_exit;
+  pthread_mutex_t mutex_lista_io;
   sem_t sem_multiprogramacion;
   sem_t sem_new;
   sem_t sem_ready;

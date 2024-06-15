@@ -70,6 +70,9 @@ typedef enum
     CREAR_PROCESO,
     FINALIZAR_PROCESO,
     // KERNEL - IO
+    CREAR_INTERFAZ,
+    FIN_INSTRUCCION_INTERFAZ,
+    // IO - KERNEL
     GENERICA,
     STDIN,
     STDOUT,
@@ -85,7 +88,7 @@ typedef enum
     ENIVIAR_FRAME,
     AJUSTAR_TAMANIO,
     RESULTADO_AJUSTE_TAMAÑIO,
-        // CPU-MEMORIA
+    // CPU-MEMORIA
     ACCESO_TABLA_PAGINAS,
     ENVIAR_INSTRUCCIONES,
     // CPU-KERNEL
@@ -162,6 +165,22 @@ typedef struct
     t_registros *registros_cpu;
     u_int32_t quantum_remanente;
 } t_pcb;
+
+typedef struct
+{
+    char *nombre;
+    char *tipo;
+    int socket;
+    t_list *cola_block_asignada;
+    pthread_mutex_t mutex_asignado;
+} t_interfaz_kernel;
+
+typedef struct
+{
+    char *nombre;
+    char *tipo;
+    int socket;
+} t_manejo_io;
 
 typedef struct
 {

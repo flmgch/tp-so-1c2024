@@ -12,6 +12,7 @@ int main(int argc, char *argv[])
   cola_block = list_create();
   cola_exit = list_create();
   lista_recursos = inicializar_recursos();
+  lista_io_conectadas = list_create();
 
   // INICIAR VARIABLES PARA TESTS
   inicializar_tests();
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
 
   // ATENDER INTERFAZ
   pthread_t hilo_interfaz;
-  pthread_create(&hilo_interfaz, NULL, (void *)atender_interfaz, NULL);
+  pthread_create(&hilo_interfaz, NULL, (void *)atender_modulo_interfaz, NULL);
   pthread_detach(hilo_interfaz);
 
   // TODO: INICIAR CONSOLA INTERACTIVA
