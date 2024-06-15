@@ -1,5 +1,5 @@
 #include "espacio_usuario.h"
-
+//yu
 void escribir_memoria(t_buffer *buffer)
 {
     int pid = extraer_int_de_buffer(buffer);
