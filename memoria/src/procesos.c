@@ -42,23 +42,19 @@ void buscar_frame_libre(int frame)
 
 void atender_program_counter(t_buffer *buffer)
 {
-    uint32_t pid_cpu = extraer_uint32_de_buffer(buffer);
+
     uint32_t program_counter = extraer_uint32_de_buffer(buffer);
+    uint32_t pid_cpu = extraer_uint32_de_buffer(buffer);
     t_proceso *proceso = malloc(sizeof(t_proceso));
 
     pthread_mutex_lock(&mutex_lista_procesos);
     proceso = encontrar_proceso(lista_de_procesos, pid_cpu);
     pthread_mutex_unlock(&mutex_lista_procesos);
 
-    if (program_counter <= list_size(proceso->listas))
-    {
-        char *instruccion = list_get(proceso->listas, program_counter);
-        enviar_instruccion(instruccion);
-    }
-    else
-    {
-        enviar_instruccion("");
-    }
+    char **instrucciones = proceso->instrucciones;
+    char *instruccion = instrucciones[program_counter];
+    log_info(mem_logger, "%s", instruccion);
+    enviar_instruccion(instruccion);
 }
 
 void enviar_instruccion(char *instruccion)
@@ -91,7 +87,7 @@ void atender_finalizar_proceso(t_buffer *buffer)
     pthread_mutex_unlock(&mutex_lista_procesos);
 
     int tamanio = proceso_a_eliminar->size / tamanio_pagina;
-    log_info(mem_logger, "Destruccion Tabla de Paginas: PID:%d - Tamaño: %d", pid, tamanio);
+    log_info(mem_logger, "PID:%d - Tamaño: %d", pid, tamanio);
 
     pthread_mutex_lock(&mutex_bitmap);
     for (int i = 0; i < tamanio_lista_procesos; i++)
@@ -103,7 +99,6 @@ void atender_finalizar_proceso(t_buffer *buffer)
     pthread_mutex_unlock(&mutex_bitmap);
 
     list_destroy_and_destroy_elements(proceso_a_eliminar->filas_tabla_paginas, eliminar_lista);
-    list_destroy_and_destroy_elements(proceso_a_eliminar->listas, eliminar_lista);
 
     bool auxiliar_no_ser_proceso_x(void *elemento)
     {
@@ -133,6 +128,7 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
     u_int32_t pid = extraer_uint32_de_buffer(buffer);
     t_proceso *proceso = malloc(sizeof(t_proceso));
     proceso->pid = pid;
+    proceso->path = path;
 
     char *auxiliar = malloc(strlen(path_instrucciones) + 1);
 
@@ -140,30 +136,40 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
 
     char *archivo = strcat(auxiliar, path);
 
-    proceso->listas = abrir_archivo(archivo);
+    proceso->instrucciones = abrir_archivo(archivo);
     proceso->size = 0;
     proceso->filas_tabla_paginas = list_create();
 
-    log_info(mem_logger, "Creacion Tabla de Paginas: PID:%d - Tamaño: %d", pid, 0);
+    log_info(mem_logger, "PID:%d - Tamaño: %d", pid, 0);
     free(auxiliar);
     return proceso;
 }
 
-t_list *abrir_archivo(const char *file)
+char **abrir_archivo(const char *file)
 {
     FILE *pseudocodiogo = fopen(file, "r");
+    char *instrucciones = NULL;
     if (pseudocodiogo != NULL)
     {
-        char instruccion[50];
-        t_list *lista_de_instrucciones = list_create();
-        while (!feof(pseudocodiogo))
+
+        fseek(pseudocodiogo, 0, SEEK_END);
+
+        int length = ftell(pseudocodiogo);
+
+        fseek(pseudocodiogo, 0, SEEK_SET);
+
+        instrucciones = malloc(length + 1);
+        if (instrucciones != NULL)
         {
-            fgets(instruccion, 50, pseudocodiogo);
-            log_info(mem_logger, "%s", instruccion);
-            list_add(lista_de_instrucciones, instruccion);
+
+            fread(instrucciones, 1, length, pseudocodiogo);
+
+            instrucciones[length] = '\0';
         }
         fclose(pseudocodiogo);
-        return lista_de_instrucciones;
+
+        log_info(mem_logger, "%s", instrucciones);
+        return string_split(instrucciones, "\n");
     }
     else
     {
@@ -186,7 +192,7 @@ void atender_acceso_tabla_paginas(t_buffer *buffer)
 
     int *frame = list_get(proceso_buscado->filas_tabla_paginas, numero_pagina);
 
-    log_info(mem_logger, "Acceso Tabla de Paginas: PID:%d - Pagina: %d - Frame: %d", pid, numero_pagina, *frame);
+    log_info(mem_logger, "PID:%d - Pagina: %d - Frame: %d", pid, numero_pagina, *frame);
 
     t_buffer *new_buffer = crear_buffer();
 
@@ -216,12 +222,12 @@ void atender_ajustar_tamanio(t_buffer *buffer)
     if (paginas_futuras > paginas_actuales)
     {
         atender_aumentar_tamanio(proceso_a_modificar, tamanio_nuevo, paginas_actuales, paginas_futuras);
-        log_info(mem_logger, "Ampliacion Proceso: PID:%d - Tamanio Actual: %d - Tamanio a Ampliar: %d", pid, proceso_a_modificar->size, proceso_a_modificar->size - tamanio_nuevo);
+        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Ampliar: %d", pid, proceso_a_modificar->size, proceso_a_modificar->size - tamanio_nuevo);
     }
     else if (paginas_futuras < paginas_actuales)
     {
         atender_reducir_tamanio(proceso_a_modificar, paginas_futuras, paginas_actuales);
-        log_info(mem_logger, "Ampliacion Proceso: PID:%d - Tamanio Actual: %d - Tamanio a Reducir: %d", pid, proceso_a_modificar->size, tamanio_nuevo - proceso_a_modificar->size);
+        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Reducir: %d", pid, proceso_a_modificar->size, tamanio_nuevo - proceso_a_modificar->size);
     }
 
     proceso_a_modificar->size = paginas_futuras * tamanio_pagina;
@@ -285,11 +291,25 @@ void enviar_resultado(char *resultado)
 
     agregar_string_a_buffer(new_buffer, resultado);
 
-    t_paquete *paquete = crear_super_paquete(RESULTADO_AJUSTE_TAMAÑIO, new_buffer);
+    t_paquete *paquete = crear_super_paquete(RESULTADO_AJUSTE_TAMAÑO, new_buffer);
 
     enviar_paquete(paquete, socket_cpu);
 
     free(resultado);
+    destruir_buffer(new_buffer);
+    eliminar_paquete(paquete);
+}
+
+void enviar_tamnio_pagina()
+{
+    t_buffer *new_buffer = crear_buffer();
+
+    agregar_int_a_buffer(new_buffer, tamanio_pagina);
+
+    t_paquete *paquete = crear_super_paquete(RECIBIR_TAMANIO_PAGINAS, new_buffer);
+
+    enviar_paquete(paquete, socket_cpu);
+
     destruir_buffer(new_buffer);
     eliminar_paquete(paquete);
 }

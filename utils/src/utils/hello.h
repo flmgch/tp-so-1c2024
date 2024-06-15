@@ -74,20 +74,21 @@ typedef enum
     STDIN,
     STDOUT,
     DIALFS,
-    // MEMORIA QUE TODAVIA NO SE USA
-    AMPLIACION_PROCESO,
-    REDUCCION_PROCESO,
-    ACCESO_ESPACIO_USUARIO_CPU,
-    ACCESO_ESPACIO_USUARIO_IO,
     // MEMORIA-KERNEL
+    // MEMORIA-CPU-IO
+    RESULTADO_LECTURA,
     // MEMORIA-CPU
+    RESULTADO_AJUSTE_TAMAÑO,
     RECIBIR_INSTRUCCION,
+    RECIBIR_TAMANIO_PAGINAS,
+    // CPU-MEMORIA
+    ACCESO_TABLA_PAGINAS,
+    ENVIAR_INSTRUCCIONES,
     ENIVIAR_FRAME,
     AJUSTAR_TAMANIO,
     RESULTADO_AJUSTE_TAMAÑIO,
-        // CPU-MEMORIA
-    ACCESO_TABLA_PAGINAS,
-    ENVIAR_INSTRUCCIONES,
+    ACCESO_ESPACIO_USUARIO_LECTURA,
+    ACCESO_ESPACIO_USUARIO_ESCRITURA,
     // CPU-KERNEL
     OP_IO_GEN_SLEEP
 } op_code;
@@ -167,7 +168,7 @@ typedef struct
 {
     uint32_t pid;
     char *path;
-    t_list *listas;
+    char **instrucciones;
     int size;
     t_list *filas_tabla_paginas;
 } t_proceso;
