@@ -17,6 +17,14 @@ void atender_interfaz()
         case PAQUETE:
             //
             break;
+        case ACCESO_ESPACIO_USUARIO_ESCRITURA:
+            un_buffer = recibir_buffer(socket_interfaz);
+            escribir_memoria(un_buffer);
+            break;
+        case ACCESO_ESPACIO_USUARIO_LECTURA:
+            un_buffer = recibir_buffer(socket_interfaz);
+            leer_memoria(un_buffer, socket_interfaz);
+            break;
         case -1:
             log_error(mem_logger, "Se desconecto interfaz");
             control_key = 0;
