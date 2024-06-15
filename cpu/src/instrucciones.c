@@ -123,6 +123,13 @@ void ejecutar_io_gen_sleep(char interfaz[20] , char unidades_de_trabajo[20] ){
 }
 
 void ejecutar_exit (){
-    enviar_pcb(pcb,socket_kernel_dispatch);
+    t_buffer *buffer = crear_buffer();
+    agregar_pcb_a_buffer(buffer, pcb);
+    agregar_cop_a_buffer(buffer, CAMBIAR_ESTADO);
+    agregar_estado_a_buffer(buffer, FINISH_EXIT);
+    t_paquete *paquete = crear_super_paquete(ENVIO_PCB, buffer);
+    enviar_paquete(paquete, socket_kernel_dispatch);
+    eliminar_paquete(paquete);
+    destruir_buffer(buffer);
 }
 

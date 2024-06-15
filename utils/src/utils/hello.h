@@ -83,6 +83,8 @@ typedef enum
     // MEMORIA-CPU
     RECIBIR_INSTRUCCION,
     ENIVIAR_FRAME,
+    AJUSTAR_TAMANIO,
+    RESULTADO_AJUSTE_TAMAÑIO,
         // CPU-MEMORIA
     ACCESO_TABLA_PAGINAS,
     ENVIAR_INSTRUCCIONES,
@@ -225,9 +227,12 @@ void agregar_uint8_a_buffer(t_buffer *buffer, u_int8_t valor);
 void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor);
 void agregar_registros_a_buffer(t_buffer *buffer, t_registros* registros);
 void agregar_string_a_buffer(t_buffer *buffer, char *string);
+void agregar_estado_a_buffer(t_buffer *buffer, estado_proceso estado);
 void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor);
 void agregar_motivo_block_a_buffer(t_buffer *buffer, motivo_block motivo);
 void agregar_motivo_exit_a_buffer(t_buffer *buffer, motivo_exit motivo);
+void agregar_cop_a_buffer(t_buffer *buffer, op_code cop);
+void agregar_pcb_a_buffer(t_buffer * buffer, t_pcb * pcb);
 
 void *extraer_de_buffer(t_buffer *buffer);
 char *extraer_string_de_buffer(t_buffer *buffer);

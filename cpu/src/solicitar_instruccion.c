@@ -1,4 +1,6 @@
 #include "solicitar_instruccion.h"
+#include "instrucciones_mem.h"
+
 cod_instruccion obtener_codigo_instruccion(char *operation) {
     if (strcmp(operation, "SET") == 0) return SET;
     if (strcmp(operation, "MOV_IN") == 0) return MOV_IN;
