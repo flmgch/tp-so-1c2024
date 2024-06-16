@@ -14,6 +14,16 @@ void atender_kernel()
             atender_generica(un_buffer);
             destruir_buffer(un_buffer);
             break;
+        case STDIN:
+            un_buffer = recibir_buffer(socket_kernel);
+            atender_stdin(un_buffer);
+            destruir_buffer(un_buffer);
+            break;
+        case STDOUT:
+            un_buffer = recibir_buffer(socket_kernel);
+            atender_stdout(un_buffer);
+            destruir_buffer(un_buffer);
+            break;
         case -1:
             log_error(io_logger, "Se desconecto Kernel");
             control_key = 0;

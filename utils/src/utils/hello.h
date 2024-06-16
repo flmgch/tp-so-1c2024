@@ -185,7 +185,7 @@ typedef struct {
 
 typedef struct
 {
-    u_int32_t pid;
+    uint32_t pid;
     char *tipo_interfaz;
     char *nombre_interfaz;
     char *archivo_configuracion;
@@ -193,10 +193,54 @@ typedef struct
     int tiempo_unidad_trabajo;
     char *ip_kernel;
     char *puerto_kernel;
+    cod_instruccion *instrucciones;
+} io_generica;
+
+typedef struct
+{
+    uint32_t pid;
+    uint32_t direccion;
+    uint32_t tamanio; 
+    char *tipo_interfaz;
+    char *archivo_configuracion;
+    char *ip_kernel;
+    char *puerto_kernel;
     char *ip_memoria;
     char *puerto_memoria;
     cod_instruccion *instrucciones;
-} interfaz; // Lo necesario para manipular lo que me mande el Kernel
+
+} io_stdin;
+
+typedef struct 
+{
+    uint32_t pid;
+    uint32_t direccion;
+    uint32_t tamanio; 
+    char *tipo_interfaz;
+    char *archivo_configuracion;
+    char *ip_kernel;
+    char *puerto_kernel;
+    char *ip_memoria;
+    char *puerto_memoria;
+    cod_instruccion *instrucciones;
+} io_stdout;
+
+typedef struct 
+{
+    uint32_t pid;
+    char *tipo_interfaz;
+    char *archivo_configuracion;
+    int tiempo_unidad_trabajo;
+    char *ip_kernel;
+    char *puerto_kernel;
+    char *ip_memoria;
+    char *puerto_memoria;
+    char *path_base_dialfs;
+    int tamanio_bloque;
+    int cantidad_bloque;
+    int retraso_compactacion;
+    cod_instruccion *instrucciones;
+} io_dialfs;
 
 // UTILIDADES
 

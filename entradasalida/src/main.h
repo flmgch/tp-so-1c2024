@@ -5,6 +5,7 @@
 #include "inicializar_io.h"
 #include "interfaz_memoria.h"
 #include "interfaz_kernel.h"
+#include "interfaces.h"
 
 // VARIABLES GLOBALES
 t_log *io_logger;
