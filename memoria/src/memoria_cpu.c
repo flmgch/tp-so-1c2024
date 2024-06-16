@@ -6,8 +6,8 @@ void atender_cpu()
     while (control_key)
     {
         t_buffer *un_buffer = crear_buffer();
-        enviar_tamnio_pagina();
         int cod_op = recibir_operacion(socket_cpu);
+        enviar_tamnio_pagina();
         usleep(retardo_respuesta);
         switch (cod_op)
         {

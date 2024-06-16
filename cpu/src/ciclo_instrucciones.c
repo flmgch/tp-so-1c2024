@@ -29,23 +29,28 @@ const char* instruccion_to_string(cod_instruccion codigo) {
 
 void decode(u_int32_t dir_instruccion){
     t_instruccion instruccion = solicitar_instruccion(dir_instruccion);
-
+    sem_wait(&sem_instruccion);
     log_info(cpu_logger,  "PID: %d - Ejecutando: %s - %s %s %s %s %s ",pcb->pid,instruccion_to_string(instruccion.codigo_instruccion), instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);
     switch(instruccion.codigo_instruccion){
 		case SET:
 			ejecutar_set(instruccion.param1, instruccion.param2);
-			break;
+            fetch();
+            break;
         case SUM:
             ejecutar_sum(instruccion.param1, instruccion.param2);
+            fetch();
             break;
         case SUB:
             ejecutar_sub(instruccion.param1, instruccion.param2);
+            fetch();
             break;
         case JNZ:
             ejecutar_jnz(instruccion.param1, instruccion.param2);
+            fetch();
             break;
         case IO_GEN_SLEEP:
             ejecutar_io_gen_sleep(instruccion.param1, instruccion.param2);
+            fetch();
             break;
         case MOV_IN:
             // ! DESCOMENTAR TODAS LAS FUNCIONES DE ABAJO CUANDO ESTEN IMPLEMENTADAS
@@ -71,8 +76,7 @@ void decode(u_int32_t dir_instruccion){
         default:
 			log_error(cpu_logger, "Instruccion no reconocida");
 			return;
-    }
-    fetch();
+        }
 }
 
 void fetch (){ 

@@ -68,7 +68,6 @@ void enviar_instruccion(char *instruccion)
 
     enviar_paquete(paquete, socket_cpu);
 
-    destruir_buffer(new_buffer);
     eliminar_paquete(paquete);
 }
 
@@ -202,7 +201,6 @@ void atender_acceso_tabla_paginas(t_buffer *buffer)
 
     enviar_paquete(paquete, socket_cpu);
 
-    destruir_buffer(new_buffer);
     eliminar_paquete(paquete);
 }
 
@@ -296,7 +294,6 @@ void enviar_resultado(char *resultado)
     enviar_paquete(paquete, socket_cpu);
 
     free(resultado);
-    destruir_buffer(new_buffer);
     eliminar_paquete(paquete);
 }
 
@@ -310,6 +307,5 @@ void enviar_tamnio_pagina()
 
     enviar_paquete(paquete, socket_cpu);
 
-    destruir_buffer(new_buffer);
     eliminar_paquete(paquete);
 }

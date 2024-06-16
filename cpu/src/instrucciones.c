@@ -1,5 +1,4 @@
 #include "instrucciones.h"
-#include "instrucciones_mem.h"
 
 void* obtener_registro(char registro[20]) {
     if (strcmp(registro, "AX") == 0) {
@@ -119,7 +118,6 @@ void ejecutar_io_gen_sleep(char interfaz[20] , char unidades_de_trabajo[20] ){
 
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
-    destruir_buffer(un_buffer);
 }
 
 void ejecutar_exit (){
@@ -130,6 +128,5 @@ void ejecutar_exit (){
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
-    destruir_buffer(buffer);
 }
 
