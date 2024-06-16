@@ -12,7 +12,6 @@ void atender_kernel()
         case GENERICA:
             un_buffer = recibir_buffer(socket_kernel);
             atender_generica(un_buffer);
-            destruir_buffer(un_buffer);
             break;
         case STDIN:
             un_buffer = recibir_buffer(socket_kernel);
@@ -32,5 +31,6 @@ void atender_kernel()
             log_warning(io_logger, "Operacion desconocida de Kernel");
             break;
         }
+        destruir_buffer(un_buffer);
     }
 };

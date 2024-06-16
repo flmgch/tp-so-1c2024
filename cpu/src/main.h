@@ -14,7 +14,8 @@ int cantidad_entradas_tlb;
 t_pcb* pcb;
 t_registros *registros;
 bool flag_execute;
-int tamanio_pagina = 32;
+int tamanio_pagina;
+t_instruccion instr;
 
 // SOCKETS
 int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
@@ -24,5 +25,8 @@ tlb_entrada_t* tlb;
 int tlb_proximo_reemplazo; 
 int tlb_entradas;
 int contador_acceso;
+
+// SEMAFOR
+sem_t sem_instruccion;
 
 #endif

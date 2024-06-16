@@ -70,22 +70,28 @@ typedef enum
     CREAR_PROCESO,
     FINALIZAR_PROCESO,
     // KERNEL - IO
+    CREAR_INTERFAZ,
+    FIN_INSTRUCCION_INTERFAZ,
+    // IO - KERNEL
     GENERICA,
     STDIN,
     STDOUT,
     DIALFS,
-    // MEMORIA QUE TODAVIA NO SE USA
-    AMPLIACION_PROCESO,
-    REDUCCION_PROCESO,
-    ACCESO_ESPACIO_USUARIO_CPU,
-    ACCESO_ESPACIO_USUARIO_IO,
     // MEMORIA-KERNEL
+    // MEMORIA-CPU-IO
+    RESULTADO_LECTURA,
     // MEMORIA-CPU
+    RESULTADO_AJUSTE_TAMAÑO,
     RECIBIR_INSTRUCCION,
-    ENIVIAR_FRAME,
-        // CPU-MEMORIA
+    RECIBIR_TAMANIO_PAGINAS,
+    // CPU-MEMORIA
     ACCESO_TABLA_PAGINAS,
     ENVIAR_INSTRUCCIONES,
+    ENIVIAR_FRAME,
+    AJUSTAR_TAMANIO,
+    RESULTADO_AJUSTE_TAMAÑIO,
+    ACCESO_ESPACIO_USUARIO_LECTURA,
+    ACCESO_ESPACIO_USUARIO_ESCRITURA,
     // CPU-KERNEL
     OP_IO_GEN_SLEEP
 } op_code;
@@ -163,9 +169,25 @@ typedef struct
 
 typedef struct
 {
+    char *nombre;
+    char *tipo;
+    int socket;
+    t_list *cola_block_asignada;
+    pthread_mutex_t mutex_asignado;
+} t_interfaz_kernel;
+
+typedef struct
+{
+    char *nombre;
+    char *tipo;
+    int socket;
+} t_manejo_io;
+
+typedef struct
+{
     uint32_t pid;
     char *path;
-    t_list *listas;
+    char **instrucciones;
     int size;
     t_list *filas_tabla_paginas;
 } t_proceso;
@@ -269,9 +291,12 @@ void agregar_uint8_a_buffer(t_buffer *buffer, u_int8_t valor);
 void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor);
 void agregar_registros_a_buffer(t_buffer *buffer, t_registros* registros);
 void agregar_string_a_buffer(t_buffer *buffer, char *string);
+void agregar_estado_a_buffer(t_buffer *buffer, estado_proceso estado);
 void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor);
 void agregar_motivo_block_a_buffer(t_buffer *buffer, motivo_block motivo);
 void agregar_motivo_exit_a_buffer(t_buffer *buffer, motivo_exit motivo);
+void agregar_cop_a_buffer(t_buffer *buffer, op_code cop);
+void agregar_pcb_a_buffer(t_buffer * buffer, t_pcb * pcb);
 
 void *extraer_de_buffer(t_buffer *buffer);
 char *extraer_string_de_buffer(t_buffer *buffer);

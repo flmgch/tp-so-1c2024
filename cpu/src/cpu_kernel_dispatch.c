@@ -17,8 +17,8 @@ void atender_kernel_dispatch()
             //
             break;
         case ENVIO_PCB:
-           un_buffer=recibir_buffer(socket_kernel_dispatch);
-           atender_recibir_pcb(un_buffer);
+           un_buffer = recibir_buffer(socket_kernel_dispatch);
+           pcb = extraer_pcb_de_buffer(un_buffer);
            destruir_buffer(un_buffer);
            log_info(cpu_logger, "Recibí el contexto del proceso %d y se inicia el ciclo de instruccion", pcb->pid);
            ejecutar_proceso();

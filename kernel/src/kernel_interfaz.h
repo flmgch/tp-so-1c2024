@@ -3,6 +3,7 @@
 
 #include "gestor_kernel.h"
 
-void atender_interfaz();
+void atender_modulo_interfaz();
+void crear_interfaz (void* args);
 
 #endif

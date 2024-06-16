@@ -214,6 +214,22 @@ void agregar_motivo_exit_a_buffer(t_buffer *buffer, motivo_exit motivo)
   agregar_a_buffer(buffer, &motivo, sizeof(motivo_exit));
 }
 
+void agregar_cop_a_buffer(t_buffer *buffer, op_code cop)
+{
+  agregar_a_buffer(buffer, &cop, sizeof(op_code));
+}
+
+void agregar_pcb_a_buffer(t_buffer *buffer, t_pcb *pcb)
+{
+  agregar_uint32_a_buffer(buffer, pcb->pid);
+  agregar_uint32_a_buffer(buffer, pcb->program_counter);
+  agregar_estado_a_buffer(buffer, pcb->estado);
+  agregar_motivo_block_a_buffer(buffer, pcb->motivo_block);
+  agregar_motivo_exit_a_buffer(buffer, pcb->motivo_exit);
+  agregar_registros_a_buffer(buffer, pcb->registros_cpu);
+  agregar_uint32_a_buffer(buffer, pcb->quantum_remanente);
+}
+
 t_paquete *crear_paquete(void)
 {
   t_paquete *paquete = malloc(sizeof(t_paquete));
@@ -496,8 +512,8 @@ t_registros* extraer_registros_de_buffer(t_buffer* buffer) {
 t_pcb *extraer_pcb_de_buffer(t_buffer *buffer)
 {
   t_pcb *pcb = malloc(sizeof(t_pcb));
-  pcb->pid = extraer_int_de_buffer(buffer);
-  pcb->program_counter = extraer_int_de_buffer(buffer);
+  pcb->pid = extraer_uint32_de_buffer(buffer);
+  pcb->program_counter = extraer_uint32_de_buffer(buffer);
   pcb->estado = extraer_estado_proceso_de_buffer(buffer);
   pcb->motivo_block = extraer_motivo_block_de_buffer(buffer);
   pcb->motivo_exit = extraer_motivo_exit_de_buffer(buffer);
@@ -576,8 +592,8 @@ char *motivo_exit_to_string(motivo_exit motivo)
 void enviar_pcb(t_pcb *pcb, int socket_servidor)
 {
   t_buffer *buffer = crear_buffer();
-  agregar_int_a_buffer(buffer, pcb->pid);
-  agregar_int_a_buffer(buffer, pcb->program_counter);
+  agregar_uint32_a_buffer(buffer, pcb->pid);
+  agregar_uint32_a_buffer(buffer, pcb->program_counter);
   agregar_estado_a_buffer(buffer, pcb->estado);
   agregar_motivo_block_a_buffer(buffer, pcb->motivo_block);
   agregar_motivo_exit_a_buffer(buffer, pcb->motivo_exit);

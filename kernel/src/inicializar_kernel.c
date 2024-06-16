@@ -43,6 +43,7 @@ void inicializar_semaforos()
     pthread_mutex_init(&mutex_cola_block_io, NULL);
     pthread_mutex_init(&mutex_cola_block_fs, NULL);
     pthread_mutex_init(&mutex_cola_exit, NULL);
+    pthread_mutex_init(&mutex_lista_io, NULL);
     sem_init(&sem_multiprogramacion, 0, grado_multiprogramacion);
     sem_init(&sem_new, 0, 0);
     sem_init(&sem_ready, 0, 0);

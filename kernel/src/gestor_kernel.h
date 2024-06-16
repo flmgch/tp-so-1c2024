@@ -15,6 +15,7 @@ extern int quantum, grado_multiprogramacion;
 extern char **recursos;
 extern int *instancias_recursos;
 extern t_list *lista_recursos;
+extern t_list *lista_io_conectadas;
 
 // SOCKETS
 extern int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha, socket_interfaz;
@@ -35,6 +36,7 @@ extern pthread_mutex_t mutex_cola_block;
 extern pthread_mutex_t mutex_cola_block_io;
 extern pthread_mutex_t mutex_cola_block_fs;
 extern pthread_mutex_t mutex_cola_exit;
+extern pthread_mutex_t mutex_lista_io;
 extern sem_t sem_multiprogramacion;
 extern sem_t sem_new;
 extern sem_t sem_ready;

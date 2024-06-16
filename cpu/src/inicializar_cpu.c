@@ -38,3 +38,8 @@ void inicializar_tlb() {
     tlb_entradas = 0;
     contador_acceso = 0; //para el lru
 }
+
+void inicializar_semaforos()
+{
+    sem_init(&sem_instruccion, 0, 0);
+}

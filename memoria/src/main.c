@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
   // borrar_espacio_usuario();
   // borrar_semaforos();
-  // list_destroy(lista_de_procesos);
+  // list_destroy_and_destroy_elements(lista_de_procesos,eliminar_lista);
   //  close(socket_escucha);
   //  close(socket_interfaz);
   //  close(socket_cpu);

@@ -29,24 +29,11 @@ void inicializar_config()
 void inicializar_espacio_usuario()
 {
     espacio_usuario = malloc(tamanio_memoria);
-    int cantidad_marcos = tamanio_memoria / tamanio_pagina;
-    int tam = calcular_tamanio(cantidad_marcos);
+    cantidad_marcos = tamanio_memoria / tamanio_pagina;
+    cantidad_de_marcos_libres = cantidad_marcos;
+    int tam = ceil((double)cantidad_marcos / 8);
     bitmap_espacio_usuario = malloc(tam);
     bitmap = bitarray_create_with_mode(bitmap_espacio_usuario, tam, LSB_FIRST);
-}
-
-int calcular_tamanio(int marcos)
-{
-    int tam;
-    if (marcos % 8 == 0)
-    {
-        tam = marcos / 8;
-    }
-    else
-    {
-        tam = marcos / 8 + 1;
-    }
-    return tam;
 }
 
 void inicializar_semaforos()
@@ -68,4 +55,9 @@ void borrar_semaforos()
     pthread_mutex_destroy(&mutex_bitmap);
     pthread_mutex_destroy(&mutex_espacio_usuario);
     pthread_mutex_destroy(&mutex_lista_procesos);
+}
+
+void eliminar_lista(void *elemento)
+{
+    free(elemento);
 }
