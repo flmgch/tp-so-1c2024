@@ -107,6 +107,11 @@ typedef enum
 } op_code;
 
 typedef struct {
+    uint32_t direccion_fisica;
+    int tamanio_dato;
+} t_direccion_fisica
+
+typedef struct {
     uint8_t ax;   // Registro Numérico de propósito general
     uint8_t bx;   // Registro Numérico de propósito general
     uint8_t cx;   // Registro Numérico de propósito general

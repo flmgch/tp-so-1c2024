@@ -182,26 +182,24 @@ void procesar_resultado_resize(char* resultado){
 void ejecutar_io_stdin_read(char interfaz[20], char reg_dir_logica[20], char reg_tam [20]){
     void* dir_logica = obtener_registro(reg_dir_logica); //las dl son de 32
     uint32_t direccion_logica = *(uint32_t*)dir_logica; //hago void* -> uint32_t*; y *(uint32_t*) para obtener el valor almacenado en la dirección apuntada
-    uint32_t direccion_fisica =  traducir_direccion_logica(direccion_logica);
-
     void* dir_tam = obtener_registro(reg_tam);
 
     t_buffer *un_buffer = crear_buffer();
     agregar_string_a_buffer(un_buffer,interfaz);
-    agregar_uint32_a_buffer(un_buffer,direccion_fisica);
     t_paquete *paquete = crear_super_paquete(OP_IO_STDIN_READ, un_buffer);
 
     if (dir_tam != NULL) {
         if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
             strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
                 uint8_t tamanio = *(uint8_t*) dir_tam;
-                agregar_uint8_a_buffer(un_buffer, tamanio);
 
         } else {
                 uint32_t tamanio = *(uint32_t*) dir_tam;
-                agregar_uint32_a_buffer(un_buffer, tamanio);
             } 
         }
+
+        t_list* direcciones = separar_en_paginas (direccion_logica,*(int*)dir_tam);
+        
         enviar_paquete(paquete, socket_kernel_dispatch);
         eliminar_paquete(paquete);
 }
@@ -348,8 +346,8 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
 
     void* dir_logica = obtener_registro(reg_dir_logica); 
     uint32_t direccion_logica = *(uint32_t*)dir_logica; 
-    uint32_t direccion_fisica =  traducir_direccion_logica(direccion_logica);
-    agregar_uint32_a_buffer(un_buffer, direccion_fisica);
+    //uint32_t direccion_fisica =  traducir_direccion_logica(direccion_logica);
+    //agregar_uint32_a_buffer(un_buffer, direccion_fisica);
 
     void* dir_tam = obtener_registro(reg_tam);
     if (dir_tam != NULL) {
@@ -376,6 +374,8 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
                 agregar_uint32_a_buffer(un_buffer, puntero);
             } 
         }
+
+    uint32_t* direcciones_fisicas = separar_en_paginas (dir_logica, *(int*)dir_tam);
 
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);

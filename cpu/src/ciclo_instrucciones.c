@@ -84,7 +84,7 @@ void decode(u_int32_t dir_instruccion){
             ejecutar_io_fs_truncate(instruccion.param1, instruccion.param2,instruccion.param3);
             fetch();
         case IO_FS_WRITE:
-            ejecutar_io_fs_write(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);
+            ejecutar_io_fs_write(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion);
             fetch();
         case IO_FS_READ:
             ejecutar_io_fs_read(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);

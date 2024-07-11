@@ -3,7 +3,7 @@
 void escribir_memoria(t_buffer *buffer)
 {
     int pid = extraer_int_de_buffer(buffer);
-    int direccion = extraer_int_de_buffer(buffer);
+    uint32_t direccion = extraer_uint32_de_buffer(buffer);
     int tamanio = extraer_int_de_buffer(buffer);
     void *valor = extraer_de_buffer(buffer);
 
@@ -18,7 +18,7 @@ void escribir_memoria(t_buffer *buffer)
 void leer_memoria(t_buffer *buffer, int socket)
 {
     int pid = extraer_int_de_buffer(buffer);
-    int direccion = extraer_int_de_buffer(buffer);
+    uint32_t direccion = extraer_uint32_de_buffer(buffer);
     int tamanio = extraer_int_de_buffer(buffer);
     void *valor = malloc(tamanio);
     log_info(mem_logger, "PID: %d - Accion: Lectura - Direccion Fisica: %d - Tamanio: %d", pid, direccion, tamanio);
