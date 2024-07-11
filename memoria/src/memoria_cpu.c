@@ -3,11 +3,11 @@
 void atender_cpu()
 {
     bool control_key = 1;
+    enviar_tamnio_pagina();
     while (control_key)
     {
         t_buffer *un_buffer = crear_buffer();
         int cod_op = recibir_operacion(socket_cpu);
-        enviar_tamnio_pagina();
         usleep(retardo_respuesta);
         switch (cod_op)
         {

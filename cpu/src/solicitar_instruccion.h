@@ -3,8 +3,8 @@
 
 #include "gestor_cpu.h"
 
-t_instruccion solicitar_instruccion(u_int32_t direccion_instruccion);
-t_instruccion formular_instruccion(char* string);
+void solicitar_instruccion(u_int32_t direccion_instruccion);
+t_instruccion formular_instruccion(char *string);
 cod_instruccion obtener_codigo_instruccion(char *operation);
 t_instruccion atender_instrucciones(t_buffer *buffer);
 

@@ -55,8 +55,7 @@ cod_instruccion obtener_codigo_instruccion(char *operation)
 t_instruccion formular_instruccion(char *string)
 {
     t_instruccion instruccion;
-    char *extra = " - - - -";
-    strcmp(string, extra);
+
     memset(&instruccion, 0, sizeof(t_instruccion));
     // armo un array de string con cada palabra de la instruccion en modo string
     char **lineas = string_n_split(string, 5, " ");
@@ -64,12 +63,27 @@ t_instruccion formular_instruccion(char *string)
     // busco el codigo de instruccion a partir del elemento 0
     instruccion.codigo_instruccion = obtener_codigo_instruccion(lineas[0]);
 
+    int cant_registros = 0;
+
+    for (int i = 1; lineas[i] && i < 6; i++)
+    {
+        cant_registros++;
+    }
+
     // si existe el parametro, lo copia en la estructura de la instruccion
-    strncpy(instruccion.param1, lineas[1] ? lineas[1] : "", sizeof(instruccion.param1) - 1);
-    strncpy(instruccion.param2, lineas[2] ? lineas[2] : "", sizeof(instruccion.param2) - 1);
-    strncpy(instruccion.param3, lineas[3] ? lineas[3] : "", sizeof(instruccion.param3) - 1);
-    strncpy(instruccion.param4, lineas[4] ? lineas[4] : "", sizeof(instruccion.param4) - 1);
-    strncpy(instruccion.param5, lineas[5] ? lineas[5] : "", sizeof(instruccion.param5) - 1);
+    (cant_registros != 0) ? strcpy(instruccion.param1, lineas[1]) : strcpy(instruccion.param1, "");
+    (cant_registros > 1) ? strcpy(instruccion.param2, lineas[2]) : strcpy(instruccion.param2, "");
+    (cant_registros > 2) ? strcpy(instruccion.param3, lineas[3]) : strcpy(instruccion.param3, "");
+    if (cant_registros == 5)
+    {
+        strcpy(instruccion.param4, lineas[4]);
+        strcpy(instruccion.param5, lineas[5]);
+    }
+    else
+    {
+        strcpy(instruccion.param4, "");
+        strcpy(instruccion.param5, "");
+    }
 
     instruccion.param1[sizeof(instruccion.param1) - 1] = '\0';
     instruccion.param2[sizeof(instruccion.param2) - 1] = '\0';
@@ -86,7 +100,7 @@ t_instruccion formular_instruccion(char *string)
     return instruccion;
 }
 
-t_instruccion solicitar_instruccion(u_int32_t direccion_instruccion)
+void solicitar_instruccion(u_int32_t direccion_instruccion)
 {
 
     // envio direccion instruccion

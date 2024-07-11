@@ -17,7 +17,7 @@ void atender_memoria()
             break;
         case RECIBIR_INSTRUCCION:
             un_buffer = recibir_buffer(socket_memoria);
-            instr = atender_instrucciones(un_buffer);
+            instruccion = atender_instrucciones(un_buffer);
             sem_post(&sem_instruccion);
             break;
         case RECIBIR_TAMANIO_PAGINAS:

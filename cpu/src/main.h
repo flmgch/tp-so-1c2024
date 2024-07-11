@@ -15,7 +15,7 @@ t_pcb* pcb;
 t_registros *registros;
 bool flag_execute;
 int tamanio_pagina;
-t_instruccion instr;
+t_instruccion instruccion;
 
 // SOCKETS
 int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
