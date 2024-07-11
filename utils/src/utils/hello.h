@@ -93,8 +93,17 @@ typedef enum
     ACCESO_ESPACIO_USUARIO_LECTURA,
     ACCESO_ESPACIO_USUARIO_ESCRITURA,
     // CPU-KERNEL
+
+    //PROVISIONAL_REVISAR!!!!!!!!!!!!!!!!!!afskdferiovndf
     OP_IO_GEN_SLEEP,
-    OP_IO_STDIN_READ
+    OP_IO_STDIN_READ,
+    OP_IO_STDOUT_WRITE,
+    OP_IO_FS_CREATE,
+    OP_IO_FS_DELETE,
+    OP_IO_FS_TRUNCATE,
+    OP_IO_FS_WRITE,
+    OP_IO_FS_READ,
+
 } op_code;
 
 typedef struct {
