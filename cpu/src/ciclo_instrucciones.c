@@ -28,14 +28,14 @@ const char* instruccion_to_string(cod_instruccion codigo) {
 }
 
 void decode(u_int32_t dir_instruccion){
-    solicitar_instruccion(dir_instruccion);
-    sem_wait(&sem_instruccion);
+    t_instruccion instruccion = solicitar_instruccion(dir_instruccion);
+
     log_info(cpu_logger,  "PID: %d - Ejecutando: %s - %s %s %s %s %s ",pcb->pid,instruccion_to_string(instruccion.codigo_instruccion), instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);
     switch(instruccion.codigo_instruccion){
 		case SET:
 			ejecutar_set(instruccion.param1, instruccion.param2);
             fetch();
-            break;
+			break;
         case SUM:
             ejecutar_sum(instruccion.param1, instruccion.param2);
             fetch();
@@ -60,30 +60,33 @@ void decode(u_int32_t dir_instruccion){
             // ejecutar_mov_out(instruccion.param1, instruccion.param2);
             break;
         case RESIZE:
-            // ejecutar_resize(instruccion.param1);
+            ejecutar_resize(instruccion.param1);
             break;
         case COPY_STRING:
-            // ejecutar_copy_string(instruccion.param1);
+            ejecutar_copy_string(instruccion.param1);
+            fetch();
             break;
         case IO_STDIN_READ:
-            // ejecutar_io_stdin_read(instruccion.param1, instruccion.param2, instruccion.param3);
+            ejecutar_io_stdin_read(instruccion.param1, instruccion.param2, instruccion.param3);
             break;
         case IO_STDOUT_WRITE:
             // ejecutar_io_stdout_write(instruccion.param1, instruccion.param2, instruccion.param3);
             break;
         case EXIT:
             ejecutar_exit();
+            fetch();
         default:
 			log_error(cpu_logger, "Instruccion no reconocida");
 			return;
-        }
+    }
 }
 
 void fetch (){ 
     u_int32_t instruccion_a_ejecutar = pcb->program_counter;
     log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pcb->pid, instruccion_a_ejecutar);
-    pcb->program_counter += 1;
+
     decode(instruccion_a_ejecutar);
+    pcb->program_counter += 1;
 }
 
 void ejecutar_proceso(){

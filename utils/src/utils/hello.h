@@ -93,7 +93,8 @@ typedef enum
     ACCESO_ESPACIO_USUARIO_LECTURA,
     ACCESO_ESPACIO_USUARIO_ESCRITURA,
     // CPU-KERNEL
-    OP_IO_GEN_SLEEP
+    OP_IO_GEN_SLEEP,
+    OP_IO_STDIN_READ
 } op_code;
 
 typedef struct {
