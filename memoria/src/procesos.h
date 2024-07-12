@@ -18,7 +18,7 @@ void buscar_frame_libre(int frame);
 void enviar_resultado(char *resultado);
 void atender_reducir_tamanio(t_proceso *proceso, int paginas_futuras, int paginas_actuales);
 void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actuales, int paginas_futuras);
-bool no_ser_proceso_x(void *elemento, uint32_t pid);
+bool debe_ser_proceso_x(void *elemento, uint32_t pid);
 bool auxiliar_no_ser_proceso_x(void *elemento);
 void enviar_tamnio_pagina();
 

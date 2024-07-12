@@ -102,21 +102,21 @@ void atender_finalizar_proceso(t_buffer *buffer)
     bool auxiliar_no_ser_proceso_x(void *elemento)
     {
 
-        return no_ser_proceso_x(elemento, pid);
+        return debe_ser_proceso_x(elemento, pid);
     }
 
     pthread_mutex_lock(&mutex_lista_procesos);
-    list_filter(lista_de_procesos, auxiliar_no_ser_proceso_x);
+    list_remove_by_condition(lista_de_procesos, auxiliar_no_ser_proceso_x);
     pthread_mutex_unlock(&mutex_lista_procesos);
 
     free(proceso_a_eliminar);
 }
 
-bool no_ser_proceso_x(void *elemento, uint32_t pid)
+bool debe_ser_proceso_x(void *elemento, uint32_t pid)
 {
     t_proceso *proceso = malloc(sizeof(t_proceso));
     proceso = (t_proceso *)elemento;
-    return proceso->pid != pid;
+    return proceso->pid == pid;
 }
 
 // CREAR PROCESO
@@ -214,7 +214,7 @@ void atender_ajustar_tamanio(t_buffer *buffer)
     pthread_mutex_lock(&mutex_lista_procesos);
     proceso_a_modificar = encontrar_proceso(lista_de_procesos, pid);
     pthread_mutex_unlock(&mutex_lista_procesos);
-    int paginas_actuales = proceso_a_modificar->size / tamanio_pagina;
+    int paginas_actuales = proceso_a_modificar->size;
     int paginas_futuras = ceil((double)tamanio_nuevo / tamanio_pagina);
 
     if (paginas_futuras > paginas_actuales)
@@ -228,7 +228,7 @@ void atender_ajustar_tamanio(t_buffer *buffer)
         log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Reducir: %d", pid, proceso_a_modificar->size, tamanio_nuevo - proceso_a_modificar->size);
     }
 
-    proceso_a_modificar->size = paginas_futuras * tamanio_pagina;
+    proceso_a_modificar->size = paginas_futuras;
 }
 
 void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actuales, int paginas_futuras)
@@ -280,7 +280,7 @@ void atender_reducir_tamanio(t_proceso *proceso, int paginas_futuras, int pagina
         paginas_actuales--;
         free(frame);
     }
-    proceso->filas_tabla_paginas = list_take(proceso->filas_tabla_paginas, paginas_futuras);
+    proceso->filas_tabla_paginas = list_take_and_remove(proceso->filas_tabla_paginas, paginas_futuras);
 }
 
 void enviar_resultado(char *resultado)

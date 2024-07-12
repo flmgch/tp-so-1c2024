@@ -28,8 +28,8 @@ const char* instruccion_to_string(cod_instruccion codigo) {
 }
 
 void decode(u_int32_t dir_instruccion){
-    t_instruccion instruccion = solicitar_instruccion(dir_instruccion);
-
+    solicitar_instruccion(dir_instruccion);
+    sem_wait(&sem_instruccion);
     log_info(cpu_logger,  "PID: %d - Ejecutando: %s - %s %s %s %s %s ",pcb->pid,instruccion_to_string(instruccion.codigo_instruccion), instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);
     switch(instruccion.codigo_instruccion){
 		case SET:
@@ -61,6 +61,7 @@ void decode(u_int32_t dir_instruccion){
             break;
         case RESIZE:
             ejecutar_resize(instruccion.param1);
+            sem_post(&sem_resize);
             break;
         case COPY_STRING:
             ejecutar_copy_string(instruccion.param1);
@@ -101,8 +102,8 @@ void fetch (){
     u_int32_t instruccion_a_ejecutar = pcb->program_counter;
     log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pcb->pid, instruccion_a_ejecutar);
 
-    decode(instruccion_a_ejecutar);
     pcb->program_counter += 1;
+    decode(instruccion_a_ejecutar);
 }
 
 void ejecutar_proceso(){

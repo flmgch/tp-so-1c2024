@@ -30,28 +30,37 @@ void* obtener_registro(char registro[20]) {
 void ejecutar_set(char registro[20], char valor[20]) {
     if (strcmp(registro, "AX") == 0) {
         pcb->registros_cpu->ax = (uint8_t)atoi(valor);
+        log_info(cpu_logger, "%d", pcb->registros_cpu->ax);
     } else if (strcmp(registro, "BX") == 0) {
         pcb->registros_cpu->bx = (uint8_t)atoi(valor);
+        log_info(cpu_logger, "%d", pcb->registros_cpu->bx);
     } else if (strcmp(registro, "CX") == 0) {
         pcb->registros_cpu->cx = (uint8_t)atoi(valor);
+        log_info(cpu_logger, "%d", pcb->registros_cpu->cx);
     } else if (strcmp(registro, "DX") == 0) {
         pcb->registros_cpu->dx = (uint8_t)atoi(valor);
+        log_info(cpu_logger, "%d", pcb->registros_cpu->dx);
     } else if (strcmp(registro, "EAX") == 0) {
         pcb->registros_cpu->eax = (uint32_t)atoi(valor);
+        log_info(cpu_logger, "%d", pcb->registros_cpu->eax);
     } else if (strcmp(registro, "EBX") == 0) {
         pcb->registros_cpu->ebx = (uint32_t)atoi(valor);
+        log_info(cpu_logger, "%d", pcb->registros_cpu->ebx);
     } else if (strcmp(registro, "ECX") == 0) {
         pcb->registros_cpu->ecx = (uint32_t)atoi(valor);
+        log_info(cpu_logger, "%d", pcb->registros_cpu->ecx);
     } else if (strcmp(registro, "EDX") == 0) {
         pcb->registros_cpu->edx = (uint32_t)atoi(valor);
+        log_info(cpu_logger, "%d", pcb->registros_cpu->edx);
     } else if (strcmp(registro, "SI") == 0) {
         pcb->registros_cpu->si = (uint32_t)atoi(valor);
+        log_info(cpu_logger, "%d", pcb->registros_cpu->si);
     } else if (strcmp(registro, "DI") == 0) {
         pcb->registros_cpu->di = (uint32_t)atoi(valor);
+        log_info(cpu_logger, "%d", pcb->registros_cpu->di);
     } else {
         log_error(cpu_logger, "No se hallo el registro");
-    } 
-}
+    }
 
 //SUM
 void ejecutar_sum(char registro_destino[20] , char registro_origen[20] ){
@@ -64,6 +73,7 @@ void ejecutar_sum(char registro_destino[20] , char registro_origen[20] ){
         if (strcmp(registro_destino, "AX") == 0 || strcmp(registro_destino, "BX") == 0 ||
             strcmp(registro_destino, "CX") == 0 || strcmp(registro_destino, "DX") == 0) {
             *(uint8_t*)puntero_destino += *(uint8_t*)puntero_origen;
+            log_info(cpu_logger, "%d", pcb->registros_cpu->ax);
         } else {
             *(uint32_t*)puntero_destino += *(uint32_t*)puntero_origen;
         }
@@ -84,6 +94,7 @@ void ejecutar_sub(char registro_destino[20] , char registro_origen[20] ){
         if (strcmp(registro_destino, "AX") == 0 || strcmp(registro_destino, "BX") == 0 ||
             strcmp(registro_destino, "CX") == 0 || strcmp(registro_destino, "DX") == 0) {
             *(uint8_t*)puntero_destino -= *(uint8_t*)puntero_origen;
+            log_info(cpu_logger, "%d", pcb->registros_cpu->cx);
         } else {
             *(uint32_t*)puntero_destino -= *(uint32_t*)puntero_origen;
         }
@@ -103,10 +114,12 @@ void ejecutar_jnz(char registro[20] , char instruccion[20]){
             strcmp(registro, "CX") == 0 || strcmp(registro, "DX") == 0) {
             if (*(uint8_t*)puntero_registro != 0) {
                 pcb->program_counter = nuevo_ip;
+                log_info(cpu_logger, "%d", pcb->program_counter);
             }
         } else {
             if (*(uint32_t*)puntero_registro != 0) {
                 pcb->program_counter = nuevo_ip;
+                log_info(cpu_logger, "%d", pcb->program_counter);
             }
         }
     } else {
@@ -117,10 +130,10 @@ void ejecutar_jnz(char registro[20] , char instruccion[20]){
 //IO_GEN_SLEEP
 void ejecutar_io_gen_sleep(char interfaz[20] , char unidades_de_trabajo[20] ){
     t_buffer *un_buffer = crear_buffer();
-    t_paquete *paquete = crear_super_paquete(OP_IO_GEN_SLEEP, un_buffer);
     agregar_uint32_a_buffer(un_buffer, atoi(unidades_de_trabajo));
     agregar_string_a_buffer(un_buffer, interfaz);
 
+    t_paquete *paquete = crear_super_paquete(OP_IO_GEN_SLEEP, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
     destruir_buffer(un_buffer);
@@ -150,8 +163,6 @@ void ejecutar_resize(char tamanio [20]){
 
     eliminar_paquete(paquete);
     destruir_buffer(un_buffer);
-
-    atender_memoria();
 }
 
 void procesar_resultado_resize(char* resultado){
@@ -169,6 +180,7 @@ void procesar_resultado_resize(char* resultado){
 
     }else if(strcmp(resultado,"Ok")){
         log_info(cpu_logger,"RESIZE exitoso");
+        fetch();
     } else{
         log_error(cpu_logger, "Registro invalido");
     }
