@@ -83,7 +83,7 @@ void atender_stdout(t_buffer *buffer)
     agregar_uint32_a_buffer(un_buffer, una_interfaz->pid);
     agregar_uint32_a_buffer(un_buffer, una_interfaz->direccion);
     agregar_uint32_a_buffer(un_buffer, una_interfaz->tamanio);
-    t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_ESCRITURA, un_buffer);
+    t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_LECTURA, un_buffer);
     enviar_paquete(paquete, socket_memoria);
 
     destruir_buffer(un_buffer);
