@@ -27,7 +27,7 @@ void atender_cpu()
             break;
         case AJUSTAR_TAMANIO:
             un_buffer = recibir_buffer(socket_cpu);
-            atender_acceso_tabla_paginas(un_buffer);
+            atender_ajustar_tamanio(un_buffer);
             break;
         case ACCESO_ESPACIO_USUARIO_ESCRITURA:
             un_buffer = recibir_buffer(socket_cpu);

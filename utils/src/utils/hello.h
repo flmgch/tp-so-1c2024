@@ -79,7 +79,6 @@ typedef enum
     DIALFS,
     // MEMORIA-KERNEL
     // MEMORIA-CPU-IO
-    RESULTADO_LECTURA,
     // MEMORIA-CPU
     RESULTADO_AJUSTE_TAMAÑO,
     RESULTADO_LECTURA,
@@ -94,7 +93,7 @@ typedef enum
     ACCESO_ESPACIO_USUARIO_ESCRITURA,
     // CPU-KERNEL
 
-    //PROVISIONAL_REVISAR!!!!!!!!!!!!!!!!!!afskdferiovndf
+    // PROVISIONAL_REVISAR!!!!!!!!!!!!!!!!!!afskdferiovndf
     OP_IO_GEN_SLEEP,
     OP_IO_STDIN_READ,
     OP_IO_STDOUT_WRITE,

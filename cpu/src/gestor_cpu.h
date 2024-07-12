@@ -27,7 +27,6 @@ extern int contador_acceso;
 // SEMAFORO
 extern sem_t sem_instruccion;
 extern sem_t sem_resize;
-extern sem_t sem_move_in;
-extern sem_t sem_copy_string;
+extern sem_t sem_resultado;
 
 #endif

@@ -1,10 +1,10 @@
 #include "espacio_usuario.h"
-//yu
+
 void escribir_memoria(t_buffer *buffer)
 {
-    int pid=extraer_int_de_buffer(buffer);
-    t_list* lista_direcciones=extraer_lista_de_buffer(buffer);
+    int pid = extraer_int_de_buffer(buffer);
     void *valor = extraer_de_buffer(buffer);
+    t_list *lista_direcciones = extraer_lista_de_buffer(buffer);
     int cant_pag_a_escribir=list_size(lista_direcciones);
 
     pthread_mutex_lock(&mutex_espacio_usuario);
@@ -41,7 +41,7 @@ void leer_memoria(t_buffer *buffer, int socket)
 
     t_buffer *new_buffer = crear_buffer();
 
-    agregar_string_a_buffer(new_buffer, *valor);
+    agregar_string_a_buffer(new_buffer, valor);
 
     t_paquete *paquete = crear_super_paquete(RESULTADO_LECTURA, new_buffer);
 

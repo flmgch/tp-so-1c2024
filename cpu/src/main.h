@@ -30,6 +30,6 @@ int contador_acceso;
 // SEMAFOR
 sem_t sem_instruccion;
 sem_t sem_resize;
-sem_t sem_move_in;
-sem_t sem_copy_string;
+sem_t sem_resultado;
+
 #endif

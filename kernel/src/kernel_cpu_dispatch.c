@@ -40,7 +40,10 @@ void atender_cpu_dispatch() {
 				atender_wait(pcb, recurso_wait);
 				free(recurso_wait);
 				break;
-			case ATENDER_SIGNAL:
+            case OUT_OF_MEMORY:
+                log_info(kernel_logger, "Llego el out of memory");
+                break;
+            case ATENDER_SIGNAL:
                 log_info(kernel_logger, "Recibi un aviso de atender SIGNAL");
 				char* recurso_signal = extraer_string_de_buffer(buffer);
 				atender_signal(pcb, recurso_signal);

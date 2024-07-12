@@ -163,11 +163,11 @@ void ejecutar_resize(char tamanio [20]){
     enviar_paquete(paquete, socket_memoria);
 
     eliminar_paquete(paquete);
-    destruir_buffer(un_buffer);
 }
 
 void procesar_resultado_resize(char* resultado){
-    if(strcmp(resultado,"Out of Memory")){
+    if (strcmp(resultado, "Out of Memory") == 0)
+    {
         pcb->motivo_exit = OUT_OF_MEMORY;
         t_buffer *buffer = crear_buffer();
         agregar_pcb_a_buffer(buffer, pcb);
@@ -178,11 +178,14 @@ void procesar_resultado_resize(char* resultado){
         enviar_paquete(paquete, socket_kernel_dispatch);
 
         eliminar_paquete(paquete);
-
-    }else if(strcmp(resultado,"Ok")){
+    }
+    else if (strcmp(resultado, "Ok"))
+    {
         log_info(cpu_logger,"RESIZE exitoso");
         fetch();
-    } else{
+    }
+    else
+    {
         log_error(cpu_logger, "Registro invalido");
     }
 }
@@ -206,16 +209,18 @@ void ejecutar_mov_in(char reg_dir_logica[20],char reg_datos[20]){
 
     t_buffer *un_buffer = crear_buffer();
     agregar_uint32_a_buffer(un_buffer,pcb->pid);
-    agregar_int_a_buffer(un_buffer,tam_segun_reg);
+    // agregar_int_a_buffer(un_buffer,tam_segun_reg);
     agregar_lista_a_buffer(un_buffer,direcciones_fisicas);
     t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_LECTURA, un_buffer);
     enviar_paquete(paquete, socket_memoria);
     eliminar_paquete(paquete);
 
-    sem_wait(&sem_move_in);
+    sem_wait(&sem_resultado);
 
-    t_buffer* un_buffer = recibir_buffer(socket_memoria);
-    reg_datos=extraer_string_de_buffer(un_buffer);
+    t_buffer *otro_buffer = recibir_buffer(socket_memoria);
+    void *aux_dato = extraer_de_buffer(otro_buffer);
+    char *dato = (char *)aux_dato;
+    ejecutar_set(reg_datos, dato);
 }
 
 /*void recibir_dato(void* dato_recibido){
@@ -237,9 +242,8 @@ void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
         if (strcmp(reg_datos, "AX") == 0 || strcmp(reg_datos, "BX") == 0 ||
             strcmp(reg_datos, "CX") == 0 || strcmp(reg_datos, "DX") == 0) {
                 tam_segun_reg = sizeof(uint8_t);
-                uint8_t dato = *(uint8_t*) dir_dato;
+                uint8_t dato = (uint8_t)dir_dato;
                 agregar_uint8_a_buffer(un_buffer, dir_dato);
-                
         } else {
                 tam_segun_reg = sizeof(uint32_t);
                 agregar_uint32_a_buffer(un_buffer, dir_dato);
@@ -255,19 +259,15 @@ void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
 }
 
 //COPY STRING
- void ejecutar_copy_string(char ch_tamanio[20]){
-    int tamanio=atoi(ch_tamanio);
-    t_list* direcciones_origen=separar_en_paginas(pcb->registros_cpu->si,tamanio);
-    char* destino=malloc(20);
+void ejecutar_copy_string(char ch_tamanio[20])
+{
 
-    ejecutar_mov_in(destino,ch_tamanio);
-    
-    sem_wait(&sem_resize);
+    ejecutar_mov_in(pcb->registros_cpu->si, ch_tamanio);
 
-    ejecutar_mov_out(pcb->registros_cpu->di,destino);
-    
+    sem_wait(&sem_resultado);
+
+    ejecutar_mov_out(pcb->registros_cpu->di, pcb->registros_cpu->si);
 }
-
 
 //IO_STDIN_READ
 void ejecutar_io_stdin_read(char interfaz[20], char reg_dir_logica[20], char reg_tam [20]){

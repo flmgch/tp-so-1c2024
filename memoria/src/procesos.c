@@ -76,28 +76,34 @@ void enviar_instruccion(char *instruccion)
 void atender_finalizar_proceso(t_buffer *buffer)
 {
     t_proceso *proceso_a_eliminar = malloc(sizeof(t_proceso));
-    int *frame;
-    int tamanio_lista_procesos;
+    int tam_lista_procesos;
     uint32_t pid = extraer_uint32_de_buffer(buffer);
 
     pthread_mutex_lock(&mutex_lista_procesos);
     proceso_a_eliminar = encontrar_proceso(lista_de_procesos, pid);
-    tamanio_lista_procesos = list_size(lista_de_procesos);
+    tam_lista_procesos = list_size(lista_de_procesos);
     pthread_mutex_unlock(&mutex_lista_procesos);
 
-    int tamanio = proceso_a_eliminar->size / tamanio_pagina;
+    int tamanio = proceso_a_eliminar->size;
     log_info(mem_logger, "PID:%d - Tamaño: %d", pid, tamanio);
-
-    pthread_mutex_lock(&mutex_bitmap);
-    for (int i = 0; i < tamanio_lista_procesos; i++)
+    int tam_filas = list_size(proceso_a_eliminar->filas_tabla_paginas);
+    if (tam_filas != 0)
     {
-        frame = list_get(proceso_a_eliminar->filas_tabla_paginas, i);
-        bitarray_clean_bit(bitmap, *frame);
-        cantidad_marcos++;
+        pthread_mutex_lock(&mutex_bitmap);
+        for (int i = 0; i < tamanio; i++)
+        {
+            int *frame = list_get(proceso_a_eliminar->filas_tabla_paginas, i);
+            bitarray_clean_bit(bitmap, *frame);
+            cantidad_marcos++;
+            free(frame);
+        }
+        pthread_mutex_unlock(&mutex_bitmap);
+        list_destroy_and_destroy_elements(proceso_a_eliminar->filas_tabla_paginas, eliminar_lista);
     }
-    pthread_mutex_unlock(&mutex_bitmap);
-
-    list_destroy_and_destroy_elements(proceso_a_eliminar->filas_tabla_paginas, eliminar_lista);
+    else
+    {
+        list_destroy(proceso_a_eliminar->filas_tabla_paginas);
+    }
 
     bool auxiliar_no_ser_proceso_x(void *elemento)
     {
@@ -108,7 +114,8 @@ void atender_finalizar_proceso(t_buffer *buffer)
     pthread_mutex_lock(&mutex_lista_procesos);
     list_remove_by_condition(lista_de_procesos, auxiliar_no_ser_proceso_x);
     pthread_mutex_unlock(&mutex_lista_procesos);
-
+    // tam_lista_procesos = list_size(lista_de_procesos);
+    // log_info(mem_logger, "%d", tam_lista_procesos);
     free(proceso_a_eliminar);
 }
 
@@ -227,8 +234,6 @@ void atender_ajustar_tamanio(t_buffer *buffer)
         atender_reducir_tamanio(proceso_a_modificar, paginas_futuras, paginas_actuales);
         log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Reducir: %d", pid, proceso_a_modificar->size, tamanio_nuevo - proceso_a_modificar->size);
     }
-
-    proceso_a_modificar->size = paginas_futuras;
 }
 
 void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actuales, int paginas_futuras)
@@ -237,11 +242,13 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
     {
         log_error(mem_logger, "No hay frames suficientes para agregar mas paginas");
         enviar_resultado("Out of Memory");
+        return;
     }
     else if (tamanio_memoria < new_size)
     {
         log_error(mem_logger, "No hay espacio de memoria suficiente para agregar mas paginas");
         enviar_resultado("Out of Memory");
+        return;
     }
     else
     {
@@ -258,11 +265,13 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
             }
             enviar_resultado("Ok");
             free(frame);
+            proceso->size = paginas_futuras;
         }
         else
         {
             log_error(mem_logger, "No hay frames suficientes para agregar mas paginas");
             enviar_resultado("Out of Memory");
+            return;
         }
     }
 }
@@ -281,6 +290,7 @@ void atender_reducir_tamanio(t_proceso *proceso, int paginas_futuras, int pagina
         free(frame);
     }
     proceso->filas_tabla_paginas = list_take_and_remove(proceso->filas_tabla_paginas, paginas_futuras);
+    proceso->size = paginas_futuras;
 }
 
 void enviar_resultado(char *resultado)
@@ -293,7 +303,6 @@ void enviar_resultado(char *resultado)
 
     enviar_paquete(paquete, socket_cpu);
 
-    free(resultado);
     eliminar_paquete(paquete);
 }
 
