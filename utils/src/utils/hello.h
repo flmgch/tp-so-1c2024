@@ -82,6 +82,7 @@ typedef enum
     RESULTADO_LECTURA,
     // MEMORIA-CPU
     RESULTADO_AJUSTE_TAMAÑO,
+    RESULTADO_LECTURA,
     RECIBIR_INSTRUCCION,
     RECIBIR_TAMANIO_PAGINAS,
     // CPU-MEMORIA
@@ -89,7 +90,6 @@ typedef enum
     ENVIAR_INSTRUCCIONES,
     ENIVIAR_FRAME,
     AJUSTAR_TAMANIO,
-    RESULTADO_AJUSTE_TAMAÑIO,
     ACCESO_ESPACIO_USUARIO_LECTURA,
     ACCESO_ESPACIO_USUARIO_ESCRITURA,
     // CPU-KERNEL
@@ -109,7 +109,7 @@ typedef enum
 typedef struct {
     uint32_t direccion_fisica;
     int tamanio_dato;
-} t_direccion_fisica
+} t_direccion_fisica;
 
 typedef struct {
     uint8_t ax;   // Registro Numérico de propósito general

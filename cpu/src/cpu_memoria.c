@@ -31,6 +31,12 @@ void atender_memoria()
             procesar_resultado_resize(resultado);
             sem_post(&sem_resize);
             break;
+        case RESULTADO_LECTURA:
+            //un_buffer = recibir_buffer(socket_memoria);
+            //char* reg_datos=extraer_string_de_buffer(un_buffer);
+            //recibir_dato(reg_datos);
+            sem_post(&sem_move_in);
+            break;
         case -1:
             log_error(cpu_logger, "Se desconecto memoria");
             control_key = 0;

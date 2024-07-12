@@ -53,15 +53,15 @@ void decode(u_int32_t dir_instruccion){
             fetch();
             break;
         case MOV_IN:
-            // ! DESCOMENTAR TODAS LAS FUNCIONES DE ABAJO CUANDO ESTEN IMPLEMENTADAS
-            // ejecutar_mov_in(instruccion.param1, instruccion.param2);
+            ejecutar_mov_in(instruccion.param1, instruccion.param2);
+            fetch();
             break;
         case MOV_OUT:
             // ejecutar_mov_out(instruccion.param1, instruccion.param2);
             break;
         case RESIZE:
             ejecutar_resize(instruccion.param1);
-            sem_post(&sem_resize);
+            sem_wait(&sem_resize);
             break;
         case COPY_STRING:
             ejecutar_copy_string(instruccion.param1);
@@ -85,7 +85,7 @@ void decode(u_int32_t dir_instruccion){
             ejecutar_io_fs_truncate(instruccion.param1, instruccion.param2,instruccion.param3);
             fetch();
         case IO_FS_WRITE:
-            ejecutar_io_fs_write(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion);
+            ejecutar_io_fs_write(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4,instruccion.param5);
             fetch();
         case IO_FS_READ:
             ejecutar_io_fs_read(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);

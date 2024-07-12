@@ -61,6 +61,7 @@ void ejecutar_set(char registro[20], char valor[20]) {
     } else {
         log_error(cpu_logger, "No se hallo el registro");
     }
+}
 
 //SUM
 void ejecutar_sum(char registro_destino[20] , char registro_origen[20] ){
@@ -186,32 +187,111 @@ void procesar_resultado_resize(char* resultado){
     }
 }
 
-/* void ejecutar_copy_string(instruccion.param1){
+//MOV IN
+void ejecutar_mov_in(char reg_dir_logica[20],char reg_datos[20]){
+    void* dir_logica = obtener_registro(reg_dir_logica); //
+    uint32_t direccion_logica = *(uint32_t*)dir_logica;
+    int tam_segun_reg;
+    //datos=&reg_datos;
+    if (reg_datos != NULL) {
+        if (strcmp(reg_datos, "AX") == 0 || strcmp(reg_datos, "BX") == 0 ||
+            strcmp(reg_datos, "CX") == 0 || strcmp(reg_datos, "DX") == 0) {
+                tam_segun_reg = sizeof(uint8_t);
+        } else {
+                tam_segun_reg = sizeof(uint32_t);
+            } 
+        }
 
-} */
+   t_list* direcciones_fisicas = separar_en_paginas (direccion_logica,  tam_segun_reg);
+
+    t_buffer *un_buffer = crear_buffer();
+    agregar_uint32_a_buffer(un_buffer,pcb->pid);
+    agregar_int_a_buffer(un_buffer,tam_segun_reg);
+    agregar_lista_a_buffer(un_buffer,direcciones_fisicas);
+    t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_LECTURA, un_buffer);
+    enviar_paquete(paquete, socket_memoria);
+    eliminar_paquete(paquete);
+
+    sem_wait(&sem_move_in);
+
+    t_buffer* un_buffer = recibir_buffer(socket_memoria);
+    reg_datos=extraer_string_de_buffer(un_buffer);
+}
+
+/*void recibir_dato(void* dato_recibido){
+    char* dato=*(char* ) dato_recibido;
+    ejecutar_set(*datos,* dato);
+}*/
+
+//MOV OUT
+void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
+    void* dir_logica = obtener_registro(reg_destino); //
+    uint32_t direccion_logica = *(uint32_t*)dir_logica;
+
+    t_buffer *un_buffer = crear_buffer();
+    agregar_uint32_a_buffer(un_buffer,pcb->pid);
+    
+    void* dir_dato = obtener_registro(reg_datos);
+    int tam_segun_reg;
+     if (reg_datos != NULL) {
+        if (strcmp(reg_datos, "AX") == 0 || strcmp(reg_datos, "BX") == 0 ||
+            strcmp(reg_datos, "CX") == 0 || strcmp(reg_datos, "DX") == 0) {
+                tam_segun_reg = sizeof(uint8_t);
+                uint8_t dato = *(uint8_t*) dir_dato;
+                agregar_uint8_a_buffer(un_buffer, dir_dato);
+                
+        } else {
+                tam_segun_reg = sizeof(uint32_t);
+                agregar_uint32_a_buffer(un_buffer, dir_dato);
+            } 
+        }
+    
+    t_list* direcciones = separar_en_paginas (direccion_logica,tam_segun_reg);
+    agregar_lista_a_buffer(un_buffer,direcciones);
+
+    t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_ESCRITURA, un_buffer);
+    enviar_paquete(paquete, socket_memoria);
+    eliminar_paquete(paquete);
+}
+
+//COPY STRING
+ void ejecutar_copy_string(char ch_tamanio[20]){
+    int tamanio=atoi(ch_tamanio);
+    t_list* direcciones_origen=separar_en_paginas(pcb->registros_cpu->si,tamanio);
+    char* destino=malloc(20);
+
+    ejecutar_mov_in(destino,ch_tamanio);
+    
+    sem_wait(&sem_resize);
+
+    ejecutar_mov_out(pcb->registros_cpu->di,destino);
+    
+}
+
 
 //IO_STDIN_READ
 void ejecutar_io_stdin_read(char interfaz[20], char reg_dir_logica[20], char reg_tam [20]){
     void* dir_logica = obtener_registro(reg_dir_logica); //las dl son de 32
     uint32_t direccion_logica = *(uint32_t*)dir_logica; //hago void* -> uint32_t*; y *(uint32_t*) para obtener el valor almacenado en la dirección apuntada
     void* dir_tam = obtener_registro(reg_tam);
-
+    t_list* direcciones;
     t_buffer *un_buffer = crear_buffer();
     agregar_string_a_buffer(un_buffer,interfaz);
-    t_paquete *paquete = crear_super_paquete(OP_IO_STDIN_READ, un_buffer);
+   
 
     if (dir_tam != NULL) {
         if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
             strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
                 uint8_t tamanio = *(uint8_t*) dir_tam;
-
+                direcciones = separar_en_paginas (direccion_logica,*(int*)tamanio);
         } else {
                 uint32_t tamanio = *(uint32_t*) dir_tam;
+               direcciones = separar_en_paginas (direccion_logica,*(int*)tamanio);
             } 
         }
 
-        t_list* direcciones = separar_en_paginas (direccion_logica,*(int*)dir_tam);
-        
+        agregar_lista_a_buffer(un_buffer,direcciones);
+        t_paquete *paquete = crear_super_paquete(OP_IO_STDIN_READ, un_buffer);
         enviar_paquete(paquete, socket_kernel_dispatch);
         eliminar_paquete(paquete);
 }
@@ -220,25 +300,26 @@ void ejecutar_io_stdin_read(char interfaz[20], char reg_dir_logica[20], char reg
 void ejecutar_io_stdout_write(char interfaz[20], char reg_dir_logica[20], char reg_tam [20]){
     void* dir_logica = obtener_registro(reg_dir_logica); //las dl son de 32
     uint32_t direccion_logica = *(uint32_t*)dir_logica; //hago void* -> uint32_t*; y *(uint32_t*) para obtener el valor almacenado en la dirección apuntada
-    uint32_t direccion_fisica =  traducir_direccion_logica(direccion_logica);
-
+    t_list* direcciones;
     t_buffer *un_buffer = crear_buffer();
     agregar_string_a_buffer(un_buffer,interfaz);
-    agregar_uint32_a_buffer(un_buffer,direccion_fisica);
-    t_paquete *paquete = crear_super_paquete(OP_IO_STDOUT_WRITE, un_buffer);
+
 
     void* dir_tam = obtener_registro(reg_tam); //direccion del registro de nombre en reg_tam
     if (dir_tam != NULL) {
         if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
             strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
                 uint8_t tamanio = *(uint8_t*) dir_tam; //leo el contenido de dir_tam (es la direccion del registro referido por reg_tam)
-                agregar_uint8_a_buffer(un_buffer, tamanio); 
+                direcciones = separar_en_paginas (direccion_logica,*(int*)tamanio); 
 
         } else {
                 uint32_t tamanio = *(uint32_t*) dir_tam;
-                agregar_uint32_a_buffer(un_buffer, tamanio);
+                direcciones = separar_en_paginas (direccion_logica,*(int*)tamanio);
             } 
         }
+        
+        agregar_lista_a_buffer(un_buffer,direcciones);
+        t_paquete *paquete = crear_super_paquete(OP_IO_STDOUT_WRITE, un_buffer);
         enviar_paquete(paquete, socket_kernel_dispatch);
         eliminar_paquete(paquete);
 }
@@ -268,7 +349,6 @@ void ejecutar_io_fs_truncate(char interfaz[20], char nombre_fs[20], char reg_tam
     t_buffer *otro_buffer = crear_buffer();
     agregar_string_a_buffer(otro_buffer,interfaz);
     agregar_string_a_buffer(otro_buffer,nombre_fs);
-    t_paquete *paquete = crear_super_paquete(OP_IO_FS_TRUNCATE, otro_buffer);
 
     void* dir_tam = obtener_registro(reg_tam);
     if (dir_tam != NULL) {
@@ -283,6 +363,7 @@ void ejecutar_io_fs_truncate(char interfaz[20], char nombre_fs[20], char reg_tam
             } 
         }
 
+    t_paquete *paquete = crear_super_paquete(OP_IO_FS_TRUNCATE, otro_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
 }
@@ -295,16 +376,12 @@ void ejecutar_io_fs_write(char interfaz[20], char nombre_archivo[20], char reg_d
     //agrego al buffer la interfaz y nombre del archivo
     agregar_string_a_buffer(un_buffer,interfaz);
     agregar_string_a_buffer(un_buffer,nombre_archivo);
-
-    //creo el paquete que voy a mandar
-    t_paquete *paquete = crear_super_paquete(OP_IO_FS_WRITE, un_buffer);
-
-    //obtnego dir_logica
+    
+     //obtnego dir_logica
     void* dir_logica = obtener_registro(reg_dir_logica); 
     uint32_t direccion_logica = *(uint32_t*)dir_logica; 
-    //la traduzo y la agrego al buffer
-    uint32_t direccion_fisica =  traducir_direccion_logica(direccion_logica);
-    agregar_uint32_a_buffer(un_buffer, direccion_fisica);
+    t_list* direcciones_fisicas;
+
 
     //el tamanio del int a agregar depende del tamanio del registro
     //obtengo puntero al registro
@@ -315,19 +392,18 @@ void ejecutar_io_fs_write(char interfaz[20], char nombre_archivo[20], char reg_d
                 //si es uno de los registros anteriores, el int a agregar va a ser de uint8
                 //creo la variable de dicho tamanio, q va a tener el contenido apuntado por dir_tam
                 uint8_t tamanio = *(uint8_t*) dir_tam;
-
-                //agrego la variable al buffer
-                agregar_uint8_a_buffer(un_buffer, tamanio);
+                direcciones_fisicas = separar_en_paginas (direccion_logica,*(int*)tamanio);
 
         } else {
                 //si no es uno de los registros anteriores, es de los otros, cuyo tamanio es 32
                 //creo la variable de tipo uint32,q va a tener el contenido apuntado por dir_tam
                 uint32_t tamanio = *(uint32_t*) dir_tam;
+                direcciones_fisicas = separar_en_paginas (direccion_logica,*(int*)tamanio);
 
-                //agrego la variable al buffer
-                agregar_uint32_a_buffer(un_buffer, tamanio);
             } 
         }
+
+    agregar_lista_a_buffer(un_buffer,direcciones_fisicas);
     //obtengo dir del registro
     void* dir_ptr = obtener_registro(reg_ptr);
     if (dir_ptr != NULL) {
@@ -336,7 +412,6 @@ void ejecutar_io_fs_write(char interfaz[20], char nombre_archivo[20], char reg_d
                 //obtengo el contenido de la direccion, y la agrego al buffer
                 uint8_t puntero = *(uint8_t*) dir_ptr;
                 agregar_uint8_a_buffer(un_buffer, puntero);
-
         } else {
                 //idem
                 uint32_t puntero = *(uint32_t*) dir_ptr;
@@ -344,6 +419,7 @@ void ejecutar_io_fs_write(char interfaz[20], char nombre_archivo[20], char reg_d
             } 
         }
 
+    t_paquete *paquete = crear_super_paquete(OP_IO_FS_WRITE, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
 }
@@ -354,8 +430,7 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
     t_buffer *un_buffer = crear_buffer();
     agregar_string_a_buffer(un_buffer,interfaz);
     agregar_string_a_buffer(un_buffer,nombre_archivo);
-    t_paquete *paquete = crear_super_paquete(OP_IO_FS_READ, un_buffer);
-
+    uint32_t* direcciones_fisicas;
     void* dir_logica = obtener_registro(reg_dir_logica); 
     uint32_t direccion_logica = *(uint32_t*)dir_logica; 
     //uint32_t direccion_fisica =  traducir_direccion_logica(direccion_logica);
@@ -366,14 +441,16 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
         if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
             strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
                 uint8_t tamanio = *(uint8_t*) dir_tam;
-                agregar_uint8_a_buffer(un_buffer, tamanio);
+                direcciones_fisicas = separar_en_paginas (direccion_logica,*(int*)tamanio);
 
         } else {
                 uint32_t tamanio = *(uint32_t*) dir_tam;
-                agregar_uint32_a_buffer(un_buffer, tamanio);
+                direcciones_fisicas = separar_en_paginas (direccion_logica,*(int*)tamanio);
             } 
         }
 
+    agregar_lista_a_buffer(un_buffer,direcciones_fisicas);
+    
     void* dir_ptr = obtener_registro(reg_ptr);
     if (dir_ptr != NULL) {
         if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
@@ -387,8 +464,7 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
             } 
         }
 
-    uint32_t* direcciones_fisicas = separar_en_paginas (dir_logica, *(int*)dir_tam);
-
+    t_paquete *paquete = crear_super_paquete(OP_IO_FS_READ, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
 }

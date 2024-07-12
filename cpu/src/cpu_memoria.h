@@ -3,6 +3,7 @@
 
 #include "gestor_cpu.h"
 #include "solicitar_instruccion.h"
+#include "instrucciones.h"
 
 void atender_memoria();
 

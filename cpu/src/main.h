@@ -16,6 +16,7 @@ t_registros *registros;
 bool flag_execute;
 int tamanio_pagina;
 t_instruccion instruccion;
+//char* datos;
 
 // SOCKETS
 int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
@@ -28,5 +29,7 @@ int contador_acceso;
 
 // SEMAFOR
 sem_t sem_instruccion;
-
+sem_t sem_resize;
+sem_t sem_move_in;
+sem_t sem_copy_string;
 #endif
