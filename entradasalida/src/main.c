@@ -2,15 +2,21 @@
 
 int main(int argc, char *argv[])
 {
-  char *nombre_interfaz = "interfaz";
-  char *archivo_configuracion = "EntradaYSalida.config";
-
   // Pasar por argumento: ./bin/entradasalida nombreinterfaz nombrearchivo.config
-  if (argc < 3)
-  {
-    fprintf(stderr, "Uso: %s <nombre_interfaz> <archivo_configuracion>\n", argv[0]);
-    return EXIT_FAILURE;
-  }
+  char *nombre_interfaz = argv[1];
+  char *archivo_configuracion = argv[2];
+
+  t_buffer *un_buffer = crear_buffer();
+  agregar_string_a_buffer(un_buffer, nombre_interfaz);
+  // => MODIFICAR: Debo agregar al buffer el tipo de interfaz para enviarselo a kernel
+  t_paquete *paquete = crear_super_paquete(CREAR_INTERFAZ, un_buffer);
+  enviar_paquete(paquete, socket_kernel);
+
+  // if (argc < 3)
+  // {
+  //   fprintf(stderr, "Uso: %s <nombre_interfaz> <archivo_configuracion>\n", argv[0]);
+  //   return EXIT_FAILURE;
+  // }
 
   // INICIALIZAR IO
   inicializar_io(nombre_interfaz, archivo_configuracion);
