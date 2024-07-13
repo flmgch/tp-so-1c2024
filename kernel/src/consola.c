@@ -1,6 +1,8 @@
 #include "consola.h"
 #include "planificador.h"
 
+int pid_buscado = 0;
+
 void inicializar_consola()
 {
     log_info(kernel_logger, "CONSOLA INICIALIZADA");
@@ -100,7 +102,8 @@ void atender_instruccion(char *leido)
     }
     else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0)
     {
-        // agregar_int_a_buffer(un_buffer, (intptr_t)comando_consola[1]); // [pid]
+        pid_buscado = atoi(comando_consola[1]);
+        finalizar_proceso();
     }
     else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0)
     {
@@ -222,8 +225,7 @@ void ejecutar_script(char *path)
     int tamanio_array_ins = string_array_size(array_instrucciones);
     free(archivo_string);
 
-    // TODO recorrer con ciclo for el array de instrucciones y para cada string hacer string_split con espacio para obtener el nombre de la instruccion y sus parametros, y ejecutarla con un ifelse.
-    for (size_t i = 0; i < tamanio_array_ins; i++)
+    for (size_t i = 0; i < tamanio_array_ins; i++)  // Agarro cada instruccion del array y la ejecuto 
     {
         char* instruccion = array_instrucciones[i];
         char** instruccion_separada = string_split(instruccion, " ");
@@ -246,4 +248,41 @@ void ejecutar_instruccion(char** instruccion_separada){
     {
         iniciar_proceso(instruccion_separada[1]);
     }
+    // TODO MANEJO DE LOS DEMAS COMANDOS
+}
+
+void finalizar_proceso()
+{
+    // PRIMERO BUSCO EN COLA NEW
+    t_pcb *pcb = (t_pcb *)list_remove_by_condition(cola_new, es_pcb_buscado);
+    if (pcb != NULL)
+    {
+        pcb->motivo_exit = INTERRUPTED_BY_USER;
+        agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+        sem_post(&sem_exit);
+        return;
+    } 
+    // LUEGO BUSCO EN COLA READY
+    pcb = (t_pcb *)list_remove_by_condition(cola_ready, es_pcb_buscado);
+    if (pcb != NULL)
+    {
+        pcb->motivo_exit = INTERRUPTED_BY_USER;
+        agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+        sem_post(&sem_exit);
+        return;
+    }
+    // SI ESTA EN COLA EXEC, MANDO INTERRUPCION A CPU // TODO EL HANDLEO DEL PCB ESTA EN ATENDER_CPU_DISPATCH.c
+    pcb = (t_pcb *)list_get(cola_execute, 0);
+    if (pcb->pid == pid_buscado) {
+        t_buffer* buffer_vacio = crear_buffer();
+        t_paquete* paquete = crear_super_paquete(FINALIZAR_PROCESO, buffer_vacio);
+        enviar_paquete(paquete, socket_conexion_cpu_interrupt);
+    }
+
+};
+
+bool es_pcb_buscado(void *data)
+{
+    t_pcb *pcb = (t_pcb *)data;
+    return pid_buscado == pcb->pid;
 }

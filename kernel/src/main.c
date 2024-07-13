@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
   lista_io_conectadas = list_create();
 
   // INICIAR VARIABLES PARA TESTS
-  inicializar_tests();
+  // inicializar_tests();
 
   //  INICIALIZAR CONEXIONES
   socket_conexion_cpu_dispatch = crear_conexion(ip_cpu, dispatch, "CPU para dispatch", kernel_logger);
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
   pthread_create(&hilo_interfaz, NULL, (void *)atender_modulo_interfaz, NULL);
   pthread_detach(hilo_interfaz);
 
-  // TODO: INICIAR CONSOLA INTERACTIVA
+  // INICIAR CONSOLA INTERACTIVA
   inicializar_consola();
 
   // close(socket_escucha);
