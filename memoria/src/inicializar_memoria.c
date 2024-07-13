@@ -34,6 +34,14 @@ void inicializar_espacio_usuario()
     int tam = ceil((double)cantidad_marcos / 8);
     bitmap_espacio_usuario = malloc(tam);
     bitmap = bitarray_create_with_mode(bitmap_espacio_usuario, tam, LSB_FIRST);
+    for (int i = 0; i < cantidad_marcos; i++)
+    {
+        bitarray_clean_bit(bitmap, i);
+    }
+    /*
+        int n = bitarray_test_bit(bitmap, i);
+        log_info(mem_logger, "%d ", n);
+    }*/
 }
 
 void inicializar_semaforos()
@@ -55,9 +63,4 @@ void borrar_semaforos()
     pthread_mutex_destroy(&mutex_bitmap);
     pthread_mutex_destroy(&mutex_espacio_usuario);
     pthread_mutex_destroy(&mutex_lista_procesos);
-}
-
-void eliminar_lista(void *elemento)
-{
-    free(elemento);
 }

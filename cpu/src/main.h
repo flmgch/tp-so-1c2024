@@ -17,6 +17,7 @@ bool flag_execute;
 int tamanio_pagina;
 t_instruccion instruccion;
 //char* datos;
+int aux_resize = 0;
 
 // SOCKETS
 int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
@@ -30,6 +31,7 @@ int contador_acceso;
 // SEMAFOR
 sem_t sem_instruccion;
 sem_t sem_resize;
-sem_t sem_resultado;
+sem_t sem_resultado_escritura;
+sem_t sem_resultado_lectura;
 
 #endif

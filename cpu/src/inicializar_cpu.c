@@ -42,4 +42,15 @@ void inicializar_tlb() {
 void inicializar_semaforos()
 {
     sem_init(&sem_instruccion, 0, 0);
+    sem_init(&sem_resize, 0, 0);
+    sem_init(&sem_resultado_escritura, 0, 0);
+    sem_init(&sem_resultado_lectura, 0, 0);
+}
+
+void borrar_semaforos()
+{
+    sem_destroy(&sem_instruccion);
+    sem_destroy(&sem_resize);
+    sem_destroy(&sem_resultado_escritura);
+    sem_destroy(&sem_resultado_lectura);
 }

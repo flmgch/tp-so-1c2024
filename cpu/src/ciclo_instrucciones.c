@@ -62,6 +62,11 @@ void decode(u_int32_t dir_instruccion){
         case RESIZE:
             ejecutar_resize(instruccion.param1);
             sem_wait(&sem_resize);
+            if (aux_resize == 1)
+            {
+                fetch();
+            }
+
             break;
         case COPY_STRING:
             ejecutar_copy_string(instruccion.param1);
@@ -102,6 +107,7 @@ void fetch (){
     u_int32_t instruccion_a_ejecutar = pcb->program_counter;
     log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pcb->pid, instruccion_a_ejecutar);
 
+    aux_resize = 0;
     pcb->program_counter += 1;
     decode(instruccion_a_ejecutar);
 }

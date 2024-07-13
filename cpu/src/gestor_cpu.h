@@ -14,6 +14,7 @@ extern bool flag_execute;
 extern int tamanio_pagina;
 extern t_instruccion instruccion;
 //extern char* datos;
+extern int aux_resize;
 
 // SOCKETS
 extern int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
@@ -27,6 +28,7 @@ extern int contador_acceso;
 // SEMAFORO
 extern sem_t sem_instruccion;
 extern sem_t sem_resize;
-extern sem_t sem_resultado;
+extern sem_t sem_resultado_escritura;
+extern sem_t sem_resultado_lectura;
 
 #endif

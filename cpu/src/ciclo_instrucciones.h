@@ -5,7 +5,7 @@
 
 void ejecutar_proceso();
 void fetch();
-void decode();
+void decode(u_int32_t dir_instruccion);
 const char *instruccion_to_string(cod_instruccion codigo);
 
 #endif

@@ -22,17 +22,24 @@ bool soy_proceso_buscado(void *elemento, uint32_t pid_cpu)
     return proceso_buscado->pid == pid_cpu;
 }
 
-void buscar_frame_libre(int frame)
+int buscar_frame_libre()
 {
 
     for (int i = 0; i < cantidad_marcos; i++)
     {
         pthread_mutex_lock(&mutex_bitmap);
-        if (bitarray_test_bit(bitmap, i))
+        int test = bitarray_test_bit(bitmap, i);
+        // log_info(mem_logger, "%d", test);
+        if (test == 0)
         {
             bitarray_set_bit(bitmap, i);
-            frame = i;
-            return;
+            /*for (int i = 0; i < cantidad_marcos; i++)
+            {
+                int n = bitarray_test_bit(bitmap, i);
+                log_info(mem_logger, "%d ", n);
+            }*/
+            pthread_mutex_unlock(&mutex_bitmap);
+            return i;
         }
         pthread_mutex_unlock(&mutex_bitmap);
     }
@@ -86,36 +93,31 @@ void atender_finalizar_proceso(t_buffer *buffer)
 
     int tamanio = proceso_a_eliminar->size;
     log_info(mem_logger, "PID:%d - Tamaño: %d", pid, tamanio);
-    int tam_filas = list_size(proceso_a_eliminar->filas_tabla_paginas);
-    if (tam_filas != 0)
-    {
+
         pthread_mutex_lock(&mutex_bitmap);
         for (int i = 0; i < tamanio; i++)
         {
             int *frame = list_get(proceso_a_eliminar->filas_tabla_paginas, i);
             bitarray_clean_bit(bitmap, *frame);
             cantidad_marcos++;
-            free(frame);
+            int n = bitarray_test_bit(bitmap, *frame);
+            log_info(mem_logger, "%d ", n);
         }
         pthread_mutex_unlock(&mutex_bitmap);
-        list_destroy_and_destroy_elements(proceso_a_eliminar->filas_tabla_paginas, eliminar_lista);
-    }
-    else
-    {
+
         list_destroy(proceso_a_eliminar->filas_tabla_paginas);
-    }
 
-    bool auxiliar_no_ser_proceso_x(void *elemento)
-    {
+        bool auxiliar_no_ser_proceso_x(void *elemento)
+        {
 
-        return debe_ser_proceso_x(elemento, pid);
-    }
+            return debe_ser_proceso_x(elemento, pid);
+        }
 
     pthread_mutex_lock(&mutex_lista_procesos);
     list_remove_by_condition(lista_de_procesos, auxiliar_no_ser_proceso_x);
     pthread_mutex_unlock(&mutex_lista_procesos);
-    // tam_lista_procesos = list_size(lista_de_procesos);
-    // log_info(mem_logger, "%d", tam_lista_procesos);
+    tam_lista_procesos = list_size(lista_de_procesos);
+    log_info(mem_logger, "%d", tam_lista_procesos);
     free(proceso_a_eliminar);
 }
 
@@ -226,13 +228,13 @@ void atender_ajustar_tamanio(t_buffer *buffer)
 
     if (paginas_futuras > paginas_actuales)
     {
+        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Ampliar: %d", pid, proceso_a_modificar->size, tamanio_nuevo - tamanio_pagina * proceso_a_modificar->size);
         atender_aumentar_tamanio(proceso_a_modificar, tamanio_nuevo, paginas_actuales, paginas_futuras);
-        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Ampliar: %d", pid, proceso_a_modificar->size, proceso_a_modificar->size - tamanio_nuevo);
     }
     else if (paginas_futuras < paginas_actuales)
     {
+        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Reducir: %d", pid, proceso_a_modificar->size, tamanio_pagina * proceso_a_modificar->size - tamanio_nuevo);
         atender_reducir_tamanio(proceso_a_modificar, paginas_futuras, paginas_actuales);
-        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Reducir: %d", pid, proceso_a_modificar->size, tamanio_nuevo - proceso_a_modificar->size);
     }
 }
 
@@ -252,20 +254,20 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
     }
     else
     {
-
+        log_info(mem_logger, "%d", cantidad_de_marcos_libres);
         int paginas_a_agregar = paginas_futuras - paginas_actuales;
         if (paginas_a_agregar <= cantidad_de_marcos_libres)
         {
-            int *frame = malloc(sizeof(int));
+
             for (int i = 0; i < paginas_a_agregar; i++)
             {
-                buscar_frame_libre(*frame);
-                list_add(proceso->filas_tabla_paginas, frame);
+                int frame = buscar_frame_libre();
+                list_add_in_index(proceso->filas_tabla_paginas, i, &frame);
                 cantidad_de_marcos_libres--;
             }
             enviar_resultado("Ok");
-            free(frame);
             proceso->size = paginas_futuras;
+            // LO
         }
         else
         {
@@ -283,14 +285,17 @@ void atender_reducir_tamanio(t_proceso *proceso, int paginas_futuras, int pagina
     while (paginas_a_eliminar > 0)
     {
         int *frame = list_get(proceso->filas_tabla_paginas, (paginas_actuales - 1));
+        pthread_mutex_lock(&mutex_bitmap);
         bitarray_clean_bit(bitmap, *frame);
+        pthread_mutex_unlock(&mutex_bitmap);
         cantidad_de_marcos_libres++;
         paginas_a_eliminar--;
         paginas_actuales--;
-        free(frame);
     }
     proceso->filas_tabla_paginas = list_take_and_remove(proceso->filas_tabla_paginas, paginas_futuras);
     proceso->size = paginas_futuras;
+    enviar_resultado("Ok");
+    ///
 }
 
 void enviar_resultado(char *resultado)
@@ -299,7 +304,7 @@ void enviar_resultado(char *resultado)
 
     agregar_string_a_buffer(new_buffer, resultado);
 
-    t_paquete *paquete = crear_super_paquete(RESULTADO_AJUSTE_TAMAÑO, new_buffer);
+    t_paquete *paquete = crear_super_paquete(RESULTADO_AJUSTE_TAMAÑO_2, new_buffer);
 
     enviar_paquete(paquete, socket_cpu);
 
