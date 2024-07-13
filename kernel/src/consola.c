@@ -88,35 +88,15 @@ bool validar_instruccion(char *leido)
 void atender_instruccion(char *leido)
 {
     char **comando_consola = string_split(leido, " ");
-    t_buffer *un_buffer = crear_buffer();
+    // t_buffer *un_buffer = crear_buffer();
 
     if (strcmp(comando_consola[0], "EJECUTAR_SCRIPT") == 0)
     {
-        // agregar_string_a_buffer(un_buffer, comando_consola[1]); // [path]
+        ejecutar_script(comando_consola[1]);
     }
     else if (strcmp(comando_consola[0], "INICIAR_PROCESO") == 0)
     {
-        // CREAR PCB
-        int pid = asignar_pid();
-        t_pcb *pcb = crear_pcb(pid);
-        
-        // AGREGAR PCB A NEW
-        log_info(kernel_logger, "Se crea el proceso %d en NEW", pid);
-        agregar_pcb(cola_new, pcb, &mutex_cola_new);
-        sem_post(&sem_new);
-
-        // TOMAR PATH DE CONSOLA
-        agregar_string_a_buffer(un_buffer, comando_consola[1]); // [path]
-        char *path = extraer_string_de_buffer(un_buffer);
-        destruir_buffer(un_buffer);
-
-        // ENVIAR A MEMORIA PATH Y PID
-        t_buffer *a_enviar = crear_buffer();
-        agregar_string_a_buffer(a_enviar, path);
-        agregar_uint32_a_buffer(a_enviar, pcb->pid);
-        t_paquete *paquete = crear_super_paquete(CREAR_PROCESO, a_enviar);
-        enviar_paquete(paquete, socket_conexion_memoria);
-        eliminar_paquete(paquete);
+        iniciar_proceso(comando_consola[1]);
     }
     else if (strcmp(comando_consola[0], "FINALIZAR_PROCESO") == 0)
     {
@@ -197,4 +177,73 @@ void inicializar_registros_pcb(t_pcb *pcb)
     pcb->registros_cpu->edx = 0;
     pcb->registros_cpu->si = 0;
     pcb->registros_cpu->di = 0;
+}
+
+void iniciar_proceso(char *path)
+{
+
+    // CREAR PCB
+    int pid = asignar_pid();
+    t_pcb *pcb = crear_pcb(pid);
+
+    // AGREGAR PCB A NEW
+    log_info(kernel_logger, "Se crea el proceso %d en NEW", pid);
+    agregar_pcb(cola_new, pcb, &mutex_cola_new);
+    sem_post(&sem_new);
+
+    // ENVIAR A MEMORIA PATH Y PID
+    t_buffer *a_enviar = crear_buffer();
+    agregar_string_a_buffer(a_enviar, path);
+    agregar_uint32_a_buffer(a_enviar, pcb->pid);
+    t_paquete *paquete = crear_super_paquete(CREAR_PROCESO, a_enviar);
+    enviar_paquete(paquete, socket_conexion_memoria);
+    eliminar_paquete(paquete);
+}
+
+void ejecutar_script(char *path)
+{
+    FILE *archivo_instrucciones = fopen(path, "r");
+    if (!archivo_instrucciones)
+    {
+        log_error(kernel_logger, "Hubo un error abriendo el archivo");
+    }
+    long int tamanio_archivo = tamanio_del_archivo(archivo_instrucciones); // Vemos el tamaño del archivo
+
+    char *archivo_string = malloc(tamanio_archivo + 1);               
+    fread(archivo_string, tamanio_archivo, 1, archivo_instrucciones); // leo
+    if (archivo_string == NULL)
+    {
+        log_error(kernel_logger, "El archivo se encuentra vacio");
+    }
+    archivo_string[tamanio_archivo] = '\0'; // Agregamos el caracter centinela 
+    fclose(archivo_instrucciones);          
+
+    char **array_instrucciones = string_split(archivo_string, "\n"); // Separamos lo leído por línea ya que cada línea es una instrucción y prosigo a liberar la memoria de lo leído
+    int tamanio_array_ins = string_array_size(array_instrucciones);
+    free(archivo_string);
+
+    // TODO recorrer con ciclo for el array de instrucciones y para cada string hacer string_split con espacio para obtener el nombre de la instruccion y sus parametros, y ejecutarla con un ifelse.
+    for (size_t i = 0; i < tamanio_array_ins; i++)
+    {
+        char* instruccion = array_instrucciones[i];
+        char** instruccion_separada = string_split(instruccion, " ");
+        ejecutar_instruccion(instruccion_separada);
+    }
+    
+    string_array_destroy(array_instrucciones);
+}
+
+long int tamanio_del_archivo(FILE *archivo)
+{
+    fseek(archivo, 0, SEEK_END);
+    long int tamanio_archivo = ftell(archivo);
+    fseek(archivo, 0, SEEK_SET);
+    return tamanio_archivo;
+}
+
+void ejecutar_instruccion(char** instruccion_separada){
+    if (strcmp(instruccion_separada[0], "INICIAR_PROCESO") == 0)
+    {
+        iniciar_proceso(instruccion_separada[1]);
+    }
 }

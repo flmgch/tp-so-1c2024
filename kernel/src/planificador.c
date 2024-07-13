@@ -57,6 +57,8 @@ t_pcb *pcb_segun_algoritmo()
         log_error(kernel_logger, "No se reconocio el algoritmo de planificacion");
         exit(EXIT_FAILURE);
     }
+
+    return NULL;
 }
 
 void agregar_pcb(t_list *list, t_pcb *pcb, pthread_mutex_t *mutex)

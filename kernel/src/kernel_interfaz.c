@@ -26,7 +26,7 @@ void atender_modulo_interfaz()
             t_manejo_io *args = malloc(sizeof(t_manejo_io));
             args->nombre = nombre_interfaz;
             args->tipo = tipo_interfaz;
-            args->socket = (int) socket_conexion_interfaz;
+            args->socket = *socket_conexion_interfaz;
 
             pthread_create(&thread, NULL, (void *)crear_interfaz, (void *)args);
             pthread_detach(thread);
