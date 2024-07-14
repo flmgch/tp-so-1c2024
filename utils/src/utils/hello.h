@@ -224,13 +224,10 @@ typedef struct
 {
     uint32_t pid;
     char *tipo_interfaz;
-    char *nombre_interfaz;
-    char *archivo_configuracion;
     int unidades_trabajo;
     int tiempo_unidad_trabajo;
     char *ip_kernel;
     char *puerto_kernel;
-    cod_instruccion *instrucciones;
 } io_generica;
 
 typedef struct
@@ -239,13 +236,10 @@ typedef struct
     uint32_t direccion;
     uint32_t tamanio; 
     char *tipo_interfaz;
-    char *archivo_configuracion;
     char *ip_kernel;
     char *puerto_kernel;
     char *ip_memoria;
     char *puerto_memoria;
-    cod_instruccion *instrucciones;
-
 } io_stdin;
 
 typedef struct 
@@ -254,12 +248,10 @@ typedef struct
     uint32_t direccion;
     uint32_t tamanio; 
     char *tipo_interfaz;
-    char *archivo_configuracion;
     char *ip_kernel;
     char *puerto_kernel;
     char *ip_memoria;
     char *puerto_memoria;
-    cod_instruccion *instrucciones;
 } io_stdout;
 
 typedef struct 

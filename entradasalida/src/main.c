@@ -12,12 +12,6 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  t_buffer *un_buffer = crear_buffer();
-  agregar_string_a_buffer(un_buffer, nombre_interfaz);
-  // => MODIFICAR: Debo agregar al buffer el tipo de interfaz para enviarselo a kernel
-  t_paquete *paquete = crear_super_paquete(CREAR_INTERFAZ, un_buffer);
-  enviar_paquete(paquete, socket_kernel);
-
   // INICIALIZAR IO
   inicializar_io(nombre_interfaz, archivo_configuracion);
 
@@ -26,6 +20,13 @@ int main(int argc, char *argv[])
   handshake_cliente(socket_memoria, io_logger);
   socket_kernel = crear_conexion(ip_kernel, puerto_kernel, "Kernel", io_logger);
   handshake_cliente(socket_kernel, io_logger);
+
+  // ENVIAR NOMBRE Y TIPO DE INTERFAZ A KERNEL
+  t_buffer *un_buffer = crear_buffer();
+  agregar_string_a_buffer(un_buffer, nombre_interfaz);
+  agregar_string_a_buffer(un_buffer, tipo_interfaz);
+  t_paquete *paquete = crear_super_paquete(CREAR_INTERFAZ, un_buffer);
+  enviar_paquete(paquete, socket_kernel);
 
   // ATENDER KERNEL
   pthread_t hilo_kernel;
