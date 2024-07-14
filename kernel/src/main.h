@@ -25,7 +25,7 @@
   t_list *lista_io_conectadas;
 
 // SOCKETS
-  int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha, socket_interfaz;
+  int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha;
 
 // LISTAS DE PLANIFICACION
   t_list *cola_new, *cola_ready, *cola_execute, *cola_block, *cola_exit;

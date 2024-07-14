@@ -18,7 +18,7 @@ extern t_list *lista_recursos;
 extern t_list *lista_io_conectadas;
 
 // SOCKETS
-extern int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha, socket_interfaz;
+extern int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha;
 
 // LISTAS DE PLANIFICACION
 extern t_list *cola_new, *cola_ready, *cola_execute, *cola_block, *cola_exit;

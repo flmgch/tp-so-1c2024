@@ -1,11 +1,12 @@
 #include "kernel_interfaz.h"
 
-void atender_modulo_interfaz()
+void atender_modulo_interfaz(void* socket)
 {
+    int socket_interfaz_conectada = *((int*) socket);
     bool control_key = 1;
     while (control_key)
     {
-        int cod_op = recibir_operacion(socket_interfaz);
+        int cod_op = recibir_operacion(socket_interfaz_conectada);
         switch (cod_op)
         {
         case MENSAJE:
@@ -15,21 +16,11 @@ void atender_modulo_interfaz()
             //
             break;
         case CREAR_INTERFAZ:
-            t_buffer *buffer = recibir_buffer(socket_interfaz);
+            log_info(kernel_logger, "Recibi un aviso para CREAR una INTERFAZ");
+            t_buffer *buffer = recibir_buffer(socket_interfaz_conectada);
             char *nombre_interfaz = extraer_string_de_buffer(buffer);
             char *tipo_interfaz = extraer_string_de_buffer(buffer);
-
-            pthread_t thread;
-            int *socket_conexion_interfaz = malloc(sizeof(int));
-            *socket_conexion_interfaz = accept(socket_escucha, NULL, NULL);
-
-            t_manejo_io *args = malloc(sizeof(t_manejo_io));
-            args->nombre = nombre_interfaz;
-            args->tipo = tipo_interfaz;
-            args->socket = *socket_conexion_interfaz;
-
-            pthread_create(&thread, NULL, (void *)crear_interfaz, (void *)args);
-            pthread_detach(thread);
+            crear_interfaz(nombre_interfaz, tipo_interfaz, socket_interfaz_conectada);
             break;
         case FIN_INSTRUCCION_INTERFAZ:
             //
@@ -40,18 +31,13 @@ void atender_modulo_interfaz()
             break;
         default:
             log_warning(kernel_logger, "Operacion desconocida de Interfaz");
+            close(socket_interfaz_conectada);
             break;
         }
     }
 };
 
-void crear_interfaz (void* args) {
-
-    t_manejo_io* datos_io = (t_manejo_io*) args;
-
-    int fd_interfaz = datos_io->socket;
-    char* nombre_interfaz = datos_io->nombre;
-    char* tipo_interfaz = datos_io->tipo;
+void crear_interfaz (char* nombre_interfaz, char* tipo_interfaz, int fd_interfaz) {
 
     t_interfaz_kernel *interfaz = malloc(sizeof(t_interfaz_kernel));
     t_list *cola_block = list_create();
@@ -64,7 +50,7 @@ void crear_interfaz (void* args) {
 
     pthread_mutex_lock(&mutex_lista_io);
     list_add(lista_io_conectadas, interfaz);
+    log_info(kernel_logger, "Interfaz %s correctamente creada y agregada a la lista de interfaces", interfaz->nombre);
     pthread_mutex_unlock(&mutex_lista_io);
 
-    // ?: QUEDARSE ESPERANDO A RECIBIR SOLICITUDES DE KERNEL
 }

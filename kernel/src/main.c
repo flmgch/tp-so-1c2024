@@ -27,11 +27,6 @@ int main(int argc, char *argv[])
   socket_conexion_memoria = crear_conexion(ip_memoria, puerto_memoria, "Memoria", kernel_logger);
   handshake_cliente(socket_conexion_memoria, kernel_logger);
 
-  // INICIALIZAR SERVER
-  socket_escucha = iniciar_escucha(puerto_escucha, "Kernel", kernel_logger);
-  socket_interfaz = esperar_conexion(socket_escucha, "Interfaz", kernel_logger);
-  handshake_servidor(socket_interfaz);
-
   // ATENDER CPU - DISPATCH
   pthread_t hilo_cpu_dispatch;
   pthread_create(&hilo_cpu_dispatch, NULL, (void *)atender_cpu_dispatch, NULL);
@@ -47,13 +42,30 @@ int main(int argc, char *argv[])
   pthread_create(&hilo_memoria, NULL, (void *)atender_memoria, NULL);
   pthread_detach(hilo_memoria);
 
-  // ATENDER INTERFAZ
-  pthread_t hilo_interfaz;
-  pthread_create(&hilo_interfaz, NULL, (void *)atender_modulo_interfaz, NULL);
-  pthread_detach(hilo_interfaz);
-
   // INICIAR CONSOLA INTERACTIVA
-  inicializar_consola();
+  pthread_t hilo_consola;
+  pthread_create(&hilo_consola, NULL, (void *)inicializar_consola, NULL);
+  pthread_detach(hilo_consola);
+
+  // INICIALIZAR SERVER
+  socket_escucha = iniciar_escucha(puerto_escucha, "Kernel", kernel_logger);
+  while (1)
+  {
+    // CREO UN HILO POR CADA INTERFAZ QUE SE ME CONECTA Y GUARDO EL SOCKET
+    int* socket_interfaz = malloc(sizeof(int));
+    *socket_interfaz = esperar_conexion(socket_escucha, "Interfaz", kernel_logger);
+    handshake_servidor(*socket_interfaz);
+
+    pthread_t hilo_interfaz;
+    pthread_create(&hilo_interfaz, NULL, (void*)atender_modulo_interfaz, socket_interfaz);
+    pthread_detach(hilo_interfaz);
+
+  }
+
+  // ATENDER INTERFAZ
+  // pthread_t hilo_interfaz;
+  // pthread_create(&hilo_interfaz, NULL, (void *)atender_modulo_interfaz, NULL);
+  // pthread_detach(hilo_interfaz);
 
   // close(socket_escucha);
   // close(socket_interfaz);
