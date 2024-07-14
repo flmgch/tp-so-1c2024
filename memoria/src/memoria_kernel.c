@@ -23,6 +23,13 @@ void atender_kernel()
             pthread_mutex_lock(&mutex_lista_procesos);
             list_add(lista_de_procesos, proceso);
             pthread_mutex_unlock(&mutex_lista_procesos);
+            // int t = list_size(lista_de_procesos);
+            /*for (int i = 0; i < t; i++)
+            {
+                t_proceso *m = list_get(lista_de_procesos, i);
+                log_info(mem_logger, "PID: %d", m->pid);
+            }*/
+
             break;
         case FINALIZAR_PROCESO:
             un_buffer = recibir_buffer(socket_kernel);

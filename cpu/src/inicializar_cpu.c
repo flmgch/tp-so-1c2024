@@ -5,6 +5,8 @@ void inicializar_cpu()
     inicializar_logger();
     inicializar_config();
     inicializar_variables();
+    inicializar_semaforos();
+    inicializar_tlb();
 }
 
 void inicializar_logger()
@@ -33,7 +35,7 @@ void inicializar_variables(){
 }
 
 void inicializar_tlb() {
-    tlb = (tlb_entrada_t*)malloc(cantidad_entradas_tlb * sizeof(tlb_entrada_t));
+    tlb = malloc(cantidad_entradas_tlb * sizeof(tlb_entrada_t));
     tlb_proximo_reemplazo = 0; 
     tlb_entradas = 0;
     contador_acceso = 0; //para el lru
@@ -45,6 +47,7 @@ void inicializar_semaforos()
     sem_init(&sem_resize, 0, 0);
     sem_init(&sem_resultado_escritura, 0, 0);
     sem_init(&sem_resultado_lectura, 0, 0);
+    sem_init(&sem_consultar_memoria, 0, 0);
 }
 
 void borrar_semaforos()
@@ -53,4 +56,5 @@ void borrar_semaforos()
     sem_destroy(&sem_resize);
     sem_destroy(&sem_resultado_escritura);
     sem_destroy(&sem_resultado_lectura);
+    sem_destroy(&sem_consultar_memoria);
 }

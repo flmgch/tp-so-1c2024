@@ -31,7 +31,7 @@ void atender_cpu()
             break;
         case ACCESO_ESPACIO_USUARIO_ESCRITURA:
             un_buffer = recibir_buffer(socket_cpu);
-            escribir_memoria(un_buffer);
+            escribir_memoria(un_buffer, socket_cpu);
             break;
         case ACCESO_ESPACIO_USUARIO_LECTURA:
             un_buffer = recibir_buffer(socket_cpu);

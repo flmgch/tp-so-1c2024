@@ -15,6 +15,7 @@ extern int tamanio_pagina;
 extern t_instruccion instruccion;
 //extern char* datos;
 extern int aux_resize;
+extern int aux_marco;
 
 // SOCKETS
 extern int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
@@ -30,5 +31,9 @@ extern sem_t sem_instruccion;
 extern sem_t sem_resize;
 extern sem_t sem_resultado_escritura;
 extern sem_t sem_resultado_lectura;
+extern sem_t sem_consultar_memoria;
+extern int numero_pagina;
+extern int desplazamiento;
+extern uint32_t dir_fisica_inicial;
 
 #endif

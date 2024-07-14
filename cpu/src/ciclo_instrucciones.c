@@ -57,7 +57,8 @@ void decode(u_int32_t dir_instruccion){
             fetch();
             break;
         case MOV_OUT:
-            // ejecutar_mov_out(instruccion.param1, instruccion.param2);
+            ejecutar_mov_out(instruccion.param1, instruccion.param2);
+            fetch();
             break;
         case RESIZE:
             ejecutar_resize(instruccion.param1);

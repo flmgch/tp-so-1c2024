@@ -25,7 +25,7 @@ void atender_memoria()
             tamanio_pagina = extraer_int_de_buffer(un_buffer);
             log_info(cpu_logger, "Recibido el tamanio de pag.");
             break;
-        case RESULTADO_AJUSTE_TAMAÑO_2:
+        case RESULTADO_AJUSTE_TAMAÑO:
             un_buffer = recibir_buffer(socket_memoria);
             char *resultado = extraer_string_de_buffer(un_buffer);
             procesar_resultado_resize(resultado);
@@ -35,7 +35,15 @@ void atender_memoria()
             sem_post(&sem_resultado_lectura);
             break;
         case RESULTADO_ESCRITURA:
+            un_buffer = recibir_buffer(socket_memoria);
+            char *mensaje = extraer_string_de_buffer(un_buffer);
+            log_info(cpu_logger, "%s", mensaje);
             sem_post(&sem_resultado_escritura);
+            break;
+        case ENIVIAR_FRAME:
+            un_buffer = recibir_buffer(socket_memoria);
+            aux_marco = extraer_int_de_buffer(un_buffer);
+            sem_post(&sem_consultar_memoria);
             break;
         case -1:
             log_error(cpu_logger, "Se desconecto memoria");

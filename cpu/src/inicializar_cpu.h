@@ -8,6 +8,7 @@ void inicializar_config();
 void inicializar_logger();
 void inicializar_variables();
 void inicializar_tlb();
+void inicializar_semaforos();
 // t_registros *inicializar_registros();
 
 #endif

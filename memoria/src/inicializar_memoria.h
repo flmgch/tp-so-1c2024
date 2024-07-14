@@ -10,5 +10,5 @@ void inicializar_espacio_usuario();
 void borrar_espacio_usuario();
 void inicializar_semaforos();
 void borrar_semaforos();
-void eliminar_lista(void *elemento);
+
 #endif

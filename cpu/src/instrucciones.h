@@ -25,5 +25,7 @@ void ejecutar_io_fs_delete(char interfaz[20], char nombre_fs[20]);
 void ejecutar_io_fs_truncate(char interfaz[20], char nombre_fs[20], char reg_tam[20]);
 void ejecutar_io_fs_write(char interfaz[20], char nombre_archivo[20], char reg_dir_logica[20], char reg_tam[20], char reg_ptr[20]);
 void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_dir_logica[20], char reg_tam[20], char reg_ptr[20]);
+void enviar_direcciones_escritura(t_list *direcciones, void *valor, int tam_segun);
+void enviar_direcciones_lectura(t_list *direcciones, void *valor, int tamanio);
 
 #endif

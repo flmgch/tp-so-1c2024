@@ -22,5 +22,7 @@ bool debe_ser_proceso_x(void *elemento, uint32_t pid);
 bool auxiliar_no_ser_proceso_x(void *elemento);
 void enviar_tamnio_pagina();
 void atender_finalizar_proceso(t_buffer *buffer);
+void quitar_frames(t_proceso *proceso, int paginas_actuales);
+void agregar_frames(t_proceso *proceso, int numero_pagina);
 
 #endif

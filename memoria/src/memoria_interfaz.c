@@ -19,7 +19,7 @@ void atender_interfaz()
             break;
         case ACCESO_ESPACIO_USUARIO_ESCRITURA:
             un_buffer = recibir_buffer(socket_interfaz);
-            escribir_memoria(un_buffer);
+            escribir_memoria(un_buffer, socket_interfaz);
             break;
         case ACCESO_ESPACIO_USUARIO_LECTURA:
             un_buffer = recibir_buffer(socket_interfaz);
