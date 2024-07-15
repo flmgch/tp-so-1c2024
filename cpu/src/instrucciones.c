@@ -193,45 +193,59 @@ void procesar_resultado_resize(char* resultado){
 
 //MOV IN
 void ejecutar_mov_in(char reg_dir_logica[20],char reg_datos[20]){
-    uint32_t *dir_logica = obtener_registro(reg_dir_logica); //
+    uint32_t *dir_logica = obtener_registro(reg_dir_logica);
+    t_buffer *un_buffer = crear_buffer();
     int tam_segun;
     t_list *direcciones;
+    char *condicion = malloc(15);
     //datos=&reg_datos;
+
+    agregar_uint32_a_buffer(un_buffer, pcb->pid);
     if (reg_datos != NULL) {
         if (strcmp(reg_datos, "AX") == 0 || strcmp(reg_datos, "BX") == 0 ||
             strcmp(reg_datos, "CX") == 0 || strcmp(reg_datos, "DX") == 0) {
             tam_segun = sizeof(uint8_t);
-            direcciones = separar_en_paginas(*dir_logica, tam_segun);
+            char *aux_condicion = "Uint8";
+            memcpy(condicion, aux_condicion, 15);
+            agregar_string_a_buffer(un_buffer, condicion);
         }
         else
         {
             tam_segun = sizeof(uint32_t);
-            direcciones = separar_en_paginas(*dir_logica, tam_segun);
+            char *aux_condicion = "Uint32";
+            memcpy(condicion, aux_condicion, 15);
+            agregar_string_a_buffer(un_buffer, condicion);
         }
         }
 
-        char *valor = malloc(tam_segun);
-        memset(valor, 0, tam_segun);
-        enviar_direcciones_lectura(direcciones, valor, tam_segun);
+        direcciones = separar_en_paginas(*dir_logica, tam_segun);
 
-        ejecutar_set(reg_datos, valor);
+        t_direccion_fisica *d = list_get(direcciones, 0);
 
-                // t_list* direcciones_fisicas = separar_en_paginas (direccion_logica,  tam_segun_reg);
+        int l = list_size(direcciones);
 
-        /*t_buffer *un_buffer = crear_buffer();
-        agregar_uint32_a_buffer(un_buffer, pcb->pid);
+        log_info(cpu_logger, "DF: %d tam: %d pag: %d", d->direccion_fisica, d->tamanio_dato, l);
+
         // agregar_int_a_buffer(un_buffer,tam_segun_reg);
-        agregar_lista_a_buffer(un_buffer, direcciones_fisicas);
+        agregar_lista_direcciones_a_buffer(un_buffer, direcciones);
+        agregar_int_a_buffer(un_buffer, tam_segun);
         t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_LECTURA, un_buffer);
         enviar_paquete(paquete, socket_memoria);
         eliminar_paquete(paquete);
 
-        sem_wait(&sem_resultado);
+        sem_wait(&sem_resultado_lectura);
 
-        t_buffer *otro_buffer = recibir_buffer(socket_memoria);
-        void *aux_dato = extraer_de_buffer(otro_buffer);
-        char *dato = (char *)aux_dato;
-        ejecutar_set(reg_datos, dato);*/
+        ejecutar_set(reg_datos, reg_aux);
+        if (strcmp(condicion, "Uint8") == 0)
+        {
+            uint8_t *aux_resultado = obtener_registro(reg_datos);
+            log_info(cpu_logger, "%d", *aux_resultado);
+        }
+        else
+        {
+            uint32_t *aux_resultado = obtener_registro(reg_datos);
+            log_info(cpu_logger, "%d", *aux_resultado);
+        }
 }
 
 /*void recibir_dato(void* dato_recibido){
@@ -246,6 +260,9 @@ void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
 
     int tam_segun;
 
+    t_buffer *un_buffer = crear_buffer();
+    agregar_uint32_a_buffer(un_buffer, pcb->pid);
+
     if (reg_datos != NULL)
     {
         if (strcmp(reg_datos, "AX") == 0 || strcmp(reg_datos, "BX") == 0 ||
@@ -253,17 +270,30 @@ void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
         {
             tam_segun = sizeof(uint8_t);
             uint8_t *valor = obtener_registro(reg_datos);
-            direcciones = separar_en_paginas(*dir_logica, tam_segun);
-            enviar_direcciones_escritura(direcciones, valor, tam_segun);
+            agregar_string_a_buffer(un_buffer, "Uint8");
+            agregar_int_a_buffer(un_buffer, tam_segun);
+            agregar_uint8_a_buffer(un_buffer, *valor);
         }
         else
         {
             tam_segun = sizeof(uint32_t);
             uint32_t *valor = obtener_registro(reg_datos);
-            direcciones = separar_en_paginas(*dir_logica, tam_segun);
-            enviar_direcciones_escritura(direcciones, valor, tam_segun);
+            agregar_string_a_buffer(un_buffer, "Uint32");
+            agregar_int_a_buffer(un_buffer, tam_segun);
+            agregar_uint32_a_buffer(un_buffer, *valor);
         }
     }
+
+    direcciones = separar_en_paginas(*dir_logica, tam_segun);
+
+    t_direccion_fisica *d = list_get(direcciones, 0);
+
+    log_info(cpu_logger, "DF: %d tam: %d", d->direccion_fisica, d->tamanio_dato);
+    agregar_lista_direcciones_a_buffer(un_buffer, direcciones);
+
+    t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_ESCRITURA, un_buffer);
+    enviar_paquete(paquete, socket_memoria);
+    eliminar_paquete(paquete);
 }
 // COPY STRING
 void ejecutar_copy_string(char ch_tamanio[20])
@@ -275,53 +305,26 @@ void ejecutar_copy_string(char ch_tamanio[20])
     t_list *direcciones_origen = separar_en_paginas(pcb->registros_cpu->si, tamanio);
     t_list *direcciones_destino = separar_en_paginas(pcb->registros_cpu->di, tamanio);
 
-    enviar_direcciones_lectura(direcciones_origen, valor, tamanio);
+    t_buffer *un_buffer = crear_buffer();
+    agregar_uint32_a_buffer(un_buffer, pcb->pid);
+    agregar_string_a_buffer(un_buffer, "String");
+    agregar_lista_direcciones_a_buffer(un_buffer, direcciones_origen);
+    agregar_int_a_buffer(un_buffer, tamanio);
+    t_paquete *paquete1 = crear_super_paquete(ACCESO_ESPACIO_USUARIO_LECTURA, un_buffer);
+    enviar_paquete(paquete1, socket_memoria);
+    eliminar_paquete(paquete1);
 
-    enviar_direcciones_escritura(direcciones_destino, valor, tamanio);
-    //
-}
+    sem_wait(&sem_resultado_lectura);
 
-void enviar_direcciones_escritura(t_list *direcciones, void *valor, int tam_segun)
-{
-    int tam_lista_direcciones = list_size(direcciones);
-
-    for (int i = 0; i < tam_lista_direcciones; i++)
-    {
-        t_buffer *un_buffer = crear_buffer();
-        t_direccion_fisica *direccion = list_get(direcciones, i);
-        agregar_uint32_a_buffer(un_buffer, pcb->pid);
-        agregar_a_buffer(un_buffer, valor, tam_segun);
-        agregar_uint32_a_buffer(un_buffer, direccion->direccion_fisica);
-        agregar_int_a_buffer(un_buffer, direccion->tamanio_dato);
-        t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_ESCRITURA, un_buffer);
-        enviar_paquete(paquete, socket_memoria);
-        eliminar_paquete(paquete);
-        sem_wait(&sem_resultado_escritura);
-    }
-    //
-}
-
-void enviar_direcciones_lectura(t_list *direcciones, void *valor, int tamanio)
-{
-    int tam_lista_direcciones = list_size(direcciones);
-    int tam_final = 0;
-    for (int i = 0; i < tam_lista_direcciones; i++)
-    {
-        t_buffer *un_buffer = crear_buffer();
-        t_direccion_fisica *direccion = list_get(direcciones, i);
-        agregar_uint32_a_buffer(un_buffer, pcb->pid);
-        agregar_uint32_a_buffer(un_buffer, direccion->direccion_fisica);
-        agregar_int_a_buffer(un_buffer, direccion->tamanio_dato);
-        t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_LECTURA, un_buffer);
-        enviar_paquete(paquete, socket_memoria);
-        eliminar_paquete(paquete);
-        sem_wait(&sem_resultado_lectura);
-        t_buffer *otro_buffer = recibir_buffer(socket_memoria);
-        void *aux_dato = extraer_de_buffer(otro_buffer);
-        memcpy(valor + tam_final, aux_dato, direccion->tamanio_dato);
-        tam_final += direccion->tamanio_dato;
-    }
-    memset(valor, 0, tamanio);
+    t_buffer *otro_buffer = crear_buffer();
+    agregar_uint32_a_buffer(otro_buffer, pcb->pid);
+    agregar_string_a_buffer(un_buffer, "String");
+    agregar_int_a_buffer(un_buffer, tamanio);
+    agregar_string_a_buffer(otro_buffer, reg_aux);
+    agregar_lista_direcciones_a_buffer(un_buffer, direcciones_destino);
+    t_paquete *paquete2 = crear_super_paquete(ACCESO_ESPACIO_USUARIO_ESCRITURA, otro_buffer);
+    enviar_paquete(paquete2, socket_memoria);
+    eliminar_paquete(paquete2);
 }
 
 //IO_STDIN_READ

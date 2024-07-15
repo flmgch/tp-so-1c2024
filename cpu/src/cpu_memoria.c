@@ -32,13 +32,14 @@ void atender_memoria()
             sem_post(&sem_resize);
             break;
         case RESULTADO_LECTURA:
+            un_buffer = recibir_buffer(socket_memoria);
+            reg_aux = extraer_string_de_buffer(un_buffer);
             sem_post(&sem_resultado_lectura);
             break;
         case RESULTADO_ESCRITURA:
             un_buffer = recibir_buffer(socket_memoria);
             char *mensaje = extraer_string_de_buffer(un_buffer);
             log_info(cpu_logger, "%s", mensaje);
-            sem_post(&sem_resultado_escritura);
             break;
         case ENIVIAR_FRAME:
             un_buffer = recibir_buffer(socket_memoria);

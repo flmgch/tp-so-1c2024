@@ -167,8 +167,26 @@ void agregar_int_a_buffer(t_buffer *buffer, int valor)
   agregar_a_buffer(buffer, &valor, sizeof(int));
 }
 
-void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor){
+void agregar_dirreccion_fisica_a_buffer(t_buffer *buffer, t_direccion_fisica *direccion)
+{
+  agregar_uint32_a_buffer(buffer, direccion->direccion_fisica);
+  agregar_int_a_buffer(buffer, direccion->tamanio_dato);
+}
+
+void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor)
+{
   agregar_a_buffer(buffer, valor, list_size(valor));
+}
+
+void agregar_lista_direcciones_a_buffer(t_buffer *buffer, t_list *valor)
+{
+  int tam = list_size(valor);
+  agregar_int_a_buffer(buffer, tam);
+  for (int i = 0; i < tam; i++)
+  {
+    t_direccion_fisica *direccion = list_get(valor, i);
+    agregar_dirreccion_fisica_a_buffer(buffer, direccion);
+  }
 }
 
 void agregar_uint8_a_buffer(t_buffer *buffer, u_int8_t valor)
@@ -488,10 +506,30 @@ char *extraer_string_de_buffer(t_buffer *buffer)
   return string;
 }
 
+t_direccion_fisica *extraer_dirreccion_fisica_de_buffer(t_buffer *buffer)
+{
+  t_direccion_fisica *direccion = malloc(sizeof(t_direccion_fisica));
+  direccion->direccion_fisica = extraer_uint32_de_buffer(buffer);
+  direccion->tamanio_dato = extraer_int_de_buffer(buffer);
+  return direccion;
+}
+
 t_list *extraer_lista_de_buffer(t_buffer *buffer)
 {
   t_list *lista = extraer_de_buffer(buffer);
   return lista;
+}
+
+t_list *extraer_lista_direcciones_de_buffer(t_buffer *buffer)
+{
+  t_list *lista_direcciones = list_create();
+  int tam = extraer_int_de_buffer(buffer);
+  for (int i = 0; i < tam; i++)
+  {
+    t_direccion_fisica *direccion = extraer_dirreccion_fisica_de_buffer(buffer);
+    list_add_in_index(lista_direcciones, i, direccion);
+  }
+  return lista_direcciones;
 }
 
 t_registros* extraer_registros_de_buffer(t_buffer* buffer) {

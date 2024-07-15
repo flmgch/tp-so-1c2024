@@ -64,6 +64,7 @@ t_list *separar_en_paginas(uint32_t direccion_logica, int tamanio_dato)
             uint32_t dir_nueva = marco * tamanio_pagina;
             t_direccion_fisica *nueva_direccion = malloc(sizeof(t_direccion_fisica));
             nueva_direccion->direccion_fisica = dir_nueva;
+
             if (queda_escribir < tamanio_pagina)
             {
                 nueva_direccion->tamanio_dato = queda_escribir;

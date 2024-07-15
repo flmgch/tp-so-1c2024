@@ -22,6 +22,9 @@ int aux_marco = 0;
 int numero_pagina = 0;
 int desplazamiento = 0;
 uint32_t dir_fisica_inicial = 0;
+int tam_aux = 0;
+void *aux_dato;
+char *reg_aux;
 // SOCKETS
 int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
 

@@ -305,6 +305,8 @@ void agregar_motivo_block_a_buffer(t_buffer *buffer, motivo_block motivo);
 void agregar_motivo_exit_a_buffer(t_buffer *buffer, motivo_exit motivo);
 void agregar_cop_a_buffer(t_buffer *buffer, op_code cop);
 void agregar_pcb_a_buffer(t_buffer * buffer, t_pcb * pcb);
+void agregar_dirreccion_fisica_a_buffer(t_buffer *buffer, t_direccion_fisica *direccion);
+void agregar_lista_direcciones_a_buffer(t_buffer *buffer, t_list *valor);
 
 void *extraer_de_buffer(t_buffer *buffer);
 char *extraer_string_de_buffer(t_buffer *buffer);
@@ -317,7 +319,8 @@ motivo_exit extraer_motivo_exit_de_buffer(t_buffer *buffer);
 estado_proceso extraer_estado_proceso_de_buffer(t_buffer *buffer);
 motivo_block extraer_motivo_block_de_buffer(t_buffer *buffer);
 t_pcb *extraer_pcb_de_buffer(t_buffer *buffer);
-
+t_direccion_fisica *extraer_dirreccion_fisica_de_buffer(t_buffer *buffer);
+t_list *extraer_lista_direcciones_de_buffer(t_buffer *buffer);
 
 // FUNCIONES PAQUETE
 
