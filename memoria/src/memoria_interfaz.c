@@ -1,8 +1,8 @@
 #include "memoria_interfaz.h"
 
-void atender_interfaz()
+void atender_interfaz(void* socket)
 {
-
+    int socket_interfaz = *((int*) socket);
     bool control_key = 1;
     while (control_key)
     {
@@ -31,6 +31,8 @@ void atender_interfaz()
             break;
         default:
             log_warning(mem_logger, "Operacion desconocida de interfaz");
+            close(socket_interfaz);
+            control_key = 0;
             break;
         }
         destruir_buffer(un_buffer);

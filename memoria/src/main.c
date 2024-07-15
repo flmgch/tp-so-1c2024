@@ -13,8 +13,6 @@ int main(int argc, char *argv[])
   handshake_servidor(socket_cpu);
   socket_kernel = esperar_conexion(socket_escucha, "Kernel", mem_logger);
   handshake_servidor(socket_kernel);
-  socket_interfaz = esperar_conexion(socket_escucha, "Interfaz", mem_logger);
-  handshake_servidor(socket_interfaz);
 
   // ATENDER CPU
 
@@ -30,9 +28,17 @@ int main(int argc, char *argv[])
 
   // ATENDER INTERFAZ
 
-  pthread_t hilo_interfaz;
-  pthread_create(&hilo_interfaz, NULL, (void *)atender_interfaz, NULL);
-  pthread_join(hilo_interfaz, NULL);
+  while (1)
+  {
+    // CREO UN HILO POR CADA INTERFAZ QUE SE ME CONECTA Y GUARDO EL SOCKET
+    int *socket_interfaz = malloc(sizeof(int));
+    *socket_interfaz = esperar_conexion(socket_escucha, "Interfaz", mem_logger);
+    handshake_servidor(*socket_interfaz);
+
+    pthread_t hilo_interfaz;
+    pthread_create(&hilo_interfaz, NULL, (void *)atender_interfaz, socket_interfaz);
+    pthread_detach(hilo_interfaz);
+  }
 
   // borrar_espacio_usuario();
   // borrar_semaforos();

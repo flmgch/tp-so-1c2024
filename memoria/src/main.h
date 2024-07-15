@@ -22,7 +22,7 @@ void *bitmap_espacio_usuario;
 t_bitarray *bitmap;
 
 // SOCKETS
-int socket_escucha, socket_cpu, socket_kernel, socket_interfaz;
+int socket_escucha, socket_cpu, socket_kernel;
 
 // SEMAFOROS Y MUTEX
 pthread_mutex_t mutex_lista_procesos;

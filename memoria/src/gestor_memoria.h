@@ -18,7 +18,7 @@ extern void *bitmap_espacio_usuario;
 extern t_bitarray *bitmap;
 
 // SOCKETS
-extern int socket_escucha, socket_cpu, socket_kernel, socket_interfaz;
+extern int socket_escucha, socket_cpu, socket_kernel;
 
 // SEMAFOROS Y MUTEX
 extern pthread_mutex_t mutex_bitmap;

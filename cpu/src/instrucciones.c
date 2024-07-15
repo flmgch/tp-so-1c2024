@@ -307,7 +307,7 @@ void ejecutar_copy_string(char ch_tamanio[20])
 
     t_buffer *un_buffer = crear_buffer();
     agregar_uint32_a_buffer(un_buffer, pcb->pid);
-    agregar_string_a_buffer(un_buffer, "String");
+    agregar_string_a_buffer(un_buffer, "Uint32");
     agregar_lista_direcciones_a_buffer(un_buffer, direcciones_origen);
     agregar_int_a_buffer(un_buffer, tamanio);
     t_paquete *paquete1 = crear_super_paquete(ACCESO_ESPACIO_USUARIO_LECTURA, un_buffer);
@@ -315,6 +315,7 @@ void ejecutar_copy_string(char ch_tamanio[20])
     eliminar_paquete(paquete1);
 
     sem_wait(&sem_resultado_lectura);
+    log_info(cpu_logger, "%s", reg_aux);
 
     t_buffer *otro_buffer = crear_buffer();
     agregar_uint32_a_buffer(otro_buffer, pcb->pid);

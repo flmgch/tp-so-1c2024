@@ -32,6 +32,7 @@ void atender_modulo_interfaz(void* socket)
         default:
             log_warning(kernel_logger, "Operacion desconocida de Interfaz");
             close(socket_interfaz_conectada);
+            control_key = 0;
             break;
         }
     }

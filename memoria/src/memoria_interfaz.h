@@ -5,6 +5,6 @@
 #include "procesos.h"
 #include "espacio_usuario.h"
 
-void atender_interfaz();
+void atender_interfaz(void* socket);
 
 #endif

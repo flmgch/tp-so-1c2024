@@ -55,7 +55,7 @@ t_list *separar_en_paginas(uint32_t direccion_logica, int tamanio_dato)
 
         int queda_escribir = tamanio_dato - espacio_restante;
 
-        int paginas_restantes = ceil(queda_escribir / tamanio_pagina);
+        int paginas_restantes = (queda_escribir / tamanio_pagina) + 1;
 
         for (int i = 1; i <= paginas_restantes; i++)
         {

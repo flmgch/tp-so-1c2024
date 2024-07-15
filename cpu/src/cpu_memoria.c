@@ -52,6 +52,8 @@ void atender_memoria()
             break;
         default:
             log_warning(cpu_logger, "Operacion desconocida de memoria");
+            close(socket_memoria);
+            control_key = 0;
             break;
         }
         destruir_buffer(un_buffer);

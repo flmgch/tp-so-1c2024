@@ -43,6 +43,7 @@ void atender_cpu()
             break;
         default:
             log_warning(mem_logger, "Operacion desconocida de CPU");
+            close(socket_cpu);
             break;
         }
         destruir_buffer(un_buffer);
