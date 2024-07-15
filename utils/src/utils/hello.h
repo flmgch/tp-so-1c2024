@@ -77,6 +77,10 @@ typedef enum
     STDIN,
     STDOUT,
     DIALFS,
+    GENERICA_FINALIZADA,
+    STDIN_FINALIZADA,
+    STDOUT_FINALIZADA,
+    DIALFS_FINALIZADA,
     // MEMORIA-KERNEL
     // MEMORIA-CPU-IO
     // MEMORIA-CPU
@@ -223,7 +227,6 @@ typedef struct {
 typedef struct
 {
     uint32_t pid;
-    char *tipo_interfaz;
     int unidades_trabajo;
     int tiempo_unidad_trabajo;
     char *ip_kernel;
@@ -233,9 +236,8 @@ typedef struct
 typedef struct
 {
     uint32_t pid;
-    uint32_t direccion;
-    uint32_t tamanio; 
-    char *tipo_interfaz;
+    t_list *lista_direcciones;
+    int tamanio_total;
     char *ip_kernel;
     char *puerto_kernel;
     char *ip_memoria;
@@ -245,9 +247,8 @@ typedef struct
 typedef struct 
 {
     uint32_t pid;
-    uint32_t direccion;
-    uint32_t tamanio; 
-    char *tipo_interfaz;
+    t_list *lista_direcciones; 
+    int tamanio_total;
     char *ip_kernel;
     char *puerto_kernel;
     char *ip_memoria;
