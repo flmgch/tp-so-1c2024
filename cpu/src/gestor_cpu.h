@@ -16,7 +16,8 @@ extern t_instruccion instruccion;
 extern int tam_aux;
 extern void *aux_dato;
 extern char *reg_aux;
-//extern char* datos;
+extern char *condicion;
+// extern char* datos;
 extern int aux_resize;
 extern int aux_marco;
 

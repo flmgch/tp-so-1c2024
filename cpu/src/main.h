@@ -25,6 +25,7 @@ uint32_t dir_fisica_inicial = 0;
 int tam_aux = 0;
 void *aux_dato;
 char *reg_aux;
+char *condicion;
 // SOCKETS
 int socket_memoria, socket_escucha_dispatch, socket_kernel_dispatch, socket_escucha_interrupt, socket_kernel_interrupt;
 

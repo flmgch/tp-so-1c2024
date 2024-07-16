@@ -33,7 +33,28 @@ void atender_memoria()
             break;
         case RESULTADO_LECTURA:
             un_buffer = recibir_buffer(socket_memoria);
-            reg_aux = extraer_string_de_buffer(un_buffer);
+            int tam = extraer_int_de_buffer(un_buffer);
+            void *aux_resultado = extraer_de_buffer(un_buffer);
+
+            if (strcmp(condicion, "Uint8") == 0)
+            {
+                uint8_t resultado;
+                memcpy(&resultado, aux_resultado, sizeof(uint8_t));
+                sprintf(reg_aux, "%u", resultado);
+            }
+            else if (strcmp(condicion, "Uint32") == 0)
+            {
+                uint32_t resultado;
+                memcpy(&resultado, aux_resultado, sizeof(uint32_t));
+                sprintf(reg_aux, "%u", resultado);
+            }
+            else
+            {
+                memcpy(reg_aux, aux_resultado, tam);
+                reg_aux[tam] = '\0';
+            }
+
+            free(aux_resultado);
             sem_post(&sem_resultado_lectura);
             break;
         case RESULTADO_ESCRITURA:
