@@ -131,13 +131,17 @@ void ejecutar_jnz(char registro[20] , char instruccion[20]){
 //IO_GEN_SLEEP
 void ejecutar_io_gen_sleep(char interfaz[20] , char unidades_de_trabajo[20] ){
     t_buffer *un_buffer = crear_buffer();
-    agregar_uint32_a_buffer(un_buffer, atoi(unidades_de_trabajo));
+    agregar_pcb_a_buffer(un_buffer, pcb);
+    agregar_cop_a_buffer(OP_IO_GEN_SLEEP);
     agregar_string_a_buffer(un_buffer, interfaz);
-
-    t_paquete *paquete = crear_super_paquete(OP_IO_GEN_SLEEP, un_buffer);
+    agregar_uint32_a_buffer(un_buffer, atoi(unidades_de_trabajo));
+    
+    t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
     destruir_buffer(un_buffer);
+
+    flag_execute = 0;
 }
 
 //EXIT

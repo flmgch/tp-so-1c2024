@@ -8,5 +8,8 @@ void procesar_cambio_estado(t_pcb *pcb, estado_proceso estado_nuevo);
 void atender_wait(t_pcb *pcb, char *recurso);
 void atender_signal(t_pcb *pcb, char *recurso);
 t_recurso *buscar_recurso(char *recurso);
+void atender_io_gen_sleep(t_pcb *pcb, char* nombre_interfaz, u_int32_t unidades);
+t_interfaz_kernel* buscar_interfaz(char* nombre_interfaz);
+bool operacion_valida(t_interfaz_kernel* interfaz, op_code operacion);
 
 #endif

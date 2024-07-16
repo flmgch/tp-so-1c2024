@@ -279,6 +279,8 @@ void finalizar_proceso()
         enviar_paquete(paquete, socket_conexion_cpu_interrupt);
     }
 
+    // TODO BUSCAR EN COLAS DE BLOCK DE CADA RECURSO/IO
+
 };
 
 bool es_pcb_buscado(void *data)

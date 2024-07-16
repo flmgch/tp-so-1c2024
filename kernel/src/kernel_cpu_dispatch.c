@@ -46,8 +46,14 @@ void atender_cpu_dispatch() {
 				atender_signal(pcb, recurso_signal);
 				free(recurso_signal);
 				break;
+            case OP_IO_GEN_SLEEP:
+                log_info(kernel_logger, "Recibi un aviso de realizar una operacion IO_GEN_SLEEP");
+                char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                u_int32_t unidades_de_trabajo = extraer_uint32_de_buffer(buffer);
+                atender_io_gen_sleep(pcb, nombre_interfaz, unidades_de_trabajo);
+                free(nombre_interfaz);
+                break;
             }
-            destruir_buffer(buffer);
             break;
         case -1:
             log_error(kernel_logger, "Se desconecto CPU - Dispatch");
@@ -168,4 +174,76 @@ void atender_signal(t_pcb *pcb, char *recurso)
         // MANDA EL PROCESO RECIBIDO A EXEC
 		dispatch_pcb(pcb);
 	}
+}
+
+void atender_io_gen_sleep(t_pcb *pcb, char* nombre_interfaz, u_int32_t unidades) {
+
+    t_interfaz_kernel *interfaz = buscar_interfaz(nombre_interfaz);
+
+    // TODO implementar: En el caso de que exista algún proceso haciendo uso de la Interfaz de I/O, el proceso que acaba de solicitar la operación de I/O deberá esperar la finalización del anterior antes de poder hacer uso de la misma.
+    
+    //! EN CASO DE QUE LA INTERFAZ NO EXISTA / NO ESTE CONECTADA
+    if(interfaz->socket == -1) {
+        pcb->estado = FINISH_ERROR;
+        pcb->motivo_exit = INVALID_INTERFACE;
+        agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+        sem_post(&sem_exit);
+    }
+
+    // ! EN CASO DE QUE LA INTERFAZ NO ADMITA LA OPERACION
+    if(!operacion_valida(interfaz, OP_IO_GEN_SLEEP)) {
+        pcb->estado = FINISH_ERROR;
+        pcb->motivo_exit = INVALID_INTERFACE;
+        agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+        sem_post(&sem_exit);
+    }
+
+    pcb->estado = BLOCK;
+    pcb->motivo_block = IO_BLOCK;
+    agregar_pcb(interfaz->cola_block_asignada, pcb, &(interfaz->mutex_asignado));
+    log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
+
+    t_buffer* buffer = crear_buffer();
+    agregar_int_a_buffer(buffer, pcb->pid);
+    agregar_uint32_a_buffer(buffer, unidades);    
+    t_paquete* paquete = crear_super_paquete(GENERICA, buffer);
+    enviar_paquete(paquete, interfaz->socket);
+    eliminar_paquete(paquete);
+}
+
+t_interfaz_kernel* buscar_interfaz(char* nombre_interfaz) {
+    int longitudLista = list_size(lista_io_conectadas);
+	t_interfaz_kernel* elemento;
+	for (int i = 0; i < longitudLista; i++)
+	{
+		elemento = (t_interfaz_kernel*) list_get(lista_io_conectadas, i);
+		if (strcmp(elemento->nombre, nombre_interfaz) == 0)
+		{
+			return elemento;
+		}
+	}
+    // ! SI NO ENCUENTRA LA INTERFAZ, RETORNA SOCKET = -1
+    elemento->socket = -1;
+	return elemento;
+}
+
+bool operacion_valida(t_interfaz_kernel* interfaz, op_code operacion) {
+
+    if ((strcmp(interfaz->tipo, "GENERICA") == 0) && operacion == OP_IO_GEN_SLEEP) {
+        return true;
+    }
+
+    if ((strcmp(interfaz->tipo, "STDIN") == 0) && operacion == OP_IO_STDIN_READ) {
+        return true;
+    }
+
+    if ((strcmp(interfaz->tipo, "STDOUT") == 0) && operacion == OP_IO_STDOUT_WRITE) {
+        return true;
+    }
+
+    if ((strcmp(interfaz->tipo, "DIALFS") == 0) && (operacion == OP_IO_FS_CREATE || operacion == OP_IO_FS_DELETE || operacion == OP_IO_FS_READ || operacion == OP_IO_FS_TRUNCATE || operacion == OP_IO_FS_WRITE)) {
+        return true;
+    }
+
+    return false;
 }

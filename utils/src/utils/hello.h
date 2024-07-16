@@ -152,7 +152,8 @@ typedef struct
 typedef enum
 {
     IO_BLOCK,
-     NONE_BLOCK
+    RESOURCE_BLOCK,
+    NONE_BLOCK
 } motivo_block;
 
 typedef enum
