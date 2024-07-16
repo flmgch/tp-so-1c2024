@@ -33,7 +33,8 @@ void tlb_agregar(uint32_t pid, int pagina, int marco) {
         tlb[index_reemplazo].pagina = pagina;
         tlb[index_reemplazo].marco = marco;
         tlb[index_reemplazo].ultimo_acceso = contador_acceso++; //para el lru
-        tlb_proximo_reemplazo = (tlb_proximo_reemplazo + 1) % cantidad_entradas_tlb; //para el fifo
+        tlb_proximo_reemplazo = (tlb_proximo_reemplazo + 1) % cantidad_entradas_tlb;
+        // para el fifo
     }
 }
 

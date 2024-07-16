@@ -8,7 +8,6 @@ void atender_cpu()
     {
         t_buffer *un_buffer = crear_buffer();
         int cod_op = recibir_operacion(socket_cpu);
-        usleep(retardo_respuesta);
         switch (cod_op)
         {
         case MENSAJE:

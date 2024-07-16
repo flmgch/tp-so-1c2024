@@ -153,7 +153,6 @@ void ejecutar_exit (){
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
-    destruir_buffer(buffer);
 }
 
 

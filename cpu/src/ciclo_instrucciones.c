@@ -84,20 +84,26 @@ void decode(u_int32_t dir_instruccion){
         case IO_FS_CREATE:
             ejecutar_io_fs_create(instruccion.param1, instruccion.param2);
             fetch();
+            break;
         case IO_FS_DELETE:
             ejecutar_io_fs_delete(instruccion.param1, instruccion.param2);
             fetch();
+            break;
         case IO_FS_TRUNCATE:
             ejecutar_io_fs_truncate(instruccion.param1, instruccion.param2,instruccion.param3);
             fetch();
+            break;
         case IO_FS_WRITE:
             ejecutar_io_fs_write(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4,instruccion.param5);
             fetch();
+            break;
         case IO_FS_READ:
             ejecutar_io_fs_read(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);
             fetch();
+            break;
         case EXIT:
             ejecutar_exit();
+            break;
         default:
 			log_error(cpu_logger, "Instruccion no reconocida");
 			return;

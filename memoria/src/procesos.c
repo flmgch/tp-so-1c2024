@@ -54,6 +54,8 @@ void atender_program_counter(t_buffer *buffer)
     uint32_t pid_cpu = extraer_uint32_de_buffer(buffer);
     t_proceso *proceso = malloc(sizeof(t_proceso));
 
+    usleep(1000 * retardo_respuesta);
+
     pthread_mutex_lock(&mutex_lista_procesos);
     proceso = encontrar_proceso(lista_de_procesos, pid_cpu);
     pthread_mutex_unlock(&mutex_lista_procesos);
@@ -86,6 +88,8 @@ void atender_finalizar_proceso(t_buffer *buffer)
     int tam_lista_procesos;
     uint32_t pid = extraer_uint32_de_buffer(buffer);
 
+    usleep(1000 * retardo_respuesta);
+
     pthread_mutex_lock(&mutex_lista_procesos);
     proceso_a_eliminar = encontrar_proceso(lista_de_procesos, pid);
     tam_lista_procesos = list_size(lista_de_procesos);
@@ -97,11 +101,12 @@ void atender_finalizar_proceso(t_buffer *buffer)
         pthread_mutex_lock(&mutex_bitmap);
         for (int i = 0; i < tamanio; i++)
         {
-            int *frame = list_get(proceso_a_eliminar->filas_tabla_paginas, i);
-            bitarray_clean_bit(bitmap, *frame);
+
+            int frame = list_get(proceso_a_eliminar->filas_tabla_paginas, i);
+            bitarray_clean_bit(bitmap, frame);
             cantidad_marcos++;
-            int n = bitarray_test_bit(bitmap, *frame);
-            log_info(mem_logger, "%d ", n);
+            /*int n = bitarray_test_bit(bitmap, *frame);
+            log_info(mem_logger, "%d ", n);*/
         }
         pthread_mutex_unlock(&mutex_bitmap);
 
@@ -134,6 +139,9 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
 {
     char *path = extraer_string_de_buffer(buffer);
     u_int32_t pid = extraer_uint32_de_buffer(buffer);
+
+    usleep(1000 * retardo_respuesta);
+
     t_proceso *proceso = malloc(sizeof(t_proceso));
     proceso->pid = pid;
     proceso->path = path;
@@ -192,6 +200,9 @@ void atender_acceso_tabla_paginas(t_buffer *buffer)
 {
     int numero_pagina = extraer_int_de_buffer(buffer);
     uint32_t pid = extraer_uint32_de_buffer(buffer);
+
+    usleep(1000 * retardo_respuesta);
+
     t_proceso *proceso_buscado = malloc(sizeof(t_proceso));
 
     pthread_mutex_lock(&mutex_lista_procesos);
@@ -204,7 +215,7 @@ void atender_acceso_tabla_paginas(t_buffer *buffer)
         log_info(mem_logger, "%d", n);
     }*/
 
-    int frame = list_get(proceso_buscado->filas_tabla_paginas, numero_pagina);
+        int frame = list_get(proceso_buscado->filas_tabla_paginas, numero_pagina);
 
     log_info(mem_logger, "PID:%d - Pagina: %d - Frame: %d", pid, numero_pagina, frame);
 
@@ -225,7 +236,11 @@ void atender_ajustar_tamanio(t_buffer *buffer)
 {
     int tamanio_nuevo = extraer_int_de_buffer(buffer);
     uint32_t pid = extraer_uint32_de_buffer(buffer);
+
+    usleep(1000 * retardo_respuesta);
+
     t_proceso *proceso_a_modificar = malloc(sizeof(t_proceso));
+
     pthread_mutex_lock(&mutex_lista_procesos);
     proceso_a_modificar = encontrar_proceso(lista_de_procesos, pid);
     pthread_mutex_unlock(&mutex_lista_procesos);
@@ -318,19 +333,6 @@ void enviar_resultado(char *resultado)
     eliminar_paquete(paquete);
 }
 
-void enviar_tamnio_pagina()
-{
-    t_buffer *new_buffer = crear_buffer();
-
-    agregar_int_a_buffer(new_buffer, tamanio_pagina);
-
-    t_paquete *paquete = crear_super_paquete(RECIBIR_TAMANIO_PAGINAS, new_buffer);
-
-    enviar_paquete(paquete, socket_cpu);
-
-    eliminar_paquete(paquete);
-}
-
 void agregar_frames(t_proceso *proceso, int numero_pagina)
 {
     int frame = buscar_frame_libre();
@@ -345,4 +347,19 @@ void quitar_frames(t_proceso *proceso, int paginas_actuales)
     bitarray_clean_bit(bitmap, frame);
     pthread_mutex_unlock(&mutex_bitmap);
     cantidad_de_marcos_libres++;
+}
+
+// TAMAÑO DE PAGINA
+
+void enviar_tamnio_pagina()
+{
+    t_buffer *new_buffer = crear_buffer();
+
+    agregar_int_a_buffer(new_buffer, tamanio_pagina);
+
+    t_paquete *paquete = crear_super_paquete(RECIBIR_TAMANIO_PAGINAS, new_buffer);
+
+    enviar_paquete(paquete, socket_cpu);
+
+    eliminar_paquete(paquete);
 }
