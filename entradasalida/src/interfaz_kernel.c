@@ -24,6 +24,32 @@ void atender_kernel()
             atender_stdout(un_buffer);
             destruir_buffer(un_buffer);
             break;
+        case FS_CREATE:
+            un_buffer = recibir_buffer(socket_kernel);
+            char* nombre_archivo = extraer_string_de_buffer(un_buffer);
+            atender_fs_create(nombre_archivo);
+            destruir_buffer(un_buffer);
+            break;
+        case FS_DELETE:
+            un_buffer = recibir_buffer(socket_kernel);
+            atender_fs_delete(un_buffer);
+            destruir_buffer(un_buffer);
+            break;
+        case FS_TRUNCATE:
+            un_buffer = recibir_buffer(socket_kernel);
+            atender_fs_truncate(un_buffer);
+            destruir_buffer(un_buffer);
+            break;
+        case FS_WRITE:
+            un_buffer = recibir_buffer(socket_kernel);
+            atender_fs_write(un_buffer);
+            destruir_buffer(un_buffer);
+            break;
+        case FS_READ:
+            un_buffer = recibir_buffer(socket_kernel);
+            atender_fs_read(un_buffer);
+            destruir_buffer(un_buffer);
+            break;
         case -1:
             log_error(io_logger, "Se desconecto Kernel");
             control_key = 0;

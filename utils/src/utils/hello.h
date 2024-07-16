@@ -19,6 +19,9 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/collections/list.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 // TIPOS DE DATOS
 typedef enum {
@@ -76,11 +79,18 @@ typedef enum
     GENERICA,
     STDIN,
     STDOUT,
-    DIALFS,
+    FS_CREATE,
+    FS_DELETE,
+    FS_TRUNCATE,
+    FS_WRITE,
+    FS_READ,
     GENERICA_FINALIZADA,
     STDIN_FINALIZADA,
     STDOUT_FINALIZADA,
-    DIALFS_FINALIZADA,
+    FS_CREATE_FINALIZADA,
+    FS_DELETE_FINALIZADA,
+    FS_WRITE_FINALIZADA,
+    FS_READ_FINALIZADA,
     // MEMORIA-KERNEL
     // MEMORIA-CPU-IO
     // MEMORIA-CPU
@@ -230,8 +240,6 @@ typedef struct
     uint32_t pid;
     int unidades_trabajo;
     int tiempo_unidad_trabajo;
-    char *ip_kernel;
-    char *puerto_kernel;
 } io_generica;
 
 typedef struct
@@ -239,10 +247,6 @@ typedef struct
     uint32_t pid;
     t_list *lista_direcciones;
     int tamanio_total;
-    char *ip_kernel;
-    char *puerto_kernel;
-    char *ip_memoria;
-    char *puerto_memoria;
 } io_stdin;
 
 typedef struct 
@@ -250,28 +254,29 @@ typedef struct
     uint32_t pid;
     t_list *lista_direcciones; 
     int tamanio_total;
-    char *ip_kernel;
-    char *puerto_kernel;
-    char *ip_memoria;
-    char *puerto_memoria;
 } io_stdout;
 
 typedef struct 
 {
     uint32_t pid;
-    char *tipo_interfaz;
-    char *archivo_configuracion;
+    char *nombre_archivo;
     int tiempo_unidad_trabajo;
-    char *ip_kernel;
-    char *puerto_kernel;
-    char *ip_memoria;
-    char *puerto_memoria;
-    char *path_base_dialfs;
-    int tamanio_bloque;
-    int cantidad_bloque;
     int retraso_compactacion;
-    cod_instruccion *instrucciones;
 } io_dialfs;
+
+typedef struct
+{
+    void* direccion; 
+    int file_descriptor;
+    int tamanio;
+    t_bitarray *bitarray;
+} t_bitmap;
+
+typedef struct
+{
+    void *direccion;
+    int file_descriptor;
+} t_bloques_datos;
 
 // UTILIDADES
 

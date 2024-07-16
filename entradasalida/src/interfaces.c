@@ -6,8 +6,6 @@ void atender_generica(t_buffer *buffer)
     una_io->pid = extraer_uint32_de_buffer(buffer);
     una_io->unidades_trabajo = extraer_int_de_buffer(buffer);
     una_io->tiempo_unidad_trabajo = tiempo_unidad_trabajo; 
-    una_io->ip_kernel = ip_kernel;
-    una_io->puerto_kernel = puerto_kernel;
 
     log_info(io_logger, "PID: %d - Operacion: SLEEP ", una_io->pid);
 
@@ -30,10 +28,6 @@ void atender_stdin(t_buffer *buffer)
     una_io->pid = extraer_uint32_de_buffer(buffer);
     una_io->lista_direcciones = extraer_lista_de_buffer(buffer);
     una_io->tamanio_total = extraer_int_de_buffer(buffer);
-    una_io->ip_kernel = ip_kernel;
-    una_io->puerto_kernel = puerto_kernel;
-    una_io->ip_memoria = ip_memoria;
-    una_io->puerto_memoria = puerto_memoria;
 
     log_info(io_logger, "PID: %d - Operacion: READ", una_io->pid);
         
@@ -83,10 +77,6 @@ void atender_stdout(t_buffer *buffer)
     una_io->pid = extraer_uint32_de_buffer(buffer);
     una_io->lista_direcciones = extraer_lista_de_buffer(buffer);
     una_io->tamanio_total = extraer_int_de_buffer(buffer);
-    una_io->ip_kernel = ip_kernel;
-    una_io->puerto_kernel = puerto_kernel;
-    una_io->ip_memoria = ip_memoria;
-    una_io->puerto_memoria = puerto_memoria;
 
     log_info(io_logger, "PID: %d - Operacion: WRITE", una_io->pid);
 
@@ -125,9 +115,4 @@ void imprimir_resultado_lectura(t_buffer *buffer)
 
     destruir_buffer(buffer_kernel);
     eliminar_paquete(paquete_kernel);
-}
-
-void atender_dialfs(t_buffer *buffer)
-{
-    //
 }

@@ -4,6 +4,8 @@
         "inicializar_cpu.h": "c",
         "instrucciones_mem.h": "c",
         "solicitar_instruccion.h": "c",
-        "cpu_kernel_interrupt.h": "c"
+        "cpu_kernel_interrupt.h": "c",
+        "gestor_io.h": "c",
+        "hello.h": "c"
     }
 }
