@@ -3,8 +3,8 @@
 void atender_generica(t_buffer *buffer)
 {
     io_generica *una_io = malloc(sizeof(io_generica));
-    una_io->pid = extraer_uint32_de_buffer(buffer);
-    una_io->unidades_trabajo = extraer_int_de_buffer(buffer);
+    una_io->pid = extraer_int_de_buffer(buffer);
+    una_io->unidades_trabajo = extraer_uint32_de_buffer(buffer);
     una_io->tiempo_unidad_trabajo = tiempo_unidad_trabajo; 
 
     log_info(io_logger, "PID: %d - Operacion: SLEEP ", una_io->pid);
@@ -14,12 +14,10 @@ void atender_generica(t_buffer *buffer)
     // Le aviso a Kernel que ya termine la operacion
     t_buffer *un_buffer = crear_buffer();
     agregar_uint32_a_buffer(un_buffer, una_io->pid);
-    t_paquete *paquete = crear_super_paquete(GENERICA_FINALIZADA, un_buffer);
+    t_paquete *paquete = crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, un_buffer);
     enviar_paquete(paquete, socket_kernel);
-
-    destruir_buffer(un_buffer);
     eliminar_paquete(paquete);
-    free(una_io);
+
 }
 
 void atender_stdin(t_buffer *buffer)
@@ -60,11 +58,9 @@ void atender_stdin(t_buffer *buffer)
     // Le aviso a Kernel que ya termine la operacion
     t_buffer *buffer_kernel = crear_buffer();
     agregar_uint32_a_buffer(buffer_kernel, una_io->pid);
-    t_paquete *paquete_kernel = crear_super_paquete(STDIN_FINALIZADA, buffer_kernel);
+    t_paquete *paquete_kernel = crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, buffer_kernel);
     enviar_paquete(paquete_kernel, socket_kernel);
 
-    destruir_buffer(buffer_memo);
-    destruir_buffer(buffer_kernel);
     eliminar_paquete(paquete_memo);
     eliminar_paquete(paquete_kernel);
     free(texto);
@@ -88,7 +84,6 @@ void atender_stdout(t_buffer *buffer)
     t_paquete *paquete_memo = crear_super_paquete(ACCESO_ESPACIO_USUARIO_LECTURA, buffer_memo);
     enviar_paquete(paquete_memo, socket_memoria);
 
-    destruir_buffer(buffer_memo);
     eliminar_paquete(paquete_memo);
     free(una_io);
 }
@@ -110,9 +105,8 @@ void imprimir_resultado_lectura(t_buffer *buffer)
     // Le aviso a Kernel que ya termine la operacion
     t_buffer *buffer_kernel = crear_buffer();
     agregar_uint32_a_buffer(buffer_kernel, pid);
-    t_paquete *paquete_kernel = crear_super_paquete(STDOUT_FINALIZADA, buffer_kernel);
+    t_paquete *paquete_kernel = crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, buffer_kernel);
     enviar_paquete(paquete_kernel, socket_kernel);
 
-    destruir_buffer(buffer_kernel);
     eliminar_paquete(paquete_kernel);
 }

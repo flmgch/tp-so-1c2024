@@ -64,7 +64,7 @@ void crear_interfaz (char* nombre_interfaz, char* tipo_interfaz, int fd_interfaz
 
     pthread_mutex_lock(&mutex_lista_io);
     list_add(lista_io_conectadas, interfaz);
-    log_info(kernel_logger, "Interfaz %s correctamente creada y agregada a la lista de interfaces", interfaz->nombre);
+    log_info(kernel_logger, "Interfaz %s de tipo %s correctamente creada y agregada a la lista de interfaces", interfaz->nombre, interfaz->tipo);
     pthread_mutex_unlock(&mutex_lista_io);
 
 }

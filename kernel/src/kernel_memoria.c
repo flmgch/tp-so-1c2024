@@ -20,6 +20,7 @@ void atender_memoria()
             break;
         default:
             log_warning(kernel_logger, "Operacion desconocida de Memoria");
+            control_key = 0;
             break;
         }
     }

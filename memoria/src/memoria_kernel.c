@@ -42,6 +42,7 @@ void atender_kernel()
         default:
             log_warning(mem_logger, "Operacion desconocida de kernel");
             close(socket_kernel);
+            control_key = 0;
             break;
         }
         destruir_buffer(un_buffer);

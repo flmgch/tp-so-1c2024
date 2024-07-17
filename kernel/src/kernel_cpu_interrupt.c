@@ -20,6 +20,7 @@ void atender_cpu_interrupt()
             break;
         default:
             log_warning(kernel_logger, "Operacion desconocida de CPU - Interrupt");
+            control_key = 0;
             break;
         }
     }

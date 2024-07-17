@@ -61,6 +61,7 @@ void atender_cpu_dispatch() {
             break;
         default:
             log_warning(kernel_logger, "Operacion desconocida de CPU - Dispatch");
+            control_key = 0;
             break;
         }
     }
@@ -183,11 +184,13 @@ void atender_io_gen_sleep(t_pcb *pcb, char* nombre_interfaz, u_int32_t unidades)
     // TODO implementar: En el caso de que exista algún proceso haciendo uso de la Interfaz de I/O, el proceso que acaba de solicitar la operación de I/O deberá esperar la finalización del anterior antes de poder hacer uso de la misma.
     
     //! EN CASO DE QUE LA INTERFAZ NO EXISTA / NO ESTE CONECTADA
-    if(interfaz->socket == -1) {
+    if(interfaz == NULL) {
         pcb->estado = FINISH_ERROR;
         pcb->motivo_exit = INVALID_INTERFACE;
         agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
         sem_post(&sem_exit);
+        sem_post(&sem_exec);
+        return;
     }
 
     // ! EN CASO DE QUE LA INTERFAZ NO ADMITA LA OPERACION
@@ -196,12 +199,15 @@ void atender_io_gen_sleep(t_pcb *pcb, char* nombre_interfaz, u_int32_t unidades)
         pcb->motivo_exit = INVALID_INTERFACE;
         agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
         sem_post(&sem_exit);
+        sem_post(&sem_exec);
+        return;
     }
 
     pcb->estado = BLOCK;
     pcb->motivo_block = IO_BLOCK;
-    agregar_pcb(interfaz->cola_block_asignada, pcb, &(interfaz->mutex_asignado));
+    list_add(interfaz->cola_block_asignada, pcb);
     log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
+    sem_post(&sem_exec);
 
     t_buffer* buffer = crear_buffer();
     agregar_int_a_buffer(buffer, pcb->pid);
@@ -222,9 +228,8 @@ t_interfaz_kernel* buscar_interfaz(char* nombre_interfaz) {
 			return elemento;
 		}
 	}
-    // ! SI NO ENCUENTRA LA INTERFAZ, RETORNA SOCKET = -1
-    elemento->socket = -1;
-	return elemento;
+    // ! SI NO ENCUENTRA LA INTERFAZ, RETORNA NULL
+	return NULL;
 }
 
 bool operacion_valida(t_interfaz_kernel* interfaz, op_code operacion) {
