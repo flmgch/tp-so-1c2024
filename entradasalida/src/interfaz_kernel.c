@@ -1,11 +1,11 @@
 #include "interfaz_kernel.h"
 
 void atender_kernel()
-{
+{ 
     bool control_key = 1;
     while (control_key)
-    {
-        t_buffer *un_buffer = crear_buffer();
+    {   
+        t_buffer *un_buffer;  
         int cod_op = recibir_operacion(socket_kernel);
         switch (cod_op)
         {
@@ -26,8 +26,7 @@ void atender_kernel()
             break;
         case FS_CREATE:
             un_buffer = recibir_buffer(socket_kernel);
-            char* nombre_archivo = extraer_string_de_buffer(un_buffer);
-            atender_fs_create(nombre_archivo);
+            atender_fs_create(un_buffer);
             destruir_buffer(un_buffer);
             break;
         case FS_DELETE:
@@ -60,6 +59,5 @@ void atender_kernel()
             control_key = 0;
             break;
         }
-        destruir_buffer(un_buffer);
     }
 };

@@ -5,7 +5,7 @@
 
 void iniciar_bitmap();
 void iniciar_bloques_datos();
-void atender_fs_create(char* nombre_archivo);
+void atender_fs_create(t_buffer *buffer);
 void atender_fs_delete(t_buffer *buffer);
 void atender_fs_truncate(t_buffer *buffer);
 void atender_fs_write(t_buffer *buffer);

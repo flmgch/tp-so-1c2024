@@ -2,15 +2,14 @@
 
 int main(int argc, char *argv[])
 {
-  // Pasar por argumento: ./bin/entradasalida nombreinterfaz nombrearchivo.config
-  char *nombre_interfaz = argv[1];
-  char *archivo_configuracion = argv[2];
-
   if (argc < 3)
   {
     fprintf(stderr, "Uso: %s <nombre_interfaz> <archivo_configuracion>\n", argv[0]);
     return EXIT_FAILURE;
   }
+  // Pasar por argumento: ./bin/entradasalida nombreinterfaz nombrearchivo.config
+  char *nombre_interfaz = argv[1];
+  char *archivo_configuracion = argv[2];
 
   // INICIALIZAR IO
   inicializar_io(nombre_interfaz, archivo_configuracion);

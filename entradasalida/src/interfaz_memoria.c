@@ -5,7 +5,7 @@ void atender_memoria()
     bool control_key = 1;
     while (control_key)
     {
-        t_buffer *un_buffer = crear_buffer();
+        t_buffer *un_buffer;
         int cod_op = recibir_operacion(socket_memoria);
         switch (cod_op)
         {

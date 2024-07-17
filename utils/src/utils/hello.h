@@ -84,13 +84,6 @@ typedef enum
     FS_TRUNCATE,
     FS_WRITE,
     FS_READ,
-    GENERICA_FINALIZADA,
-    STDIN_FINALIZADA,
-    STDOUT_FINALIZADA,
-    FS_CREATE_FINALIZADA,
-    FS_DELETE_FINALIZADA,
-    FS_WRITE_FINALIZADA,
-    FS_READ_FINALIZADA,
     // MEMORIA-KERNEL
     // MEMORIA-CPU-IO
     // MEMORIA-CPU
@@ -237,28 +230,28 @@ typedef struct {
 
 typedef struct
 {
-    uint32_t pid;
-    int unidades_trabajo;
+    int pid;
+    u_int32_t unidades_trabajo;
     int tiempo_unidad_trabajo;
 } io_generica;
 
 typedef struct
 {
-    uint32_t pid;
+    u_int32_t pid;
     t_list *lista_direcciones;
     int tamanio_total;
 } io_stdin;
 
 typedef struct 
 {
-    uint32_t pid;
+    u_int32_t pid;
     t_list *lista_direcciones; 
     int tamanio_total;
 } io_stdout;
 
 typedef struct 
 {
-    uint32_t pid;
+    u_int32_t pid;
     char *nombre_archivo;
     int tiempo_unidad_trabajo;
     int retraso_compactacion;

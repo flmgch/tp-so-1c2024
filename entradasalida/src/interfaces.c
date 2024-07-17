@@ -1,5 +1,8 @@
 #include "interfaces.h"
 
+// VARIABLE GLOBAL PARA EL LOG DE STDOUT
+uint32_t pid_global;
+
 void atender_generica(t_buffer *buffer)
 {
     io_generica *una_io = malloc(sizeof(io_generica));
@@ -13,11 +16,12 @@ void atender_generica(t_buffer *buffer)
 
     // Le aviso a Kernel que ya termine la operacion
     t_buffer *un_buffer = crear_buffer();
-    agregar_uint32_a_buffer(un_buffer, una_io->pid);
+    agregar_int_a_buffer(un_buffer, una_io->pid);
     t_paquete *paquete = crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, un_buffer);
     enviar_paquete(paquete, socket_kernel);
-    eliminar_paquete(paquete);
 
+    eliminar_paquete(paquete);
+    free(una_io);
 }
 
 void atender_stdin(t_buffer *buffer)
@@ -30,6 +34,8 @@ void atender_stdin(t_buffer *buffer)
     log_info(io_logger, "PID: %d - Operacion: READ", una_io->pid);
         
     char *texto = malloc(una_io->tamanio_total);
+    void *texto_aux = malloc(una_io->tamanio_total);
+
     while (1)
     {
         printf("> Ingrese un texto de %d caracteres: ", una_io->tamanio_total);
@@ -46,12 +52,17 @@ void atender_stdin(t_buffer *buffer)
         }
     }
 
+    memcpy(texto_aux, texto, una_io->tamanio_total);
+
     // Le aviso a memoria para que escriba el texto ingresado
     t_buffer *buffer_memo = crear_buffer();
     agregar_uint32_a_buffer(buffer_memo, una_io->pid);
     agregar_lista_direcciones_a_buffer(buffer_memo, una_io->lista_direcciones);
     agregar_int_a_buffer(buffer_memo, una_io->tamanio_total);
     agregar_string_a_buffer(buffer_memo, texto);
+    agregar_a_buffer(buffer_memo, texto_aux, una_io->tamanio_total);
+    agregar_lista_a_buffer(buffer_memo, una_io->lista_direcciones);
+
     t_paquete *paquete_memo = crear_super_paquete(ACCESO_ESPACIO_USUARIO_ESCRITURA, buffer_memo);
     enviar_paquete(paquete_memo, socket_memoria);
 
@@ -74,6 +85,8 @@ void atender_stdout(t_buffer *buffer)
     una_io->lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
     una_io->tamanio_total = extraer_int_de_buffer(buffer);
 
+    pid_global = una_io->pid;
+
     log_info(io_logger, "PID: %d - Operacion: WRITE", una_io->pid);
 
     // le aviso a memoria para que lea el texto pedido
@@ -90,21 +103,19 @@ void atender_stdout(t_buffer *buffer)
 
 void imprimir_resultado_lectura(t_buffer *buffer)
 {
-    // AVISAR => Memoria me tiene que devolver el PID que le envie antes !!!!
-    uint32_t pid = extraer_uint32_de_buffer(buffer);
-    char *valor = extraer_string_de_buffer(buffer);
+    int tamanio_total = extraer_int_de_buffer(buffer);
+    void *texto_aux = extraer_de_buffer(buffer);
 
+    char *texto = malloc(tamanio_total);
+    memcpy(texto, texto_aux, tamanio_total);
     // Le agrego el caracter nulo 
-    int tamanio = string_length(valor);
-    char *valor_con_nulo = malloc(tamanio + 1);
-    memcpy(valor_con_nulo, valor, tamanio);
-    valor_con_nulo[tamanio] = '\0';
+    texto[tamanio_total] = '\0';
 
-    log_info(io_logger, "PID: %d - Consola: %s", pid, valor_con_nulo);
+    log_info(io_logger, "PID: %d - Consola: %s", pid_global, texto);
 
     // Le aviso a Kernel que ya termine la operacion
     t_buffer *buffer_kernel = crear_buffer();
-    agregar_uint32_a_buffer(buffer_kernel, pid);
+    agregar_uint32_a_buffer(buffer_kernel, pid_global);
     t_paquete *paquete_kernel = crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, buffer_kernel);
     enviar_paquete(paquete_kernel, socket_kernel);
 

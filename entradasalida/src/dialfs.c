@@ -28,7 +28,7 @@
 // VARIABLES GLOBALES
 t_bitmap *bitmap;
 t_bloques_datos *bloques_datos;
-char* path_metadata;
+char *path_metadata;
 
 void iniciar_bitmap(){
 
@@ -36,7 +36,7 @@ void iniciar_bitmap(){
 
     bitmap->tamanio = (cantidad_bloque / 8);
 
-    char *path_bitmap[strlen(path_base_dialfs) + 12]; 
+    char path_bitmap[strlen(path_base_dialfs) + 12]; 
     sprintf(path_bitmap, "%s/bitmap.dat", path_base_dialfs);
 
 	if(access(path_bitmap, F_OK) == -1)
@@ -71,7 +71,7 @@ void iniciar_bloques_datos()
 {
     bloques_datos = malloc(sizeof(t_bloques_datos));
 
-    char *path_bloques_datos[strlen(path_base_dialfs) + 13];
+    char path_bloques_datos[strlen(path_base_dialfs) + 13];
     sprintf(path_bloques_datos, "%s/bloques.dat", path_base_dialfs);
 
     if (access(path_bloques_datos, F_OK) == -1) 
@@ -101,7 +101,10 @@ void iniciar_bloques_datos()
     }
 }
 
-void atender_fs_create(char* nombre_archivo){   
+void atender_fs_create(t_buffer *buffer)
+{   
+    u_int32_t pid = extraer_uint32_de_buffer(buffer);
+    char *nombre_archivo = extraer_string_de_buffer(buffer);
 
     int bloque_libre = -1;
 
@@ -156,7 +159,7 @@ void atender_fs_create(char* nombre_archivo){
 
     free(metadata_path);
 
-    log_info(io_logger, "PID:   - Crear Archivo: %d",nombre_archivo); //FALTA EL PID!!
+    log_info(io_logger, "PID: %d - Crear Archivo: %s", pid, nombre_archivo);
 }
 
     
