@@ -413,36 +413,36 @@ void ejecutar_io_stdout_write(char interfaz[20], char reg_dir_logica[20], char r
 }
 
 //IO_FS_CREATE
-void ejecutar_io_fs_create(char interfaz[20], char nombre_fs[20]){
+void ejecutar_io_fs_create(char interfaz[20], char nombre_archivo[20]){
     t_buffer *otro_buffer = crear_buffer();
     agregar_pcb_a_buffer(otro_buffer, pcb);
     agregar_cop_a_buffer(otro_buffer, IO_FS_CREATE);
     agregar_string_a_buffer(otro_buffer,interfaz);
-    agregar_string_a_buffer(otro_buffer,nombre_fs);
+    agregar_string_a_buffer(otro_buffer,nombre_archivo);
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, otro_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
 }
 
 //IO_FS_DELETE
-void ejecutar_io_fs_delete(char interfaz[20], char nombre_fs[20]){
+void ejecutar_io_fs_delete(char interfaz[20], char nombre_archivo[20]){
     t_buffer *un_buffer = crear_buffer();
     agregar_pcb_a_buffer(un_buffer, pcb);
     agregar_cop_a_buffer(un_buffer, OP_IO_FS_DELETE);
     agregar_string_a_buffer(un_buffer,interfaz);
-    agregar_string_a_buffer(un_buffer,nombre_fs);
+    agregar_string_a_buffer(un_buffer,nombre_archivo);
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
 }
 
 //IO_FS_TRUNCATE
-void ejecutar_io_fs_truncate(char interfaz[20], char nombre_fs[20], char reg_tam[20]){
+void ejecutar_io_fs_truncate(char interfaz[20], char nombre_archivo[20], char reg_tam[20]){
     t_buffer *otro_buffer = crear_buffer();
     agregar_pcb_a_buffer(otro_buffer, pcb);
     agregar_cop_a_buffer(otro_buffer, OP_IO_FS_TRUNCATE);
     agregar_string_a_buffer(otro_buffer,interfaz);
-    agregar_string_a_buffer(otro_buffer,nombre_fs);
+    agregar_string_a_buffer(otro_buffer,nombre_archivo);
 
     void* dir_tam = obtener_registro(reg_tam);
     if (dir_tam != NULL) {
