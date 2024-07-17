@@ -11,5 +11,7 @@ t_recurso *buscar_recurso(char *recurso);
 void atender_io_gen_sleep(t_pcb *pcb, char* nombre_interfaz, u_int32_t unidades);
 t_interfaz_kernel* buscar_interfaz(char* nombre_interfaz);
 bool operacion_valida(t_interfaz_kernel* interfaz, op_code operacion);
+void atender_io_stdin_read(t_pcb* pcb, char* nombre_interfaz, t_list* direcciones_fisicas, u_int32_t tamanio);
+void atender_io_stdout_write(t_pcb* pcb, char* nombre_interfaz, t_list* direcciones_fisicas, u_int32_t tamanio);
 
 #endif

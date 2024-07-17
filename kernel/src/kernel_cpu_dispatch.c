@@ -46,12 +46,84 @@ void atender_cpu_dispatch() {
 				atender_signal(pcb, recurso_signal);
 				free(recurso_signal);
 				break;
-            case OP_IO_GEN_SLEEP:
+            case OP_IO_GEN_SLEEP:{
                 log_info(kernel_logger, "Recibi un aviso de realizar una operacion IO_GEN_SLEEP");
                 char* nombre_interfaz = extraer_string_de_buffer(buffer);
                 u_int32_t unidades_de_trabajo = extraer_uint32_de_buffer(buffer);
                 atender_io_gen_sleep(pcb, nombre_interfaz, unidades_de_trabajo);
                 free(nombre_interfaz);
+                break;
+            }
+            case OP_IO_STDIN_READ:{
+                log_info(kernel_logger, "Recibi un aviso de realizar una operacion IO_STDIN_READ");
+                char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                t_list* direcciones_fisicas = extraer_lista_direcciones_de_buffer(buffer);
+                u_int32_t tamanio = extraer_uint32_de_buffer(buffer);
+                atender_io_stdin_read(pcb, nombre_interfaz, direcciones_fisicas, tamanio);
+                free(nombre_interfaz);
+                list_destroy(direcciones_fisicas);
+                break;
+            }
+            case OP_IO_STDOUT_WRITE:{
+                log_info(kernel_logger, "Recibi un aviso de realizar una operacion IO_STDOUT_WRITE");
+                char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                t_list* direcciones_fisicas = extraer_lista_direcciones_de_buffer(buffer);
+                u_int32_t tamanio = extraer_uint32_de_buffer(buffer);
+                atender_io_stdout_write(pcb, nombre_interfaz, direcciones_fisicas, tamanio);
+                free(nombre_interfaz);
+                list_destroy(direcciones_fisicas);
+                break;
+            }
+            case OP_IO_FS_CREATE:{
+                log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_CREATE");
+                char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                char* nombre_archivo = extraer_string_de_buffer(buffer);
+                // atender_io_fs_create(pcb, nombre_interfaz, nombre_archivo);
+                free(nombre_interfaz);
+                free(nombre_archivo);
+                break;
+            }
+            case OP_IO_FS_DELETE:{
+                log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_DELETE");
+                char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                char* nombre_archivo = extraer_string_de_buffer(buffer);
+                // atender_io_fs_delete(pcb, nombre_interfaz, nombre_archivo);
+                free(nombre_interfaz);
+                free(nombre_archivo);
+                break;
+            }
+            case OP_IO_FS_TRUNCATE:{
+                log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_TRUNCATE");
+                char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                char* nombre_archivo = extraer_string_de_buffer(buffer);
+                // TODO VER SI FUNCIONA RECIBIR UINT32 Y YA ESTA, O SI ES NECESARIO DIFERENCIAR UINT8 y UINT32
+                char* variable_tamanio = extraer_string_de_buffer(buffer);
+                
+                // atender_io_fs_truncate(pcb, nombre_interfaz, nombre_archivo);
+                free(nombre_interfaz);
+                free(nombre_archivo);
+                break;
+            }
+                break;
+            case OP_IO_FS_WRITE:{
+                log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_DELETE");
+                char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                char* nombre_archivo = extraer_string_de_buffer(buffer);
+                // atender_io_fs_delete(pcb, nombre_interfaz, nombre_archivo);
+                free(nombre_interfaz);
+                free(nombre_archivo);
+                break;
+            }
+                break;
+            case OP_IO_FS_READ:{
+                log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_DELETE");
+                char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                char* nombre_archivo = extraer_string_de_buffer(buffer);
+                // atender_io_fs_delete(pcb, nombre_interfaz, nombre_archivo);
+                free(nombre_interfaz);
+                free(nombre_archivo);
+                break;
+            }
                 break;
             }
             break;
@@ -251,4 +323,84 @@ bool operacion_valida(t_interfaz_kernel* interfaz, op_code operacion) {
     }
 
     return false;
+}
+
+void atender_io_stdin_read(t_pcb* pcb, char* nombre_interfaz, t_list* direcciones_fisicas, u_int32_t tamanio) {
+    t_interfaz_kernel *interfaz = buscar_interfaz(nombre_interfaz);
+
+    // TODO implementar: En el caso de que exista algún proceso haciendo uso de la Interfaz de I/O, el proceso que acaba de solicitar la operación de I/O deberá esperar la finalización del anterior antes de poder hacer uso de la misma.
+    
+    //! EN CASO DE QUE LA INTERFAZ NO EXISTA / NO ESTE CONECTADA
+    if(interfaz == NULL) {
+        pcb->estado = FINISH_ERROR;
+        pcb->motivo_exit = INVALID_INTERFACE;
+        agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+        sem_post(&sem_exit);
+        sem_post(&sem_exec);
+        return;
+    }
+
+    // ! EN CASO DE QUE LA INTERFAZ NO ADMITA LA OPERACION
+    if(!operacion_valida(interfaz, OP_IO_STDIN_READ)) {
+        pcb->estado = FINISH_ERROR;
+        pcb->motivo_exit = INVALID_INTERFACE;
+        agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+        sem_post(&sem_exit);
+        sem_post(&sem_exec);
+        return;
+    }
+
+    pcb->estado = BLOCK;
+    pcb->motivo_block = IO_BLOCK;
+    list_add(interfaz->cola_block_asignada, pcb);
+    log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
+    sem_post(&sem_exec);
+
+    t_buffer* buffer = crear_buffer();
+    agregar_int_a_buffer(buffer, pcb->pid);
+    agregar_lista_direcciones_a_buffer(buffer, direcciones_fisicas);   
+    agregar_uint32_a_buffer(buffer, tamanio);
+    t_paquete* paquete = crear_super_paquete(STDIN, buffer);
+    enviar_paquete(paquete, interfaz->socket);
+    eliminar_paquete(paquete);
+}
+
+void atender_io_stdout_write(t_pcb* pcb, char* nombre_interfaz, t_list* direcciones_fisicas, u_int32_t tamanio) {
+    t_interfaz_kernel *interfaz = buscar_interfaz(nombre_interfaz);
+
+    // TODO implementar: En el caso de que exista algún proceso haciendo uso de la Interfaz de I/O, el proceso que acaba de solicitar la operación de I/O deberá esperar la finalización del anterior antes de poder hacer uso de la misma.
+    
+    //! EN CASO DE QUE LA INTERFAZ NO EXISTA / NO ESTE CONECTADA
+    if(interfaz == NULL) {
+        pcb->estado = FINISH_ERROR;
+        pcb->motivo_exit = INVALID_INTERFACE;
+        agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+        sem_post(&sem_exit);
+        sem_post(&sem_exec);
+        return;
+    }
+
+    // ! EN CASO DE QUE LA INTERFAZ NO ADMITA LA OPERACION
+    if(!operacion_valida(interfaz, OP_IO_STDOUT_WRITE)) {
+        pcb->estado = FINISH_ERROR;
+        pcb->motivo_exit = INVALID_INTERFACE;
+        agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+        sem_post(&sem_exit);
+        sem_post(&sem_exec);
+        return;
+    }
+
+    pcb->estado = BLOCK;
+    pcb->motivo_block = IO_BLOCK;
+    list_add(interfaz->cola_block_asignada, pcb);
+    log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
+    sem_post(&sem_exec);
+
+    t_buffer* buffer = crear_buffer();
+    agregar_int_a_buffer(buffer, pcb->pid);
+    agregar_lista_direcciones_a_buffer(buffer, direcciones_fisicas);   
+    agregar_uint32_a_buffer(buffer, tamanio);
+    t_paquete* paquete = crear_super_paquete(STDOUT, buffer);
+    enviar_paquete(paquete, interfaz->socket);
+    eliminar_paquete(paquete);
 }

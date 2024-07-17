@@ -24,8 +24,8 @@ void atender_stdin(t_buffer *buffer)
 {
     io_stdin *una_io = malloc(sizeof(io_stdin));
     una_io->pid = extraer_uint32_de_buffer(buffer);
-    una_io->lista_direcciones = extraer_lista_de_buffer(buffer);
-    una_io->tamanio_total = extraer_int_de_buffer(buffer);
+    una_io->lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
+    una_io->tamanio_total = extraer_uint32_de_buffer(buffer);
 
     log_info(io_logger, "PID: %d - Operacion: READ", una_io->pid);
         
@@ -49,7 +49,7 @@ void atender_stdin(t_buffer *buffer)
     // Le aviso a memoria para que escriba el texto ingresado
     t_buffer *buffer_memo = crear_buffer();
     agregar_uint32_a_buffer(buffer_memo, una_io->pid);
-    agregar_lista_a_buffer(buffer_memo, una_io->lista_direcciones);
+    agregar_lista_direcciones_a_buffer(buffer_memo, una_io->lista_direcciones);
     agregar_int_a_buffer(buffer_memo, una_io->tamanio_total);
     agregar_string_a_buffer(buffer_memo, texto);
     t_paquete *paquete_memo = crear_super_paquete(ACCESO_ESPACIO_USUARIO_ESCRITURA, buffer_memo);
@@ -71,7 +71,7 @@ void atender_stdout(t_buffer *buffer)
 {
     io_stdout *una_io = malloc(sizeof(io_stdout));
     una_io->pid = extraer_uint32_de_buffer(buffer);
-    una_io->lista_direcciones = extraer_lista_de_buffer(buffer);
+    una_io->lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
     una_io->tamanio_total = extraer_int_de_buffer(buffer);
 
     log_info(io_logger, "PID: %d - Operacion: WRITE", una_io->pid);
@@ -79,7 +79,7 @@ void atender_stdout(t_buffer *buffer)
     // le aviso a memoria para que lea el texto pedido
     t_buffer *buffer_memo = crear_buffer();
     agregar_uint32_a_buffer(buffer_memo, una_io->pid);
-    agregar_lista_a_buffer(buffer_memo, una_io->lista_direcciones);
+    agregar_lista_direcciones_a_buffer(buffer_memo, una_io->lista_direcciones);
     agregar_int_a_buffer(buffer_memo, una_io->tamanio_total);
     t_paquete *paquete_memo = crear_super_paquete(ACCESO_ESPACIO_USUARIO_LECTURA, buffer_memo);
     enviar_paquete(paquete_memo, socket_memoria);
