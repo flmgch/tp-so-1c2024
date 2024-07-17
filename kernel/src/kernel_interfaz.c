@@ -1,11 +1,12 @@
 #include "kernel_interfaz.h"
 #include "planificador.h"
 
-char *nombre_interfaz;
-char *tipo_interfaz;
+char* interfaz_a_eliminar;
 
 void atender_modulo_interfaz(void* socket)
 {
+    char* nombre_interfaz;
+    char* tipo_interfaz;
     int socket_interfaz_conectada = *((int*) socket);
     t_buffer *buffer = crear_buffer();
     bool control_key = 1;
@@ -28,9 +29,10 @@ void atender_modulo_interfaz(void* socket)
             crear_interfaz(nombre_interfaz, tipo_interfaz, socket_interfaz_conectada);
             break;
         case FIN_INSTRUCCION_INTERFAZ:
+            log_info(kernel_logger, "Recibi un aviso de una OPERACION de INTERFAZ finalizada");
             buffer = recibir_buffer(socket_interfaz_conectada);
             int pid = extraer_int_de_buffer(buffer);
-            t_pcb* pcb = remover_pcb_lista_io(nombre_interfaz);
+            t_pcb *pcb = remover_pcb_lista_io(nombre_interfaz);
             agregar_pcb(cola_block, pcb, &mutex_cola_block);
             sem_post(&sem_block_return);
             log_info(kernel_logger, "PID: %d ha finalizado su uso de la interfaz: %s", pid, nombre_interfaz);
@@ -42,6 +44,7 @@ void atender_modulo_interfaz(void* socket)
         default:
             log_warning(kernel_logger, "Operacion desconocida de Interfaz");
             log_warning(kernel_logger, "La interfaz %s se ha desconectado", nombre_interfaz);
+            interfaz_a_eliminar = nombre_interfaz;
             list_remove_by_condition(lista_io_conectadas, es_interfaz_buscada); // Saco la IO de la lista para solo tener io CONECTADAS.
             destruir_buffer(buffer);
             close(socket_interfaz_conectada);
@@ -72,7 +75,7 @@ void crear_interfaz (char* nombre_interfaz, char* tipo_interfaz, int fd_interfaz
 bool es_interfaz_buscada(void *data)
 {
     t_interfaz_kernel *interfaz = (t_interfaz_kernel *)data;
-    return (strcmp(nombre_interfaz, interfaz->nombre) == 0);
+    return (strcmp(interfaz_a_eliminar, interfaz->nombre) == 0);
 }
 
 t_pcb* remover_pcb_lista_io(char* nombre_io) {

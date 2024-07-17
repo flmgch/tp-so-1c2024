@@ -22,6 +22,7 @@ void atender_kernel_dispatch()
            destruir_buffer(un_buffer);
            log_info(cpu_logger, "Recibí el contexto del proceso %d y se inicia el ciclo de instruccion", pcb->pid);
            ejecutar_proceso();
+           break;
         case -1:
             log_error(cpu_logger, "Se desconecto kernel-dispatch");
             control_key = 0;

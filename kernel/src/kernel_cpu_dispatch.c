@@ -275,7 +275,7 @@ void atender_io_gen_sleep(t_pcb *pcb, char* nombre_interfaz, u_int32_t unidades)
         return;
     }
 
-    pcb->estado = BLOCK;
+    cambiar_estado(pcb, BLOCK);
     pcb->motivo_block = IO_BLOCK;
     list_add(interfaz->cola_block_asignada, pcb);
     log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
