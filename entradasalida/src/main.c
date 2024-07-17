@@ -20,6 +20,9 @@ int main(int argc, char *argv[])
   socket_kernel = crear_conexion(ip_kernel, puerto_kernel, "Kernel", io_logger);
   handshake_cliente(socket_kernel, io_logger);
 
+  // INICIALIZAR SISTEMA DE ARCHIVOS => ¡¡¡¡¡ PONER LA RUTA ABSOLUTA EN EL CONFIG !!!!! 
+  iniciar_sistema_archivos();
+
   // ENVIAR NOMBRE Y TIPO DE INTERFAZ A KERNEL
   t_buffer *un_buffer = crear_buffer();
   agregar_string_a_buffer(un_buffer, nombre_interfaz);

@@ -22,6 +22,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <dirent.h>
 
 // TIPOS DE DATOS
 typedef enum {

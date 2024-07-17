@@ -28,7 +28,7 @@
 // VARIABLES GLOBALES
 t_bitmap *bitmap;
 t_bloques_datos *bloques_datos;
-char *path_metadata;
+t_list *lista_metadatas;
 
 void iniciar_bitmap(){
 
@@ -62,6 +62,7 @@ void iniciar_bitmap(){
     if(bitmap->direccion == MAP_FAILED)
     {
         perror("Error al mapear bitmap.dat");
+        exit(EXIT_FAILURE);
     }
 
 	bitmap->bitarray = bitarray_create_with_mode(bitmap->direccion, bitmap->tamanio, LSB_FIRST);
@@ -101,65 +102,86 @@ void iniciar_bloques_datos()
     }
 }
 
+void cargar_metadatas()
+{
+    DIR *directorio;
+    struct dirent *entrada;
+    lista_metadatas = list_create();
+
+    if((directorio = opendir(path_base_dialfs)) == NULL)
+    {
+        perror("Error al abrir el directorio");
+        exit(EXIT_FAILURE);
+    } 
+
+    while((entrada = readdir(directorio)) != NULL)
+    {
+        if(entrada->d_type == DT_REG)
+        {
+            if(strstr(entrada->d_name, ".txt") != NULL)
+            {
+                char *nombre_archivo = strdup(entrada->d_name);
+                list_add(lista_metadatas, nombre_archivo);
+            }
+        }
+    }
+    closedir(directorio);
+}
+
+void iniciar_sistema_archivos(){
+    iniciar_bloques_datos();
+    iniciar_bitmap();
+    cargar_metadatas();
+
+    log_info(io_logger, "Sistema de archivos inicializado correctamente");
+}
+
 void atender_fs_create(t_buffer *buffer)
 {   
     u_int32_t pid = extraer_uint32_de_buffer(buffer);
     char *nombre_archivo = extraer_string_de_buffer(buffer);
+    
+    log_info(io_logger, "PID: %d - Crear Archivo: %s", pid, nombre_archivo);
 
+    char path_metadata[strlen(path_base_dialfs) + strlen(nombre_archivo) + 2];
+    sprintf(path_metadata, "%s/%s", path_base_dialfs, nombre_archivo);
+    
+    // Busco un bloque libre en el bitmap
     int bloque_libre = -1;
-
-    // busco un bloqu libre en el bitmap
     for (int i = 0; i < cantidad_bloque; i++) {
-        if (!bitarray_test_bit(bitmap, i)) {
+        if (!bitarray_test_bit(bitmap->bitarray, i)) {
             bloque_libre = i;
-            bitarray_set_bit(bitmap, i);
+            bitarray_set_bit(bitmap->bitarray, i);
             break;
         }
     }
-
     if (bloque_libre == -1) {
-        log_error(io_logger, "No se encontraron bloques libres en el bitmap");
-        return;
+        perror("No se encontraron bloques libres en el bitmap");
+        exit(EXIT_FAILURE);
     }
 
-    //sincronizo el bitmap.dat con el array en si
+    // Sincronizo los cambios con el bitmap.dat
     if (msync(bitmap->direccion, bitmap->tamanio, MS_SYNC) == -1) {
         perror("Error al sincronizar el bitmap");
-        log_error(io_logger, "Error al sincronizar el bitmap");
-        return;
+        exit(EXIT_FAILURE);
     }
 
-    // creo el nombre del archivo de metadata
-    char *metadata_path = malloc(strlen(path_metadata) + strlen(nombre_archivo) + 2);
-    if (!metadata_path) {
-        log_error(io_logger, "Error al asignar memoria para la ruta del archivo de metadata");
-        return;
-    }
-
-    //armo el nombre del path
-    strcpy(metadata_path, path_metadata);
-    strcat(metadata_path, "/");
-    strcat(metadata_path, nombre_archivo);
-
-    // creoe y abr el archivo de metadata 
-    t_config *metadata_config = config_create(metadata_path);
+    // Creo y abro el archivo de metadata 
+    t_config *metadata_config = config_create(path_metadata);
     if (metadata_config == NULL) {
-        log_error(io_logger, "Error al crear el archivo de metadata");
-        free(metadata_path);
-        return;
+        perror("Error al crear el archivo de metadata");
+        exit(EXIT_FAILURE);
     }
 
-    // escribo la info en el archivo de metadata
+    // Escribo la info en el archivo de metadata
     config_set_value(metadata_config, "BLOQUE_INICIAL", string_itoa(bloque_libre));
     config_set_value(metadata_config, "TAMANIO_ARCHIVO", "0");
     config_save(metadata_config);
     config_destroy(metadata_config);
 
-    log_info(io_logger, "Archivo %s creado exitosamente con bloque inicial %d y tamaño 0", nombre_archivo, bloque_libre);
+    log_info(io_logger, "Operacion FS_CREATE con %s finalizada", nombre_archivo);
 
-    free(metadata_path);
-
-    log_info(io_logger, "PID: %d - Crear Archivo: %s", pid, nombre_archivo);
+    list_add(lista_metadatas, nombre_archivo);
 }
 
     

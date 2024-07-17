@@ -10,7 +10,7 @@ void atender_generica(t_buffer *buffer)
     una_io->unidades_trabajo = extraer_uint32_de_buffer(buffer);
     una_io->tiempo_unidad_trabajo = tiempo_unidad_trabajo; 
 
-    log_info(io_logger, "PID: %d - Operacion: SLEEP ", una_io->pid);
+    log_info(io_logger, "PID: %d - Operacion: GEN_SLEEP ", una_io->pid);
 
     usleep(una_io->unidades_trabajo * una_io->tiempo_unidad_trabajo * 1000);
 
@@ -19,6 +19,8 @@ void atender_generica(t_buffer *buffer)
     agregar_int_a_buffer(un_buffer, una_io->pid);
     t_paquete *paquete = crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, un_buffer);
     enviar_paquete(paquete, socket_kernel);
+
+    log_info(io_logger, "Operacion GEN_SLEEP finalizada");
 
     eliminar_paquete(paquete);
     free(una_io);
@@ -31,7 +33,7 @@ void atender_stdin(t_buffer *buffer)
     una_io->lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
     una_io->tamanio_total = extraer_uint32_de_buffer(buffer);
 
-    log_info(io_logger, "PID: %d - Operacion: READ", una_io->pid);
+    log_info(io_logger, "PID: %d - Operacion: STDIN_READ", una_io->pid);
         
     char *texto = malloc(una_io->tamanio_total);
     void *texto_aux = malloc(una_io->tamanio_total);
@@ -72,6 +74,8 @@ void atender_stdin(t_buffer *buffer)
     t_paquete *paquete_kernel = crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, buffer_kernel);
     enviar_paquete(paquete_kernel, socket_kernel);
 
+    log_info(io_logger, "Operacion STDIN_READ finalizada");
+
     eliminar_paquete(paquete_memo);
     eliminar_paquete(paquete_kernel);
     free(texto);
@@ -87,7 +91,7 @@ void atender_stdout(t_buffer *buffer)
 
     pid_global = una_io->pid;
 
-    log_info(io_logger, "PID: %d - Operacion: WRITE", una_io->pid);
+    log_info(io_logger, "PID: %d - Operacion: STDOUT_WRITE", una_io->pid);
 
     // le aviso a memoria para que lea el texto pedido
     t_buffer *buffer_memo = crear_buffer();
@@ -118,6 +122,8 @@ void imprimir_resultado_lectura(t_buffer *buffer)
     agregar_uint32_a_buffer(buffer_kernel, pid_global);
     t_paquete *paquete_kernel = crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, buffer_kernel);
     enviar_paquete(paquete_kernel, socket_kernel);
+
+    log_info(io_logger, "Operacion STDOUT_WRITE finalizada");
 
     eliminar_paquete(paquete_kernel);
 }
