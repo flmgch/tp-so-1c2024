@@ -75,34 +75,28 @@ void decode(u_int32_t dir_instruccion){
             break;
         case IO_STDIN_READ:
             ejecutar_io_stdin_read(instruccion.param1, instruccion.param2, instruccion.param3);
-            fetch();
             break;
         case IO_STDOUT_WRITE:
             ejecutar_io_stdout_write(instruccion.param1, instruccion.param2, instruccion.param3);
-            fetch();
             break;
         case IO_FS_CREATE:
             ejecutar_io_fs_create(instruccion.param1, instruccion.param2);
-            fetch();
             break;
         case IO_FS_DELETE:
             ejecutar_io_fs_delete(instruccion.param1, instruccion.param2);
-            fetch();
             break;
         case IO_FS_TRUNCATE:
-            ejecutar_io_fs_truncate(instruccion.param1, instruccion.param2,instruccion.param3);
-            fetch();
+            ejecutar_io_fs_truncate(instruccion.param1, instruccion.param2, instruccion.param3);
             break;
         case IO_FS_WRITE:
-            ejecutar_io_fs_write(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4,instruccion.param5);
-            fetch();
+            ejecutar_io_fs_write(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);
             break;
         case IO_FS_READ:
             ejecutar_io_fs_read(instruccion.param1, instruccion.param2, instruccion.param3, instruccion.param4, instruccion.param5);
-            fetch();
             break;
         case EXIT:
             ejecutar_exit();
+            pcb->program_counter = 0;
             break;
         default:
 			log_error(cpu_logger, "Instruccion no reconocida");

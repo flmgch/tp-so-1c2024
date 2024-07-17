@@ -17,6 +17,9 @@ extern int tam_aux;
 extern void *aux_dato;
 extern char *reg_aux;
 extern char *condicion;
+extern int numero_pagina;
+extern int desplazamiento;
+extern uint32_t dir_fisica_inicial;
 // extern char* datos;
 extern int aux_resize;
 extern int aux_marco;
@@ -36,8 +39,6 @@ extern sem_t sem_resize;
 extern sem_t sem_resultado_escritura;
 extern sem_t sem_resultado_lectura;
 extern sem_t sem_consultar_memoria;
-extern int numero_pagina;
-extern int desplazamiento;
-extern uint32_t dir_fisica_inicial;
+extern sem_t sem_pcb;
 
 #endif

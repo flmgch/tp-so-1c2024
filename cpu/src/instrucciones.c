@@ -139,9 +139,6 @@ void ejecutar_io_gen_sleep(char interfaz[20] , char unidades_de_trabajo[20] ){
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
-    destruir_buffer(un_buffer);
-
-    flag_execute = 0;
 }
 
 //EXIT
