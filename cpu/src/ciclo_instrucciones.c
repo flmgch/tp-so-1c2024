@@ -50,7 +50,6 @@ void decode(u_int32_t dir_instruccion){
             break;
         case IO_GEN_SLEEP:
             ejecutar_io_gen_sleep(instruccion.param1, instruccion.param2);
-            fetch();
             break;
         case MOV_IN:
             ejecutar_mov_in(instruccion.param1, instruccion.param2);
