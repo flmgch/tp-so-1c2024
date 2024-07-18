@@ -107,16 +107,11 @@ void atender_instruccion(char *leido)
     }
     else if (strcmp(comando_consola[0], "DETENER_PLANIFICACION") == 0)
     {
-        //  TODO
-        planif_iniciada = false;
-        printf("La planificacion ha sido pausada. \n");
+        detener_planificacion();
     }
     else if (strcmp(comando_consola[0], "INICIAR_PLANIFICACION") == 0)
     {
-        //  TODO
-        planif_iniciada = true;
-        planificar();
-        printf("La planificacion ha sido iniciada. \n");
+        iniciar_planificacion();
     }
     else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
     {
@@ -287,4 +282,25 @@ bool es_pcb_buscado(void *data)
 {
     t_pcb *pcb = (t_pcb *)data;
     return pid_buscado == pcb->pid;
+}
+
+void detener_planificacion() {
+    planif_iniciada = false;
+    printf("La planificacion ha sido pausada. \n");
+    sem_wait(&sem_planif_new);
+    sem_wait(&sem_planif_ready);
+    sem_wait(&sem_planif_exec); // PARA ENTRADA A EXEC
+    sem_wait(&sem_planif_exec); // PARA VUELTA DE EXEC (ENVIO_PCB)
+    sem_wait(&sem_planif_block);
+}
+
+void iniciar_planificacion() {
+    planif_iniciada = true;
+    planificar();
+    printf("La planificacion ha sido iniciada. ALGORITMO: %s \n", algoritmo_planificacion);
+    sem_post(&sem_planif_new);
+    sem_post(&sem_planif_ready);
+    sem_post(&sem_planif_exec); // PARA ENTRADA A EXEC
+    sem_post(&sem_planif_exec); // PARA VUELTA DE EXEC (ENVIO_PCB)
+    sem_post(&sem_planif_block);
 }

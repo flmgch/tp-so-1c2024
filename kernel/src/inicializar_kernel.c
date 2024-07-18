@@ -50,6 +50,10 @@ void inicializar_semaforos()
     sem_init(&sem_exec, 0, 1);
     sem_init(&sem_block_return, 0, 0);
     sem_init(&sem_exit, 0, 0);
+    sem_init(&sem_planif_new, 0, 0);
+    sem_init(&sem_planif_ready, 0, 0);
+    sem_init(&sem_planif_exec, 0, 0);
+    sem_init(&sem_planif_block, 0, 0);
 }
 
 t_list *inicializar_recursos()

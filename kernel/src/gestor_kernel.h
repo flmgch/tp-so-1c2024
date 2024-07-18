@@ -43,6 +43,10 @@ extern sem_t sem_ready;
 extern sem_t sem_exec;
 extern sem_t sem_block_return;
 extern sem_t sem_exit;
+extern sem_t sem_planif_new;
+extern sem_t sem_planif_ready;
+extern sem_t sem_planif_exec;
+extern sem_t sem_planif_block;
 
 // STRUCTS PARA TESTS
 extern t_registros registros1;

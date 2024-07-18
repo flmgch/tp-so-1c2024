@@ -50,6 +50,10 @@
   sem_t sem_exec;
   sem_t sem_block_return;
   sem_t sem_exit;
+  sem_t sem_planif_new;
+  sem_t sem_planif_ready;
+  sem_t sem_planif_exec;
+  sem_t sem_planif_block;
 
 // STRUCTS PARA TESTS
 t_registros registros1;

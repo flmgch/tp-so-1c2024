@@ -33,8 +33,10 @@ void execute_pcb()
     {
         sem_wait(&sem_ready);
         sem_wait(&sem_exec);
+        sem_wait(&sem_planif_exec);
         t_pcb *pcb = pcb_segun_algoritmo();
         dispatch_pcb(pcb);
+        sem_post(&sem_planif_exec);
     }
 }
 
@@ -123,11 +125,13 @@ void exit_pcb()
 
 void pasar_a_ready(t_pcb *pcb)
 {
+    sem_wait(&sem_planif_ready);
     pthread_mutex_lock(&mutex_cola_ready);
     cambiar_estado(pcb, READY);
     list_add(cola_ready, pcb);
     log_info(kernel_logger, "Se pasa el proceso: %d a READY", pcb->pid);
     pthread_mutex_unlock(&mutex_cola_ready);
+    sem_post(&sem_planif_ready);
 }
 
 void new_pcb()
@@ -135,10 +139,12 @@ void new_pcb()
     while (1)
     {
         sem_wait(&sem_new);
+        sem_wait(&sem_planif_new);
         t_pcb *pcb = remover_pcb(cola_new, &mutex_cola_new);
         sem_wait(&sem_multiprogramacion);
         pasar_a_ready(pcb);
         sem_post(&sem_ready);
+        sem_post(&sem_planif_new);
     }
 }
 
@@ -148,8 +154,10 @@ void block_pcb()
     while (1)
     {
         sem_wait(&sem_block_return);
+        sem_wait(&sem_planif_block);
         t_pcb *pcb = remover_pcb(cola_block, &mutex_cola_block);
         pasar_a_ready(pcb);
         sem_post(&sem_ready);
+        sem_post(&sem_planif_block);
     }
 }

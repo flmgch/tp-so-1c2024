@@ -19,7 +19,7 @@ void atender_cpu_dispatch() {
             t_buffer *buffer = recibir_buffer(socket_conexion_cpu_dispatch);
             t_pcb *contexto_recibido = extraer_pcb_de_buffer(buffer);
             log_info(kernel_logger, "Recibi un PCB que me envio el CPU");
-
+            sem_wait(&sem_planif_exec);
             // ACTUALIZO EL PCB QUE ESTABA EN EXEC
             t_pcb *pcb = remover_pcb(cola_execute, &mutex_cola_exec);
             pcb = contexto_recibido;
@@ -28,104 +28,107 @@ void atender_cpu_dispatch() {
             
             switch (cop)
             {
-            case CAMBIAR_ESTADO:
-                log_info(kernel_logger, "Recibi un aviso de cambio de estado");
-                estado_proceso nuevo_estado = extraer_estado_proceso_de_buffer(buffer);
-                procesar_cambio_estado(pcb, nuevo_estado);
-                sem_post(&sem_exec);
-                break;
-            case ATENDER_WAIT:
-                log_info(kernel_logger, "Recibi un aviso de atender WAIT");
-				char* recurso_wait = extraer_string_de_buffer(buffer);
-				atender_wait(pcb, recurso_wait);
-				free(recurso_wait);
-                break;
-            case ATENDER_SIGNAL:
-                log_info(kernel_logger, "Recibi un aviso de atender SIGNAL");
-				char* recurso_signal = extraer_string_de_buffer(buffer);
-				atender_signal(pcb, recurso_signal);
-				free(recurso_signal);
-				break;
-            case OP_IO_GEN_SLEEP:{
-                log_info(kernel_logger, "Recibi un aviso de realizar una operacion IO_GEN_SLEEP");
-                char* nombre_interfaz = extraer_string_de_buffer(buffer);
-                u_int32_t unidades_de_trabajo = extraer_uint32_de_buffer(buffer);
-                atender_io_gen_sleep(pcb, nombre_interfaz, unidades_de_trabajo);
-                free(nombre_interfaz);
-                break;
-            }
-            case OP_IO_STDIN_READ:{
-                log_info(kernel_logger, "Recibi un aviso de realizar una operacion IO_STDIN_READ");
-                char* nombre_interfaz = extraer_string_de_buffer(buffer);
-                t_list* direcciones_fisicas = extraer_lista_direcciones_de_buffer(buffer);
-                u_int32_t tamanio = extraer_uint32_de_buffer(buffer);
-                atender_io_stdin_read(pcb, nombre_interfaz, direcciones_fisicas, tamanio);
-                free(nombre_interfaz);
-                list_destroy(direcciones_fisicas);
-                break;
-            }
-            case OP_IO_STDOUT_WRITE:{
-                log_info(kernel_logger, "Recibi un aviso de realizar una operacion IO_STDOUT_WRITE");
-                char* nombre_interfaz = extraer_string_de_buffer(buffer);
-                t_list* direcciones_fisicas = extraer_lista_direcciones_de_buffer(buffer);
-                u_int32_t tamanio = extraer_uint32_de_buffer(buffer);
-                atender_io_stdout_write(pcb, nombre_interfaz, direcciones_fisicas, tamanio);
-                free(nombre_interfaz);
-                list_destroy(direcciones_fisicas);
-                break;
-            }
-            case OP_IO_FS_CREATE:{
-                log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_CREATE");
-                char* nombre_interfaz = extraer_string_de_buffer(buffer);
-                char* nombre_archivo = extraer_string_de_buffer(buffer);
-                atender_io_fs_create(pcb, nombre_interfaz, nombre_archivo);
-                free(nombre_interfaz);
-                free(nombre_archivo);
-                break;
-            }
-            case OP_IO_FS_DELETE:{
-                log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_DELETE");
-                char* nombre_interfaz = extraer_string_de_buffer(buffer);
-                char* nombre_archivo = extraer_string_de_buffer(buffer);
-                atender_io_fs_delete(pcb, nombre_interfaz, nombre_archivo);
-                free(nombre_interfaz);
-                free(nombre_archivo);
-                break;
-            }
-            case OP_IO_FS_TRUNCATE:{
-                log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_TRUNCATE");
-                char* nombre_interfaz = extraer_string_de_buffer(buffer);
-                char* nombre_archivo = extraer_string_de_buffer(buffer);
-                // TODO VER SI FUNCIONA RECIBIR UINT32 Y YA ESTA, O SI ES NECESARIO DIFERENCIAR UINT8 y UINT32
-                // char* variable_tamanio = extraer_string_de_buffer(buffer);
-                
-                // atender_io_fs_truncate(pcb, nombre_interfaz, nombre_archivo);
-                free(nombre_interfaz);
-                free(nombre_archivo);
-                break;
-            }
-                break;
-            case OP_IO_FS_WRITE:{
-                log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_WRITE");
-                char* nombre_interfaz = extraer_string_de_buffer(buffer);
-                char* nombre_archivo = extraer_string_de_buffer(buffer);
-                // atender_io_fs_write(pcb, nombre_interfaz, nombre_archivo);
-                free(nombre_interfaz);
-                free(nombre_archivo);
-                break;
-            }
-                break;
-            case OP_IO_FS_READ:{
-                log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_READ");
-                char* nombre_interfaz = extraer_string_de_buffer(buffer);
-                char* nombre_archivo = extraer_string_de_buffer(buffer);
-                // atender_io_fs_read(pcb, nombre_interfaz, nombre_archivo);
-                free(nombre_interfaz);
-                free(nombre_archivo);
-                break;
-            }
-                break;
-            }
+                case CAMBIAR_ESTADO:
+                    log_info(kernel_logger, "Recibi un aviso de cambio de estado");
+                    estado_proceso nuevo_estado = extraer_estado_proceso_de_buffer(buffer);
+                    procesar_cambio_estado(pcb, nuevo_estado);
+                    sem_post(&sem_exec);
+                    break;
+                case ATENDER_WAIT:
+                    log_info(kernel_logger, "Recibi un aviso de atender WAIT");
+                    char* recurso_wait = extraer_string_de_buffer(buffer);
+                    atender_wait(pcb, recurso_wait);
+                    free(recurso_wait);
+                    break;
+                case ATENDER_SIGNAL:
+                    log_info(kernel_logger, "Recibi un aviso de atender SIGNAL");
+                    char* recurso_signal = extraer_string_de_buffer(buffer);
+                    atender_signal(pcb, recurso_signal);
+                    free(recurso_signal);
+                    break;
+                case OP_IO_GEN_SLEEP:{
+                    log_info(kernel_logger, "Recibi un aviso de realizar una operacion IO_GEN_SLEEP");
+                    char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                    u_int32_t unidades_de_trabajo = extraer_uint32_de_buffer(buffer);
+                    atender_io_gen_sleep(pcb, nombre_interfaz, unidades_de_trabajo);
+                    free(nombre_interfaz);
+                    break;
+                }
+                case OP_IO_STDIN_READ:{
+                    log_info(kernel_logger, "Recibi un aviso de realizar una operacion IO_STDIN_READ");
+                    char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                    t_list* direcciones_fisicas = extraer_lista_direcciones_de_buffer(buffer);
+                    u_int32_t tamanio = extraer_uint32_de_buffer(buffer);
+                    atender_io_stdin_read(pcb, nombre_interfaz, direcciones_fisicas, tamanio);
+                    free(nombre_interfaz);
+                    list_destroy(direcciones_fisicas);
+                    break;
+                }
+                case OP_IO_STDOUT_WRITE:{
+                    log_info(kernel_logger, "Recibi un aviso de realizar una operacion IO_STDOUT_WRITE");
+                    char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                    t_list* direcciones_fisicas = extraer_lista_direcciones_de_buffer(buffer);
+                    u_int32_t tamanio = extraer_uint32_de_buffer(buffer);
+                    atender_io_stdout_write(pcb, nombre_interfaz, direcciones_fisicas, tamanio);
+                    free(nombre_interfaz);
+                    list_destroy(direcciones_fisicas);
+                    break;
+                }
+                case OP_IO_FS_CREATE:{
+                    log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_CREATE");
+                    char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                    char* nombre_archivo = extraer_string_de_buffer(buffer);
+                    atender_io_fs_create(pcb, nombre_interfaz, nombre_archivo);
+                    free(nombre_interfaz);
+                    free(nombre_archivo);
+                    break;
+                }
+                case OP_IO_FS_DELETE:{
+                    log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_DELETE");
+                    char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                    char* nombre_archivo = extraer_string_de_buffer(buffer);
+                    atender_io_fs_delete(pcb, nombre_interfaz, nombre_archivo);
+                    free(nombre_interfaz);
+                    free(nombre_archivo);
+                    break;
+                }
+                case OP_IO_FS_TRUNCATE:{
+                    log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_TRUNCATE");
+                    char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                    char* nombre_archivo = extraer_string_de_buffer(buffer);
+                    // TODO VER SI FUNCIONA RECIBIR UINT32 Y YA ESTA, O SI ES NECESARIO DIFERENCIAR UINT8 y UINT32
+                    // char* variable_tamanio = extraer_string_de_buffer(buffer);
+                    
+                    // atender_io_fs_truncate(pcb, nombre_interfaz, nombre_archivo);
+                    free(nombre_interfaz);
+                    free(nombre_archivo);
+                    break;
+                }
+                    break;
+                case OP_IO_FS_WRITE:{
+                    log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_WRITE");
+                    char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                    char* nombre_archivo = extraer_string_de_buffer(buffer);
+                    // atender_io_fs_write(pcb, nombre_interfaz, nombre_archivo);
+                    free(nombre_interfaz);
+                    free(nombre_archivo);
+                    break;
+                }
+                    break;
+                case OP_IO_FS_READ:{
+                    log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_READ");
+                    char* nombre_interfaz = extraer_string_de_buffer(buffer);
+                    char* nombre_archivo = extraer_string_de_buffer(buffer);
+                    // atender_io_fs_read(pcb, nombre_interfaz, nombre_archivo);
+                    free(nombre_interfaz);
+                    free(nombre_archivo);
+                    break;
+                }
+                default:
+                    log_warning(kernel_logger, "Operacion a realizar con el pcb recibido desconocida");
+                    break;
+                }
+            sem_post(&sem_planif_exec);
             break;
         case -1:
             log_error(kernel_logger, "Se desconecto CPU - Dispatch");

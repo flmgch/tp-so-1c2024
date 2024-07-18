@@ -15,5 +15,7 @@ long int tamanio_del_archivo(FILE *archivo);
 void ejecutar_instruccion(char** instruccion_separada);
 void finalizar_proceso();
 bool es_pcb_buscado(void *data);
+void detener_planificacion();
+void iniciar_planificacion();
 
 #endif
