@@ -138,6 +138,8 @@ void iniciar_sistema_archivos(){
 
 void atender_fs_create(t_buffer *buffer)
 {   
+    usleep(tiempo_unidad_trabajo * 1000);
+
     u_int32_t pid = extraer_uint32_de_buffer(buffer);
     char *nombre_archivo = extraer_string_de_buffer(buffer);
     
@@ -155,40 +157,107 @@ void atender_fs_create(t_buffer *buffer)
             break;
         }
     }
-    if (bloque_libre == -1) {
+
+    if (bloque_libre == -1) 
+    {
         perror("No se encontraron bloques libres en el bitmap");
         exit(EXIT_FAILURE);
     }
 
     // Sincronizo los cambios con el bitmap.dat
-    if (msync(bitmap->direccion, bitmap->tamanio, MS_SYNC) == -1) {
+    if (msync(bitmap->direccion, bitmap->tamanio, MS_SYNC) == -1) 
+    {
         perror("Error al sincronizar el bitmap");
         exit(EXIT_FAILURE);
     }
 
-    // Creo y abro el archivo de metadata 
+    // Creo un config para poder manejar el metadata
     t_config *metadata_config = config_create(path_metadata);
-    if (metadata_config == NULL) {
+    if (metadata_config == NULL) 
+    {
         perror("Error al crear el archivo de metadata");
         exit(EXIT_FAILURE);
     }
 
-    // Escribo la info en el archivo de metadata
+    // Escribo la informacion en el archivo de metadata
     config_set_value(metadata_config, "BLOQUE_INICIAL", string_itoa(bloque_libre));
     config_set_value(metadata_config, "TAMANIO_ARCHIVO", "0");
     config_save(metadata_config);
     config_destroy(metadata_config);
 
+    list_add(lista_metadatas, nombre_archivo);
+
+    // Le aviso a Kernel que ya termine la operacion
+    t_buffer *un_buffer = crear_buffer();
+    agregar_uint32_a_buffer(un_buffer, pid);
+    t_paquete *paquete = crear_paquete();
+    crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, un_buffer);
+    enviar_paquete(paquete, socket_kernel);
+
     log_info(io_logger, "Operacion FS_CREATE con %s finalizada", nombre_archivo);
 
-    list_add(lista_metadatas, nombre_archivo);
+    eliminar_paquete(paquete);
 }
-
-    
 
 void atender_fs_delete(t_buffer *buffer)
 {
-    //   
+    usleep(tiempo_unidad_trabajo * 1000);
+
+    u_int32_t pid = extraer_uint32_de_buffer(buffer);
+    char *nombre_archivo = extraer_string_de_buffer(buffer);
+
+    log_info(io_logger, "PID: %d - Eliminar Archivo: %s", pid, nombre_archivo);
+
+    char path_metadata[strlen(path_base_dialfs) + strlen(nombre_archivo) + 2];
+    sprintf(path_metadata, "%s/%s", path_base_dialfs, nombre_archivo);
+    
+    // Creo un config para manejar el metadata
+    t_config *metadata_config = config_create(path_metadata);
+
+    char *bloque_inicial_aux = config_get_string_value(metadata_config, "BLOQUE_INICIAL");
+    char *tamanio_metadata_aux = config_get_string_value(metadata_config, "TAMANIO_ARCHIVO");
+
+    int bloque_inicial = atoi(bloque_inicial_aux);
+    int tamanio_metadata = atoi(tamanio_metadata_aux);
+
+    // Libero todos los bloques ocupados por el metadata
+    int bloques_ocupados = (tamanio_metadata + tamanio_bloque - 1) / tamanio_bloque; // Redondeo para arriba
+    for (int i = 0; i < bloques_ocupados; i++)
+    {
+        int bloque_actual = bloque_inicial + i;
+        bitarray_clean_bit(bitmap->bitarray, bloque_actual);
+    }
+
+    // Sincronizo los cambios con el bitmap.dat
+    if (msync(bitmap->direccion, bitmap->tamanio, MS_SYNC) == -1) 
+    {
+        perror("Error al sincronizar el bitmap");
+        exit(EXIT_FAILURE);
+    }
+
+    // Actualizo la lista de metadatas
+    int tamanio_lista = list_size(lista_metadatas);
+    for (int i = 0; i < tamanio_lista; i++) 
+    {
+        char *nombre_metadata = list_get(lista_metadatas, i);
+        if (strcmp(nombre_metadata, nombre_archivo) == 0) {
+            list_remove_and_destroy_element(lista_metadatas, i, free);
+            break;
+        }
+    }
+
+    // Le aviso a Kernel que ya termine la operacion
+    t_buffer *un_buffer = crear_buffer();
+    agregar_uint32_a_buffer(un_buffer, pid);
+    t_paquete *paquete = crear_paquete();
+    crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, un_buffer);
+    enviar_paquete(paquete, socket_kernel);
+
+    log_info(io_logger, "Operacion FS_DELETE con %s finalizada", nombre_archivo);
+
+    eliminar_paquete(paquete);
+    remove(path_metadata);
+    config_destroy(metadata_config);
 }
 
 void atender_fs_truncate(t_buffer *buffer)
