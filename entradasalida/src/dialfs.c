@@ -260,6 +260,76 @@ void atender_fs_delete(t_buffer *buffer)
     config_destroy(metadata_config);
 }
 
+void realizar_compactacion(int *bloque_inicial_trunc, t_config *metadata_config_trunc, char* nombre_archivo_trunc, u_int32_t pid){
+
+     log_info(io_logger, "PID: %d - Inicio Compactación.",pid);
+
+     usleep(retraso_compactacion * 1000);
+
+    int i; //contador gral
+    int j; //contador bloques asignando
+    int bloque_libre = 0; //posiciones de inicio de los archivos
+
+    char path_metadata[strlen(path_base_dialfs)+50];
+
+    //pongo todo el bitarray en 0
+    for(i=0; i<cantidad_bloque; i++){
+        bitarray_clean_bit(bitmap->bitarray,i);
+    }
+
+    //reasigno archivos q no sean el truncado
+    for(i=0; i <list_size(lista_metadatas);i++){
+        char* nombre_archivo = list_get(lista_metadatas,i);
+        sprintf(path_metadata,"%s/%s",path_base_dialfs,nombre_archivo);
+
+        if(strcmp(nombre_archivo,nombre_archivo_trunc)==0){ //si se trata del archivo truncado, q lo deje para lo ultimo
+            continue; //es para q salte a la siguiente iteracion sin tener q englobar todo lo sigueinte en un if(strcmp(nombre_archivo,nombre_archivo_trunc)==1)
+        }
+
+        t_config *metadata_config = config_create(path_metadata);
+        if (metadata_config == NULL) {
+            perror("Error al abrir el archivo de metadata para compactar");
+            exit(EXIT_FAILURE);
+        }
+
+        int tamanio_archivo = atoi(config_get_string_value(metadata_config,"TAMANIO_ARCHIVO"));
+        int bloques_necesarios = (tamanio_archivo + tamanio_bloque -1)/tamanio_bloque;
+
+        for(j=0;j<bloques_necesarios;j++){                      //asigno los bloques necesarios...
+            bitarray_set_bit(bitmap->bitarray,bloque_libre + j);//partiendo de bloque_libre
+        }
+
+        //actualizo el bloq inicial del metadata de c/ archivo
+        config_set_value(metadata_config, "BLOQUE_INICIAL", string_itoa(bloque_libre));
+        config_save(metadata_config);
+        config_destroy(metadata_config);
+
+        bloque_libre = bloque_libre + bloques_necesarios; //actualizo la posicion de inicio del proximo archivo
+
+    }
+
+    int tamanio_original_trunc = atoi(config_get_string_value(metadata_config_trunc, "TAMANIO_ARCHIVO"));
+    int bloques_necesarios_trunc = (tamanio_original_trunc + tamanio_bloque - 1) / tamanio_bloque;
+
+    for (j = 0; j < bloques_necesarios_trunc; j++) {//asgino los bloques de trunc al final de todo
+        bitarray_set_bit(bitmap->bitarray, bloque_libre + j);
+    }
+
+    //actualizo los datos de trunc
+    config_set_value(metadata_config_trunc, "BLOQUE_INICIAL", string_itoa(bloque_libre));
+    config_save(metadata_config_trunc);
+    *bloque_inicial_trunc = bloque_libre;
+
+    //sincronizo reasignacion
+    if (msync(bitmap->direccion, bitmap->tamanio, MS_SYNC) == -1) {
+        perror("Error al sincronizar el bitmap después de la compactación");
+        exit(EXIT_FAILURE);
+    }
+
+    log_info(io_logger, "PID: %d - Fin Compactación.",pid);
+
+}
+
 void atender_fs_truncate(t_buffer *buffer)
 {
     usleep(tiempo_unidad_trabajo * 1000);
@@ -306,8 +376,9 @@ void atender_fs_truncate(t_buffer *buffer)
             }
         }
         
+        //chequeo si hace falta compactar
         if(bloques_libres_contiguos < bloques_incremento) {
-            //realizar_compactacion(&bloque_inicial,metadata_config); //retiro el archivo, compacto el resto y al archivo le asigno un nuevo bloque inicial
+            realizar_compactacion(&bloque_inicial,metadata_config,nombre_archivo,pid); //retiro el archivo, compacto el resto y al archivo le asigno un nuevo bloque inicial
             int bloques_libres_contiguos = 0;
             int i; //posicion a partir dle ultimo bloque
 
@@ -327,6 +398,7 @@ void atender_fs_truncate(t_buffer *buffer)
                 }
             }
         }
+        //ahora si: lo agrando :)
         //rango: bloque siguiente al ultimo (bloque_inicial+bloques_actuales) - incremento a partir del bloque siguiente al ultimo (bloque_inicial+bloques_actuales+bloques_incremento)
         for(int i = bloque_inicial+bloques_actuales; i<bloque_inicial+bloques_actuales+bloques_incremento;i++){
             bitarray_set_bit(bitmap->bitarray, i);
