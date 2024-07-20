@@ -262,7 +262,105 @@ void atender_fs_delete(t_buffer *buffer)
 
 void atender_fs_truncate(t_buffer *buffer)
 {
-    //
+    usleep(tiempo_unidad_trabajo * 1000);
+
+    u_int32_t pid = extraer_uint32_de_buffer(buffer);
+    char *nombre_archivo = extraer_string_de_buffer(buffer);
+    int tamanio = extraer_int_de_buffer(buffer);
+
+    log_info(io_logger, "PID: %d - Truncar Archivo: %s - Tamaño: %d",pid, nombre_archivo, tamanio);
+
+    //construyo el pat
+    char path_metadata[strlen(path_base_dialfs) + strlen(nombre_archivo) + 2];
+    sprintf(path_metadata, "%s/%s", path_base_dialfs, nombre_archivo);
+
+    //creo el config para manjar el metadata
+    t_config *metadata_config = config_create(path_metadata);
+    if (metadata_config == NULL) {
+        perror("Error al abrir el archivo de metadata");
+        exit(EXIT_FAILURE);
+    }
+    /*int bloque_inicial = config_get_string_value(metadata_config, "BLOQUE_INICIAL");
+    int tamanio_actual = config_get_string_value(metadata_config, "TAMANIO_ARCHIVO"); //me da error*/
+    int bloque_inicial = atoi(config_get_string_value(metadata_config, "BLOQUE_INICIAL"));
+    int tamanio_actual = atoi(config_get_string_value(metadata_config, "TAMANIO_ARCHIVO"));
+
+    int bloques_actuales = (tamanio_actual + tamanio_bloque - 1) / tamanio_bloque; //cant bloques ocupados
+    int bloques_necesarios = (tamanio + tamanio_bloque - 1) / tamanio_bloque; //cant bloques ocupados pos truncate
+
+    if(bloques_necesarios > bloques_actuales){ //aumenta el tamanio
+        int bloques_libres_contiguos = 0;
+        int bloques_incremento = bloques_necesarios - bloques_actuales;
+
+        int i; //posicion a partir dle ultimo bloque
+
+        for(i=bloque_inicial+bloques_actuales;i<cantidad_bloque;i++){
+            if(bitarray_test_bit(bitmap->bitarray,i)==0){
+                bloques_libres_contiguos++;
+                if(bloques_libres_contiguos == bloques_necesarios){
+                    break; //encontre los bloques libres, salgo del bucle
+                }
+
+            } else {
+                break; //no encontre los bloques libres suficientes, salgo del bucle
+            }
+        }
+        
+        if(bloques_libres_contiguos < bloques_incremento) {
+            //realizar_compactacion(&bloque_inicial,metadata_config); //retiro el archivo, compacto el resto y al archivo le asigno un nuevo bloque inicial
+            int bloques_libres_contiguos = 0;
+            int i; //posicion a partir dle ultimo bloque
+
+            for(i=bloque_inicial+bloques_actuales;i<cantidad_bloque;i++){
+                if(bitarray_test_bit(bitmap->bitarray,i)==0){
+                    bloques_libres_contiguos++;
+                    if(bloques_libres_contiguos == bloques_necesarios){
+                        break; //encontre los bloques libres, salgo del bucle
+                    }
+
+                } else {
+                    break; //no encontre los bloques libres suficientes, salgo del bucle
+                }
+            if (bloques_libres_contiguos < bloques_necesarios - bloques_actuales) {
+                    perror("No se encontraron bloques contiguos suficientes incluso después de la compactación");
+                    exit(EXIT_FAILURE);
+                }
+            }
+        }
+        //rango: bloque siguiente al ultimo (bloque_inicial+bloques_actuales) - incremento a partir del bloque siguiente al ultimo (bloque_inicial+bloques_actuales+bloques_incremento)
+        for(int i = bloque_inicial+bloques_actuales; i<bloque_inicial+bloques_actuales+bloques_incremento;i++){
+            bitarray_set_bit(bitmap->bitarray, i);
+        }
+
+     } else if (bloques_necesarios<bloques_actuales){ //se achica
+        int nuevo_tamanio = bloque_inicial + bloques_necesarios;
+        int antiguo_tamanio =  bloque_inicial + bloques_actuales;
+        //pongo en 0 los bits del nuevo tamanio al antiguo tamanio
+        for (int i = nuevo_tamanio; i < antiguo_tamanio; i++) {
+            bitarray_clean_bit(bitmap->bitarray, i);
+        }
+     }
+        
+    if (msync(bitmap->direccion, bitmap->tamanio, MS_SYNC) == -1) {
+        perror("Error al sincronizar el bitmap");
+        exit(EXIT_FAILURE);
+    }
+
+    config_set_value(metadata_config, "TAMANIO_ARCHIVO", string_itoa(tamanio));
+    config_save(metadata_config);
+    config_destroy(metadata_config);
+
+    //aviso al kernel q termine
+    t_buffer *un_buffer = crear_buffer();
+    agregar_uint32_a_buffer(un_buffer, pid);
+    t_paquete *paquete = crear_paquete();
+    crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, un_buffer);
+    enviar_paquete(paquete, socket_kernel);
+
+    log_info(io_logger, "Operacion FS_TRUNCATE con %s finalizada", nombre_archivo);
+
+    eliminar_paquete(paquete);
+
 }
 
 void atender_fs_write(t_buffer *buffer)
