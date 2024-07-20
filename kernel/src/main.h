@@ -28,20 +28,18 @@
   int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha;
 
 // LISTAS DE PLANIFICACION
-  t_list *cola_new, *cola_ready, *cola_execute, *cola_block, *cola_exit;
+  t_list *cola_new, *cola_ready, *cola_ready_prioridad, *cola_execute, *cola_block, *cola_exit;
 
-// TODO LISTAS DE MANEJO DE IO
-  t_list *cola_block_io;
-  t_list *cola_block_fs;
+// HILO PARA QUANTUM
+  pthread_t hilo_quantum;
 
 // SEMAFOROS
   pthread_mutex_t mutex_pid;
   pthread_mutex_t mutex_cola_new;
   pthread_mutex_t mutex_cola_ready;
+  pthread_mutex_t mutex_cola_ready_prioridad;
   pthread_mutex_t mutex_cola_exec;
   pthread_mutex_t mutex_cola_block;
-  pthread_mutex_t mutex_cola_block_io;
-  pthread_mutex_t mutex_cola_block_fs;
   pthread_mutex_t mutex_cola_exit;
   pthread_mutex_t mutex_lista_io;
   sem_t sem_multiprogramacion;
@@ -54,14 +52,5 @@
   sem_t sem_planif_ready;
   sem_t sem_planif_exec;
   sem_t sem_planif_block;
-
-// STRUCTS PARA TESTS
-t_registros registros1;
-t_registros registros2;
-t_registros registros3;
-t_pcb pcb1;
-t_pcb pcb2;
-t_pcb pcb3;
-void inicializar_tests();
 
 #endif

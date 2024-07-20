@@ -31,7 +31,7 @@ void inicializar_config()
 
 void inicializar_variables(){
 	// registros = inicializar_registros();
-	flag_execute = true;
+	flag_execute = false;
 }
 
 void inicializar_tlb() {
@@ -48,6 +48,7 @@ void inicializar_semaforos()
     sem_init(&sem_resultado_escritura, 0, 0);
     sem_init(&sem_resultado_lectura, 0, 0);
     sem_init(&sem_consultar_memoria, 0, 0);
+    pthread_mutex_init(&mutex_flag_execute, NULL);
 }
 
 void borrar_semaforos()

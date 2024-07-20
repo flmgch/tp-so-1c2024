@@ -38,10 +38,9 @@ void inicializar_semaforos()
     pthread_mutex_init(&mutex_pid, NULL);
     pthread_mutex_init(&mutex_cola_new, NULL);
     pthread_mutex_init(&mutex_cola_ready, NULL);
+    pthread_mutex_init(&mutex_cola_ready_prioridad, NULL);
     pthread_mutex_init(&mutex_cola_exec, NULL);
     pthread_mutex_init(&mutex_cola_block, NULL);
-    pthread_mutex_init(&mutex_cola_block_io, NULL);
-    pthread_mutex_init(&mutex_cola_block_fs, NULL);
     pthread_mutex_init(&mutex_cola_exit, NULL);
     pthread_mutex_init(&mutex_lista_io, NULL);
     sem_init(&sem_multiprogramacion, 0, grado_multiprogramacion);

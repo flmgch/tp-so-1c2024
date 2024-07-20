@@ -15,5 +15,5 @@ void atender_io_stdin_read(t_pcb* pcb, char* nombre_interfaz, t_list* direccione
 void atender_io_stdout_write(t_pcb* pcb, char* nombre_interfaz, t_list* direcciones_fisicas, u_int32_t tamanio);
 void atender_io_fs_create(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo);
 void atender_io_fs_delete(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo);
-
+bool chequear_quantum(t_pcb* pcb);
 #endif

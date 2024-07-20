@@ -266,11 +266,11 @@ void finalizar_proceso()
         sem_post(&sem_exit);
         return;
     }
-    // SI ESTA EN COLA EXEC, MANDO INTERRUPCION A CPU // TODO EL HANDLEO DEL PCB ESTA EN ATENDER_CPU_DISPATCH.c
+    // SI ESTA EN COLA EXEC, MANDO INTERRUPCION A CPU // TODO EL HANDLEO DEL PCB ESTA EN KERNEL_CPU_DISPATCH.c
     pcb = (t_pcb *)list_get(cola_execute, 0);
     if (pcb->pid == pid_buscado) {
         t_buffer* buffer_vacio = crear_buffer();
-        t_paquete* paquete = crear_super_paquete(FINALIZAR_PROCESO, buffer_vacio);
+        t_paquete* paquete = crear_super_paquete(INT_FINALIZAR_PROCESO, buffer_vacio);
         enviar_paquete(paquete, socket_conexion_cpu_interrupt);
     }
 

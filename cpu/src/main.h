@@ -41,5 +41,6 @@ sem_t sem_resize;
 sem_t sem_resultado_escritura;
 sem_t sem_resultado_lectura;
 sem_t sem_consultar_memoria;
+pthread_mutex_t mutex_flag_execute;
 
 #endif

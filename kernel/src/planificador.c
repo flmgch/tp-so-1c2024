@@ -86,7 +86,23 @@ void dispatch_pcb(t_pcb *pcb)
     enviar_pcb(pcb, socket_conexion_cpu_dispatch);
 }
 
-// TODO t_pcb *obtener_pcb_RR();
+t_pcb *obtener_pcb_RR() {
+    pthread_create(&hilo_quantum, NULL, (void*)manejar_quantum, NULL);
+    pthread_detach(hilo_quantum);
+    return remover_pcb(cola_ready, &mutex_cola_ready);
+};
+
+void manejar_quantum() {
+    while (1)
+    {
+        usleep(quantum * 1000); // ESPERO EL TIEMPO DEL CONFIG EN MS
+        t_buffer* buffer_vacio = crear_buffer();
+        t_paquete* paquete = crear_super_paquete(INT_FIN_QUANTUM, buffer_vacio);
+        enviar_paquete(paquete, socket_conexion_cpu_interrupt);
+        eliminar_paquete(paquete);
+    }
+}
+
 // TODO t_pcb *obtener_pcb_VRR();
 
 void planificar_largo_plazo()
@@ -156,6 +172,7 @@ void block_pcb()
         sem_wait(&sem_block_return);
         sem_wait(&sem_planif_block);
         t_pcb *pcb = remover_pcb(cola_block, &mutex_cola_block);
+        pcb->motivo_block = NONE_BLOCK;
         pasar_a_ready(pcb);
         sem_post(&sem_ready);
         sem_post(&sem_planif_block);

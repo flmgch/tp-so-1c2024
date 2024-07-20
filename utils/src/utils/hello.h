@@ -70,6 +70,8 @@ typedef enum
     CAMBIAR_ESTADO,
     ATENDER_WAIT,
     ATENDER_SIGNAL,
+    INT_FIN_QUANTUM,
+    INT_FINALIZAR_PROCESO,
     // KERNEL - MEMORIA
     CREAR_PROCESO,
     FINALIZAR_PROCESO,
@@ -167,6 +169,7 @@ typedef enum
     INVALID_RESOURCE,
     INVALID_INTERFACE,
     OUT_OF_MEMORY,
+    FIN_QUANTUM,
     NONE_EXIT
 } motivo_exit;
 typedef enum

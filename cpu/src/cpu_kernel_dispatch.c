@@ -21,6 +21,9 @@ void atender_kernel_dispatch()
            pcb = extraer_pcb_de_buffer(un_buffer);
            destruir_buffer(un_buffer);
            log_info(cpu_logger, "Recibí el contexto del proceso %d y se inicia el ciclo de instruccion", pcb->pid);
+           pthread_mutex_lock(&mutex_flag_execute);
+           flag_execute = true;
+           pthread_mutex_unlock(&mutex_flag_execute);
            ejecutar_proceso();
            break;
         case -1:

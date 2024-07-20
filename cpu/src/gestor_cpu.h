@@ -40,5 +40,6 @@ extern sem_t sem_resultado_escritura;
 extern sem_t sem_resultado_lectura;
 extern sem_t sem_consultar_memoria;
 extern sem_t sem_pcb;
+extern pthread_mutex_t mutex_flag_execute;
 
 #endif

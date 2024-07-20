@@ -19,7 +19,7 @@ void execute_pcb();
 t_pcb *remover_pcb(t_list *list, pthread_mutex_t *mutex);
 t_pcb *pcb_segun_algoritmo();
 
-// TODO RR VRR
-// t_pcb *obtener_pcb_RR();
+t_pcb *obtener_pcb_RR();
+void manejar_quantum();
 // t_pcb *obtener_pcb_VRR();
 #endif

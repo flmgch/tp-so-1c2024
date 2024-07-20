@@ -18,6 +18,9 @@ void atender_cpu_dispatch() {
             // OBTENGO EL CONTEXTO DE LA CPU
             t_buffer *buffer = recibir_buffer(socket_conexion_cpu_dispatch);
             t_pcb *contexto_recibido = extraer_pcb_de_buffer(buffer);
+            if(chequear_quantum(contexto_recibido)) {
+                pthread_cancel(hilo_quantum);
+            }
             log_info(kernel_logger, "Recibi un PCB que me envio el CPU");
             sem_wait(&sem_planif_exec);
             // ACTUALIZO EL PCB QUE ESTABA EN EXEC
@@ -104,7 +107,6 @@ void atender_cpu_dispatch() {
                     free(nombre_archivo);
                     break;
                 }
-                    break;
                 case OP_IO_FS_WRITE:{
                     log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_WRITE");
                     char* nombre_interfaz = extraer_string_de_buffer(buffer);
@@ -114,7 +116,6 @@ void atender_cpu_dispatch() {
                     free(nombre_archivo);
                     break;
                 }
-                    break;
                 case OP_IO_FS_READ:{
                     log_info(kernel_logger, "Recibi un aviso de realizar una operacion DIALFS_READ");
                     char* nombre_interfaz = extraer_string_de_buffer(buffer);
@@ -148,8 +149,11 @@ void procesar_cambio_estado(t_pcb *pcb, estado_proceso estado_nuevo)
     switch (estado_nuevo)
     {
     case READY:
+        if(strcmp(algoritmo_planificacion, "RR") == 0) {
         pasar_a_ready(pcb);
         sem_post(&sem_ready);
+        }
+        // TODO IF ALGORITMO_PLANIFICACION == "VRR"
         break;
     case FINISH_EXIT:
         cambiar_estado(pcb, estado_nuevo);
@@ -190,9 +194,8 @@ void atender_wait(t_pcb *pcb, char *recurso)
 		if (recursobuscado->instancias < 0)
 		{
 			cambiar_estado(pcb, BLOCK);
+            pcb->motivo_block = RESOURCE_BLOCK;
 			log_info(kernel_logger, "PID: %d - Bloqueado por: %s", pcb->pid, recurso);
-            // TODO Calcular quantum remanente del proceso para usarlo en VRR
-			// calcular_estimacion(pcb);
 			agregar_pcb(recursobuscado->cola_block_asignada, pcb, &recursobuscado->mutex_asignado);
 			sem_post(&sem_exec);
 		}
@@ -492,3 +495,6 @@ void atender_io_fs_delete(t_pcb *pcb, char *nombre_interfaz, char *nombre_archiv
     eliminar_paquete(paquete);
 }
 
+bool chequear_quantum(t_pcb* pcb) {
+    return (((strcmp(algoritmo_planificacion, "RR") == 0) || (strcmp(algoritmo_planificacion, "VRR") == 0)) && pcb->motivo_exit != FIN_QUANTUM);
+}

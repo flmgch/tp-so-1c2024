@@ -104,12 +104,14 @@ void decode(u_int32_t dir_instruccion){
 }
 
 void fetch (){ 
+    if(flag_execute == true) {
     u_int32_t instruccion_a_ejecutar = pcb->program_counter;
     log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pcb->pid, instruccion_a_ejecutar);
 
     aux_resize = 0;
     pcb->program_counter += 1;
     decode(instruccion_a_ejecutar);
+    }
 }
 
 void ejecutar_proceso(){
