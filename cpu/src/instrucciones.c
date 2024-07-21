@@ -416,7 +416,7 @@ void ejecutar_io_stdout_write(char interfaz[20], char reg_dir_logica[20], char r
 void ejecutar_io_fs_create(char interfaz[20], char nombre_archivo[20]){
     t_buffer *otro_buffer = crear_buffer();
     agregar_pcb_a_buffer(otro_buffer, pcb);
-    agregar_cop_a_buffer(otro_buffer, IO_FS_CREATE);
+    agregar_cop_a_buffer(otro_buffer, OP_IO_FS_CREATE);
     agregar_string_a_buffer(otro_buffer,interfaz);
     agregar_string_a_buffer(otro_buffer,nombre_archivo);
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, otro_buffer);
@@ -445,19 +445,21 @@ void ejecutar_io_fs_truncate(char interfaz[20], char nombre_archivo[20], char re
     agregar_string_a_buffer(otro_buffer,nombre_archivo);
 
     void* dir_tam = obtener_registro(reg_tam);
-    if (dir_tam != NULL) {
-        if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
-            strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
-                uint8_t tamanio = *(uint8_t*) dir_tam;
-                agregar_string_a_buffer(otro_buffer, "Uint8");
-                agregar_uint8_a_buffer(otro_buffer, tamanio);
+    // if (dir_tam != NULL) {
+    //     if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
+    //         strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
+    //             uint8_t tamanio = *(uint8_t*) dir_tam;
+    //             agregar_string_a_buffer(otro_buffer, "Uint8");
+    //             agregar_uint8_a_buffer(otro_buffer, tamanio);
 
-        } else {
-                uint32_t tamanio = *(uint32_t*) dir_tam;
-                agregar_string_a_buffer(otro_buffer, "Uint32");
-                agregar_uint32_a_buffer(otro_buffer, tamanio);
-            } 
-        }
+    //     } else {
+    //             uint32_t tamanio = *(uint32_t*) dir_tam;
+    //             agregar_string_a_buffer(otro_buffer, "Uint32");
+    //             agregar_uint32_a_buffer(otro_buffer, tamanio);
+    //         }
+    //     }
+    uint32_t tamanio = *(uint32_t *)dir_tam;
+    agregar_uint32_a_buffer(otro_buffer, tamanio);
 
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, otro_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
@@ -486,38 +488,43 @@ void ejecutar_io_fs_write(char interfaz[20], char nombre_archivo[20], char reg_d
     //el tamanio del int a agregar depende del tamanio del registro
     //obtengo puntero al registro
     void* dir_tam = obtener_registro(reg_tam);
-    if (dir_tam != NULL) {
-        if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
-            strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
-                //si es uno de los registros anteriores, el int a agregar va a ser de uint8
-                //creo la variable de dicho tamanio, q va a tener el contenido apuntado por dir_tam
-                uint8_t tamanio = *(uint8_t*) dir_tam;
-                direcciones_fisicas = separar_en_paginas(direccion_logica, tamanio);
-        } else {
-                //si no es uno de los registros anteriores, es de los otros, cuyo tamanio es 32
-                //creo la variable de tipo uint32,q va a tener el contenido apuntado por dir_tam
-                uint32_t tamanio = *(uint32_t*) dir_tam;
-                direcciones_fisicas = separar_en_paginas(direccion_logica, tamanio);
-            } 
-        }
+    // if (dir_tam != NULL) {
+    //     if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
+    //         strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
+    //             //si es uno de los registros anteriores, el int a agregar va a ser de uint8
+    //             //creo la variable de dicho tamanio, q va a tener el contenido apuntado por dir_tam
+    //             uint8_t tamanio = *(uint8_t*) dir_tam;
+    //             direcciones_fisicas = separar_en_paginas(direccion_logica, tamanio);
+    //     } else {
+    //             //si no es uno de los registros anteriores, es de los otros, cuyo tamanio es 32
+    //             //creo la variable de tipo uint32,q va a tener el contenido apuntado por dir_tam
+    //             uint32_t tamanio = *(uint32_t*) dir_tam;
+    //             direcciones_fisicas = separar_en_paginas(direccion_logica, tamanio);
+    //         }
+    //     }
+    uint32_t tamanio = *(uint32_t *)dir_tam;
+    direcciones_fisicas = separar_en_paginas(direccion_logica, tamanio);
 
     agregar_lista_direcciones_a_buffer(un_buffer,direcciones_fisicas);
+    agregar_uint32_a_buffer(un_buffer, tamanio);
     //obtengo dir del registro
     void* dir_ptr = obtener_registro(reg_ptr);
-    if (dir_ptr != NULL) {
-        if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
-            strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
-                //obtengo el contenido de la direccion, y la agrego al buffer
-                uint8_t puntero = *(uint8_t*) dir_ptr;
-                agregar_string_a_buffer(un_buffer, "Uint8");
-                agregar_uint8_a_buffer(un_buffer, puntero);
-        } else {
-                //idem
-                uint32_t puntero = *(uint32_t*) dir_ptr;
-                agregar_string_a_buffer(un_buffer, "Uint32");
-                agregar_uint32_a_buffer(un_buffer, puntero);
-            } 
-        }
+    // if (dir_ptr != NULL) {
+    //     if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
+    //         strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
+    //             //obtengo el contenido de la direccion, y la agrego al buffer
+    //             uint8_t puntero = *(uint8_t*) dir_ptr;
+    //             agregar_string_a_buffer(un_buffer, "Uint8");
+    //             agregar_uint8_a_buffer(un_buffer, puntero);
+    //     } else {
+    //             //idem
+    //             uint32_t puntero = *(uint32_t*) dir_ptr;
+    //             agregar_string_a_buffer(un_buffer, "Uint32");
+    //             agregar_uint32_a_buffer(un_buffer, puntero);
+    //         }
+    //     }
+    uint32_t puntero = *(uint32_t *)dir_ptr;
+    agregar_uint32_a_buffer(un_buffer, puntero);
 
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
@@ -539,33 +546,40 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
     //agregar_uint32_a_buffer(un_buffer, direccion_fisica);
 
     void* dir_tam = obtener_registro(reg_tam);
-    if (dir_tam != NULL) {
-        if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
-            strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
-                uint8_t tamanio = *(uint8_t*) dir_tam;
-                direcciones_fisicas = separar_en_paginas(direccion_logica, tamanio);
-        } else {
-                uint32_t tamanio = *(uint32_t*) dir_tam;
-                direcciones_fisicas = separar_en_paginas(direccion_logica, tamanio);
-            } 
-        }
+    // if (dir_tam != NULL) {
+    //     if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
+    //         strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
+    //             uint8_t tamanio = *(uint8_t*) dir_tam;
+    //             direcciones_fisicas = separar_en_paginas(direccion_logica, tamanio);
+    //     } else {
+    //             uint32_t tamanio = *(uint32_t*) dir_tam;
+    //             direcciones_fisicas = separar_en_paginas(direccion_logica, tamanio);
+    //         }
+    //     }
+    uint32_t tamanio = *(uint32_t *)dir_tam;
+    direcciones_fisicas = separar_en_paginas(direccion_logica, tamanio);
+    agregar_lista_direcciones_a_buffer(un_buffer, direcciones_fisicas);
+    agregar_uint32_a_buffer(un_buffer, tamanio);
 
-    agregar_lista_direcciones_a_buffer(un_buffer,direcciones_fisicas);
-    
-    void* dir_ptr = obtener_registro(reg_ptr);
-    if (dir_ptr != NULL) {
-        if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
-            strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0) {
-                uint8_t puntero = *(uint8_t*) dir_ptr;
-                agregar_string_a_buffer(un_buffer, "Uint8");
-                agregar_uint8_a_buffer(un_buffer, puntero);
-
-        } else {
-                uint32_t puntero = *(uint32_t*) dir_ptr;
-                agregar_string_a_buffer(un_buffer, "Uint32");
-                agregar_uint32_a_buffer(un_buffer, puntero);
-            } 
-        }
+    void *dir_ptr = obtener_registro(reg_ptr);
+    // if (dir_ptr != NULL)
+    // {
+    //     if (strcmp(reg_tam, "AX") == 0 || strcmp(reg_tam, "BX") == 0 ||
+    //         strcmp(reg_tam, "CX") == 0 || strcmp(reg_tam, "DX") == 0)
+    //     {
+    //         uint8_t puntero = *(uint8_t *)dir_ptr;
+    //         agregar_string_a_buffer(un_buffer, "Uint8");
+    //         agregar_uint8_a_buffer(un_buffer, puntero);
+    //     }
+    //     else
+    //     {
+    //         uint32_t puntero = *(uint32_t *)dir_ptr;
+    //         agregar_string_a_buffer(un_buffer, "Uint32");
+    //         agregar_uint32_a_buffer(un_buffer, puntero);
+    //     }
+    // }
+    uint32_t puntero = *(uint32_t *)dir_ptr;
+    agregar_uint32_a_buffer(un_buffer, puntero);
 
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
