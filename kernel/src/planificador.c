@@ -31,7 +31,6 @@ void execute_pcb()
 {
     while (1)
     {
-        sem_wait(&sem_ready);
         sem_wait(&sem_exec);
         sem_wait(&sem_planif_exec);
         t_pcb *pcb = pcb_segun_algoritmo();
@@ -44,15 +43,17 @@ t_pcb *pcb_segun_algoritmo()
 {
     if (strcasecmp(algoritmo_planificacion, "FIFO") == 0)
     {
+        sem_wait(&sem_ready);
         return remover_pcb(cola_ready, &mutex_cola_ready);
     }
     else if (strcasecmp(algoritmo_planificacion, "RR") == 0)
     {
+        sem_wait(&sem_ready);
         return obtener_pcb_RR();
     }
     else if (strcasecmp(algoritmo_planificacion, "VRR") == 0)
     {
-        // return obtener_pcb_VRR();
+        return obtener_pcb_VRR();
     }
     else
     {
@@ -85,6 +86,10 @@ void dispatch_pcb(t_pcb *pcb)
     log_info(kernel_logger, "El proceso %d se pone en ejecucion", pcb->pid);
     agregar_pcb(cola_execute, pcb, &mutex_cola_exec);
     enviar_pcb(pcb, socket_conexion_cpu_dispatch);
+    if (strcmp(algoritmo_planificacion, "VRR") == 0)
+    {
+        tiempo_exec = temporal_create();
+    }
 }
 
 t_pcb *obtener_pcb_RR() {
@@ -93,21 +98,67 @@ t_pcb *obtener_pcb_RR() {
     return remover_pcb(cola_ready, &mutex_cola_ready);
 };
 
-void manejar_quantum() {
-    while (1)
-    {
-        usleep(quantum * 1000); // ESPERO EL TIEMPO DEL CONFIG EN MS
-        t_buffer* buffer_vacio = crear_buffer();
+void manejar_quantum(void *quantum_remanente_ptr)
+{   
+    int* q_rem_ptr = (int *)quantum_remanente_ptr;
+    if(q_rem_ptr != NULL && (strcmp(algoritmo_planificacion, "VRR") == 0)) {
+        int quantum_remanente = *q_rem_ptr;
+        usleep(quantum_remanente * 1000); // ESPERO EL TIEMPO DEL QUANTUM REMANENTE EN MS
+        t_buffer *buffer_vacio = crear_buffer();
         agregar_int_a_buffer(buffer_vacio, 1);
-        t_paquete* paquete = crear_super_paquete(INT_FIN_QUANTUM, buffer_vacio);
+        t_paquete *paquete = crear_super_paquete(INT_FIN_QUANTUM, buffer_vacio);
         enviar_paquete(paquete, socket_conexion_cpu_interrupt);
         eliminar_paquete(paquete);
         pthread_cancel(hilo_quantum);
         return;
+    } else {
+    usleep(quantum * 1000); // ESPERO EL TIEMPO DEL CONFIG EN MS
+    t_buffer *buffer_vacio = crear_buffer();
+    agregar_int_a_buffer(buffer_vacio, 1);
+    t_paquete *paquete = crear_super_paquete(INT_FIN_QUANTUM, buffer_vacio);
+    enviar_paquete(paquete, socket_conexion_cpu_interrupt);
+    eliminar_paquete(paquete);
+    pthread_cancel(hilo_quantum);
+    return;
     }
 }
 
-// TODO t_pcb *obtener_pcb_VRR();
+// void manejar_quantum_remanente(void *quantum_remanente_ptr)
+// {
+//     int quantum_remanente = *(int *)quantum_remanente_ptr;
+//     while (1)
+//     {
+//         usleep(quantum_remanente * 1000); // ESPERO EL TIEMPO DEL QUANTUM REMANENTE EN MS
+//         t_buffer *buffer_vacio = crear_buffer();
+//         agregar_int_a_buffer(buffer_vacio, 1);
+//         t_paquete *paquete = crear_super_paquete(INT_FIN_QUANTUM, buffer_vacio);
+//         enviar_paquete(paquete, socket_conexion_cpu_interrupt);
+//         eliminar_paquete(paquete);
+//         pthread_cancel(hilo_quantum_remanente);
+//         return;
+//     }
+// }
+
+t_pcb *obtener_pcb_VRR()
+{
+    if (!list_is_empty(cola_ready_prioridad))
+    {
+        sem_wait(&sem_ready_prioridad);
+        t_pcb *pcb = remover_pcb(cola_ready_prioridad, &mutex_cola_ready_prioridad);
+        int *quantum_remanente_ptr = malloc(sizeof(int));
+        *quantum_remanente_ptr = pcb->quantum_remanente;
+        pthread_create(&hilo_quantum, NULL, (void *)manejar_quantum, (void *)quantum_remanente_ptr);
+        pthread_detach(hilo_quantum);
+        return pcb;
+    }
+    else
+    {
+        sem_wait(&sem_ready);
+        pthread_create(&hilo_quantum, NULL, (void *)manejar_quantum, NULL);
+        pthread_detach(hilo_quantum);
+        return remover_pcb(cola_ready, &mutex_cola_ready);
+    }
+};
 
 void planificar_largo_plazo()
 {
@@ -176,8 +227,27 @@ void block_pcb()
         sem_wait(&sem_planif_block);
         t_pcb *pcb = remover_pcb(cola_block, &mutex_cola_block);
         pcb->motivo_block = NONE_BLOCK;
-        pasar_a_ready(pcb);
-        sem_post(&sem_ready);
+        if (pcb->quantum_remanente > 0 && (strcmp(algoritmo_planificacion, "VRR") == 0))
+        {
+            pasar_a_ready_prioridad(pcb);
+            sem_post(&sem_ready_prioridad);
+        }
+        else
+        {
+            pasar_a_ready(pcb);
+            sem_post(&sem_ready);
+        }
         sem_post(&sem_planif_block);
     }
+}
+
+void pasar_a_ready_prioridad(t_pcb *pcb)
+{
+
+    sem_wait(&sem_planif_ready_prioridad);
+    pthread_mutex_lock(&mutex_cola_ready_prioridad);
+    cambiar_estado(pcb, READY_PRIORIDAD);
+    list_add(cola_ready_prioridad, pcb);
+    pthread_mutex_unlock(&mutex_cola_ready_prioridad);
+    sem_post(&sem_planif_ready_prioridad);
 }

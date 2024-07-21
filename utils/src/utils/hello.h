@@ -19,6 +19,7 @@
 #include <commons/string.h>
 #include <commons/config.h>
 #include <commons/collections/list.h>
+#include <commons/temporal.h>
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -176,6 +177,7 @@ typedef enum
 {
     NEW,
     READY,
+    READY_PRIORIDAD,
     EXEC,
     BLOCK,
     FINISH_EXIT,

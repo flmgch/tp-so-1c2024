@@ -18,6 +18,10 @@ void atender_cpu_dispatch() {
             // OBTENGO EL CONTEXTO DE LA CPU
             t_buffer *buffer = recibir_buffer(socket_conexion_cpu_dispatch);
             t_pcb *contexto_recibido = extraer_pcb_de_buffer(buffer);
+            if (strcmp(algoritmo_planificacion, "VRR") == 0)
+            {
+                temporal_stop(tiempo_exec);
+            }
             if(chequear_quantum(contexto_recibido)) {
                 pthread_cancel(hilo_quantum);
             }
@@ -156,11 +160,14 @@ void procesar_cambio_estado(t_pcb *pcb, estado_proceso estado_nuevo)
     switch (estado_nuevo)
     {
     case READY:
-        if(strcmp(algoritmo_planificacion, "RR") == 0) {
+    {
+        if (strcmp(algoritmo_planificacion, "VRR") == 0)
+        {
+            pcb->quantum_remanente = quantum; // REINICIO EL QUANTUM SI EL PCB VOLVIO POR FIN DE QUANTUM
+        }
         pasar_a_ready(pcb);
         sem_post(&sem_ready);
-        }
-        // TODO IF ALGORITMO_PLANIFICACION == "VRR"
+    }
         break;
     case FINISH_EXIT:
         cambiar_estado(pcb, estado_nuevo);
@@ -288,6 +295,13 @@ void atender_io_gen_sleep(t_pcb *pcb, char* nombre_interfaz, u_int32_t unidades)
         return;
     }
 
+    if ((strcmp(algoritmo_planificacion, "VRR") == 0) && (pcb->motivo_exit != FIN_QUANTUM))
+    {
+        int tiempo_exec_proceso = temporal_gettime(tiempo_exec);
+        pcb->quantum_remanente -= tiempo_exec_proceso;
+        temporal_destroy(tiempo_exec);
+    }
+
     cambiar_estado(pcb, BLOCK);
     pcb->motivo_block = IO_BLOCK;
     list_add(interfaz->cola_block_asignada, pcb);
@@ -363,6 +377,13 @@ void atender_io_stdin_read(t_pcb* pcb, char* nombre_interfaz, t_list* direccione
         return;
     }
 
+    if ((strcmp(algoritmo_planificacion, "VRR") == 0) && (pcb->motivo_exit != FIN_QUANTUM))
+    {
+        int tiempo_exec_proceso = temporal_gettime(tiempo_exec);
+        pcb->quantum_remanente -= tiempo_exec_proceso;
+        temporal_destroy(tiempo_exec);
+    }
+
     cambiar_estado(pcb, BLOCK);
     pcb->motivo_block = IO_BLOCK;
     list_add(interfaz->cola_block_asignada, pcb);
@@ -401,6 +422,13 @@ void atender_io_stdout_write(t_pcb* pcb, char* nombre_interfaz, t_list* direccio
         sem_post(&sem_exit);
         sem_post(&sem_exec);
         return;
+    }
+
+    if ((strcmp(algoritmo_planificacion, "VRR") == 0) && (pcb->motivo_exit != FIN_QUANTUM))
+    {
+        int tiempo_exec_proceso = temporal_gettime(tiempo_exec);
+        pcb->quantum_remanente -= tiempo_exec_proceso;
+        temporal_destroy(tiempo_exec);
     }
 
     cambiar_estado(pcb, BLOCK);
@@ -446,6 +474,13 @@ void atender_io_fs_create(t_pcb *pcb, char *nombre_interfaz, char *nombre_archiv
         return;
     }
 
+    if ((strcmp(algoritmo_planificacion, "VRR") == 0) && (pcb->motivo_exit != FIN_QUANTUM))
+    {
+        int tiempo_exec_proceso = temporal_gettime(tiempo_exec);
+        pcb->quantum_remanente -= tiempo_exec_proceso;
+        temporal_destroy(tiempo_exec);
+    }
+
     cambiar_estado(pcb, BLOCK);
     pcb->motivo_block = IO_BLOCK;
     list_add(interfaz->cola_block_asignada, pcb);
@@ -486,6 +521,13 @@ void atender_io_fs_delete(t_pcb *pcb, char *nombre_interfaz, char *nombre_archiv
         sem_post(&sem_exit);
         sem_post(&sem_exec);
         return;
+    }
+
+    if ((strcmp(algoritmo_planificacion, "VRR") == 0) && (pcb->motivo_exit != FIN_QUANTUM))
+    {
+        int tiempo_exec_proceso = temporal_gettime(tiempo_exec);
+        pcb->quantum_remanente -= tiempo_exec_proceso;
+        temporal_destroy(tiempo_exec);
     }
 
     cambiar_estado(pcb, BLOCK);
@@ -533,6 +575,13 @@ void atender_io_fs_truncate(t_pcb *pcb, char *nombre_interfaz, char *nombre_arch
         return;
     }
 
+    if ((strcmp(algoritmo_planificacion, "VRR") == 0) && (pcb->motivo_exit != FIN_QUANTUM))
+    {
+        int tiempo_exec_proceso = temporal_gettime(tiempo_exec);
+        pcb->quantum_remanente -= tiempo_exec_proceso;
+        temporal_destroy(tiempo_exec);
+    }
+
     cambiar_estado(pcb, BLOCK);
     pcb->motivo_block = IO_BLOCK;
     list_add(interfaz->cola_block_asignada, pcb);
@@ -573,6 +622,13 @@ void atender_io_fs_write(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo
         sem_post(&sem_exit);
         sem_post(&sem_exec);
         return;
+    }
+
+    if ((strcmp(algoritmo_planificacion, "VRR") == 0) && (pcb->motivo_exit != FIN_QUANTUM))
+    {
+        int tiempo_exec_proceso = temporal_gettime(tiempo_exec);
+        pcb->quantum_remanente -= tiempo_exec_proceso;
+        temporal_destroy(tiempo_exec);
     }
 
     cambiar_estado(pcb, BLOCK);
@@ -617,6 +673,13 @@ void atender_io_fs_read(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo,
         sem_post(&sem_exit);
         sem_post(&sem_exec);
         return;
+    }
+
+    if ((strcmp(algoritmo_planificacion, "VRR") == 0) && (pcb->motivo_exit != FIN_QUANTUM))
+    {
+        int tiempo_exec_proceso = temporal_gettime(tiempo_exec);
+        pcb->quantum_remanente -= tiempo_exec_proceso;
+        temporal_destroy(tiempo_exec);
     }
 
     cambiar_estado(pcb, BLOCK);

@@ -12,6 +12,7 @@ void planificar_largo_plazo();
 
 void agregar_pcb(t_list *list, t_pcb *pcb, pthread_mutex_t *mutex);
 void pasar_a_ready(t_pcb *pcb);
+void pasar_a_ready_prioridad(t_pcb *pcb);
 void block_pcb();
 void new_pcb();
 void exit_pcb();
@@ -20,6 +21,7 @@ t_pcb *remover_pcb(t_list *list, pthread_mutex_t *mutex);
 t_pcb *pcb_segun_algoritmo();
 
 t_pcb *obtener_pcb_RR();
-void manejar_quantum();
-// t_pcb *obtener_pcb_VRR();
+void manejar_quantum(void* quantum_remanente_ptr);
+t_pcb *obtener_pcb_VRR();
+
 #endif

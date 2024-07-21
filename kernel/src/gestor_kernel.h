@@ -25,6 +25,10 @@ extern t_list *cola_new, *cola_ready, *cola_ready_prioridad, *cola_execute, *col
 
 // HILO PARA QUANTUM
 extern pthread_t hilo_quantum;
+extern pthread_t hilo_quantum_remanente;
+
+// CRONOMENTRO PARA VRR
+extern t_temporal *tiempo_exec;
 
 // SEMAFOROS
 extern pthread_mutex_t mutex_pid;
@@ -38,11 +42,13 @@ extern pthread_mutex_t mutex_lista_io;
 extern sem_t sem_multiprogramacion;
 extern sem_t sem_new;
 extern sem_t sem_ready;
+extern sem_t sem_ready_prioridad;
 extern sem_t sem_exec;
 extern sem_t sem_block_return;
 extern sem_t sem_exit;
 extern sem_t sem_planif_new;
 extern sem_t sem_planif_ready;
+extern sem_t sem_planif_ready_prioridad;
 extern sem_t sem_planif_exec;
 extern sem_t sem_planif_block;
 

@@ -588,6 +588,9 @@ char *estado_to_string(estado_proceso estado)
   case READY:
     return "READY";
     break;
+  case READY_PRIORIDAD:
+    return "READY_PRIORIDAD";
+    break;
   case BLOCK:
     return "BLOCK";
     break;

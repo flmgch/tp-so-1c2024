@@ -153,8 +153,14 @@ t_pcb *crear_pcb(int pid)
     pcb->estado = NEW;
     pcb->motivo_block = NONE_BLOCK;
     pcb->motivo_exit = NONE_EXIT;
-    pcb->quantum_remanente = 0;
-
+    if (strcmp(algoritmo_planificacion, "VRR") == 0)
+    {
+        pcb->quantum_remanente = quantum;
+    }
+    else
+    {
+        pcb->quantum_remanente = 0;
+    }
     t_registros *registros = malloc(sizeof(t_registros));
     pcb->registros_cpu = registros;
     inicializar_registros_pcb(pcb);
@@ -291,6 +297,7 @@ void detener_planificacion() {
     printf("La planificacion ha sido pausada. \n");
     sem_wait(&sem_planif_new);
     sem_wait(&sem_planif_ready);
+    sem_wait(&sem_planif_ready_prioridad);
     sem_wait(&sem_planif_exec); // PARA ENTRADA A EXEC
     sem_wait(&sem_planif_exec); // PARA VUELTA DE EXEC (ENVIO_PCB)
     sem_wait(&sem_planif_block);
@@ -302,6 +309,7 @@ void iniciar_planificacion() {
     printf("La planificacion ha sido iniciada. ALGORITMO: %s \n", algoritmo_planificacion);
     sem_post(&sem_planif_new);
     sem_post(&sem_planif_ready);
+    sem_post(&sem_planif_ready_prioridad);
     sem_post(&sem_planif_exec); // PARA ENTRADA A EXEC
     sem_post(&sem_planif_exec); // PARA VUELTA DE EXEC (ENVIO_PCB)
     sem_post(&sem_planif_block);

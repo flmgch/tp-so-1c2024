@@ -32,6 +32,10 @@
 
 // HILO PARA QUANTUM
   pthread_t hilo_quantum;
+  pthread_t hilo_quantum_remanente;
+  
+// CRONOMENTRO PARA VRR
+  t_temporal* tiempo_exec;
 
 // SEMAFOROS
   pthread_mutex_t mutex_pid;
@@ -45,11 +49,13 @@
   sem_t sem_multiprogramacion;
   sem_t sem_new;
   sem_t sem_ready;
+  sem_t sem_ready_prioridad;
   sem_t sem_exec;
   sem_t sem_block_return;
   sem_t sem_exit;
   sem_t sem_planif_new;
   sem_t sem_planif_ready;
+  sem_t sem_planif_ready_prioridad;
   sem_t sem_planif_exec;
   sem_t sem_planif_block;
 
