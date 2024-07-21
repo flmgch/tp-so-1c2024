@@ -1,7 +1,7 @@
 #include "interfaces.h"
 
 // VARIABLE GLOBAL PARA EL LOG DE STDOUT
-uint32_t pid_global;
+u_int32_t pid_global;
 
 void atender_generica(t_buffer *buffer)
 {

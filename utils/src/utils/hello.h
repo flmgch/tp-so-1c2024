@@ -234,7 +234,7 @@ typedef struct {
 
 typedef struct
 {
-    int pid;
+    u_int32_t pid;
     u_int32_t unidades_trabajo;
     int tiempo_unidad_trabajo;
 } io_generica;
@@ -252,14 +252,6 @@ typedef struct
     t_list *lista_direcciones; 
     int tamanio_total;
 } io_stdout;
-
-typedef struct 
-{
-    u_int32_t pid;
-    char *nombre_archivo;
-    int tiempo_unidad_trabajo;
-    int retraso_compactacion;
-} io_dialfs;
 
 typedef struct
 {
