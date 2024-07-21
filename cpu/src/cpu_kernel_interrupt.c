@@ -15,6 +15,8 @@ void atender_kernel_interrupt()
             //
             break;
         case INT_FIN_QUANTUM:{
+            t_buffer* vacio = recibir_buffer(socket_kernel_interrupt);
+            log_info(cpu_logger, "INTERRUPCION POR FIN DE QUANTUM");
             pthread_mutex_lock(&mutex_flag_execute);
             flag_execute = false;
             pthread_mutex_unlock(&mutex_flag_execute);
@@ -26,9 +28,12 @@ void atender_kernel_interrupt()
             t_paquete* paquete = crear_super_paquete(ENVIO_PCB, buffer);
             enviar_paquete(paquete, socket_kernel_dispatch);
             eliminar_paquete(paquete);
+            destruir_buffer(vacio);
             break;
         }
         case INT_FINALIZAR_PROCESO:{
+            t_buffer* vacio = recibir_buffer(socket_kernel_interrupt);
+            log_info(cpu_logger, "INTERRUPCION POR FINALIZAR PROCESO");
             pthread_mutex_lock(&mutex_flag_execute);
             flag_execute = false;
             pthread_mutex_unlock(&mutex_flag_execute);
@@ -40,6 +45,7 @@ void atender_kernel_interrupt()
             t_paquete* paquete = crear_super_paquete(ENVIO_PCB, buffer);
             enviar_paquete(paquete, socket_kernel_dispatch);
             eliminar_paquete(paquete);
+            destruir_buffer(vacio);
             break;
         }
         case -1:
@@ -48,6 +54,7 @@ void atender_kernel_interrupt()
             break;
         default:
             log_warning(cpu_logger, "Operacion desconocida de kernel-interrupt");
+            control_key = 0;
             break;
         }
     }

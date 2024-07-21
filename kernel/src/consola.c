@@ -270,8 +270,10 @@ void finalizar_proceso()
     pcb = (t_pcb *)list_get(cola_execute, 0);
     if (pcb->pid == pid_buscado) {
         t_buffer* buffer_vacio = crear_buffer();
+        agregar_int_a_buffer(buffer_vacio, 1);
         t_paquete* paquete = crear_super_paquete(INT_FINALIZAR_PROCESO, buffer_vacio);
         enviar_paquete(paquete, socket_conexion_cpu_interrupt);
+        eliminar_paquete(paquete);
     }
 
     // TODO BUSCAR EN COLAS DE BLOCK DE CADA RECURSO/IO

@@ -32,6 +32,7 @@ void atender_kernel_dispatch()
             break;
         default:
             log_warning(cpu_logger, "Operacion desconocida de kernel-dispatch");
+            control_key = 0;
             break;
         }
     }

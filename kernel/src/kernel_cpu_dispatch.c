@@ -22,6 +22,9 @@ void atender_cpu_dispatch() {
                 pthread_cancel(hilo_quantum);
             }
             log_info(kernel_logger, "Recibi un PCB que me envio el CPU");
+            if(contexto_recibido->motivo_exit == FIN_QUANTUM) {
+                log_info(kernel_logger, "PID: %d - Desalojado por fin de Quantum", contexto_recibido->pid);
+            }
             sem_wait(&sem_planif_exec);
             // ACTUALIZO EL PCB QUE ESTABA EN EXEC
             t_pcb *pcb = remover_pcb(cola_execute, &mutex_cola_exec);

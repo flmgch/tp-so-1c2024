@@ -48,7 +48,7 @@ t_pcb *pcb_segun_algoritmo()
     }
     else if (strcasecmp(algoritmo_planificacion, "RR") == 0)
     {
-        // return obtener_pcb_RR();
+        return obtener_pcb_RR();
     }
     else if (strcasecmp(algoritmo_planificacion, "VRR") == 0)
     {
@@ -81,6 +81,7 @@ t_pcb *remover_pcb(t_list *list, pthread_mutex_t *mutex) {
 void dispatch_pcb(t_pcb *pcb)
 {
     cambiar_estado(pcb, EXEC);
+    pcb->motivo_exit = NONE_EXIT; // ESTO ES NECESARIO POR SI UN PROCESO FUE DESALOJADO POR FIN DE QUANTUM ANTES
     log_info(kernel_logger, "El proceso %d se pone en ejecucion", pcb->pid);
     agregar_pcb(cola_execute, pcb, &mutex_cola_exec);
     enviar_pcb(pcb, socket_conexion_cpu_dispatch);
@@ -97,9 +98,12 @@ void manejar_quantum() {
     {
         usleep(quantum * 1000); // ESPERO EL TIEMPO DEL CONFIG EN MS
         t_buffer* buffer_vacio = crear_buffer();
+        agregar_int_a_buffer(buffer_vacio, 1);
         t_paquete* paquete = crear_super_paquete(INT_FIN_QUANTUM, buffer_vacio);
         enviar_paquete(paquete, socket_conexion_cpu_interrupt);
         eliminar_paquete(paquete);
+        pthread_cancel(hilo_quantum);
+        return;
     }
 }
 
@@ -145,7 +149,6 @@ void pasar_a_ready(t_pcb *pcb)
     pthread_mutex_lock(&mutex_cola_ready);
     cambiar_estado(pcb, READY);
     list_add(cola_ready, pcb);
-    log_info(kernel_logger, "Se pasa el proceso: %d a READY", pcb->pid);
     pthread_mutex_unlock(&mutex_cola_ready);
     sem_post(&sem_planif_ready);
 }
