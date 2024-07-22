@@ -13,6 +13,8 @@ char *puerto_dispatch, *puerto_interrupt, *ip_memoria, *puerto_memoria, *algorit
 int cantidad_entradas_tlb;
 t_pcb* pcb;
 t_registros *registros;
+bool pc_modificado;
+bool primera_instruccion;
 bool flag_execute;
 int tamanio_pagina;
 t_instruccion instruccion;

@@ -32,6 +32,8 @@ void inicializar_config()
 void inicializar_variables(){
 	// registros = inicializar_registros();
 	flag_execute = false;
+    pc_modificado = false;
+    primera_instruccion = false;
 }
 
 void inicializar_tlb() {

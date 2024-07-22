@@ -11,6 +11,8 @@ extern int cantidad_entradas_tlb;
 extern t_pcb* pcb;
 extern t_registros* registros;
 extern bool flag_execute;
+extern bool pc_modificado;
+extern bool primera_instruccion;
 extern int tamanio_pagina;
 extern t_instruccion instruccion;
 extern int tam_aux;

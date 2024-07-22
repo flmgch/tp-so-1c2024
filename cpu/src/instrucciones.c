@@ -1,64 +1,115 @@
 #include "instrucciones.h"
 
 void* obtener_registro(char registro[20]) {
-    if (strcmp(registro, "AX") == 0) {
+    if (strcmp(registro, "PC") == 0)
+    {
+        return &(pcb->registros_cpu->pc);
+    }
+    else if (strcmp(registro, "AX") == 0)
+    {
         return &(pcb->registros_cpu->ax);
-    } else if (strcmp(registro, "BX") == 0) {
+    }
+    else if (strcmp(registro, "BX") == 0)
+    {
         return &(pcb->registros_cpu->bx);
-    } else if (strcmp(registro, "CX") == 0) {
+    }
+    else if (strcmp(registro, "CX") == 0)
+    {
         return &(pcb->registros_cpu->cx);
-    } else if (strcmp(registro, "DX") == 0) {
+    }
+    else if (strcmp(registro, "DX") == 0)
+    {
         return &(pcb->registros_cpu->dx);
-    } else if (strcmp(registro, "EAX") == 0) {
+    }
+    else if (strcmp(registro, "EAX") == 0)
+    {
         return &(pcb->registros_cpu->eax);
-    } else if (strcmp(registro, "EBX") == 0) {
+    }
+    else if (strcmp(registro, "EBX") == 0)
+    {
         return &(pcb->registros_cpu->ebx);
-    } else if (strcmp(registro, "ECX") == 0) {
+    }
+    else if (strcmp(registro, "ECX") == 0)
+    {
         return &(pcb->registros_cpu->ecx);
-    } else if (strcmp(registro, "EDX") == 0) {
+    }
+    else if (strcmp(registro, "EDX") == 0)
+    {
         return &(pcb->registros_cpu->edx);
-    } else if (strcmp(registro, "SI") == 0) {
+    }
+    else if (strcmp(registro, "SI") == 0)
+    {
         return &(pcb->registros_cpu->si);
-    } else if (strcmp(registro, "DI") == 0) {
+    }
+    else if (strcmp(registro, "DI") == 0)
+    {
         return &(pcb->registros_cpu->di);
-    } else {
+    }
+    else
+    {
         return NULL;
     }
 }
 
 //ATOI PARA CHAR[]->INT
 void ejecutar_set(char registro[20], char valor[20]) {
-    if (strcmp(registro, "AX") == 0) {
+    if (strcmp(registro, "PC") == 0)
+    {
+        pcb->registros_cpu->pc = (uint32_t)atoi(valor);
+        pc_modificado = true;
+    }
+    else if (strcmp(registro, "AX") == 0)
+    {
         pcb->registros_cpu->ax = (uint8_t)atoi(valor);
         log_info(cpu_logger, "%d", pcb->registros_cpu->ax);
-    } else if (strcmp(registro, "BX") == 0) {
+    }
+    else if (strcmp(registro, "BX") == 0)
+    {
         pcb->registros_cpu->bx = (uint8_t)atoi(valor);
         log_info(cpu_logger, "%d", pcb->registros_cpu->bx);
-    } else if (strcmp(registro, "CX") == 0) {
+    }
+    else if (strcmp(registro, "CX") == 0)
+    {
         pcb->registros_cpu->cx = (uint8_t)atoi(valor);
         log_info(cpu_logger, "%d", pcb->registros_cpu->cx);
-    } else if (strcmp(registro, "DX") == 0) {
+    }
+    else if (strcmp(registro, "DX") == 0)
+    {
         pcb->registros_cpu->dx = (uint8_t)atoi(valor);
         log_info(cpu_logger, "%d", pcb->registros_cpu->dx);
-    } else if (strcmp(registro, "EAX") == 0) {
+    }
+    else if (strcmp(registro, "EAX") == 0)
+    {
         pcb->registros_cpu->eax = (uint32_t)atoi(valor);
         log_info(cpu_logger, "%d", pcb->registros_cpu->eax);
-    } else if (strcmp(registro, "EBX") == 0) {
+    }
+    else if (strcmp(registro, "EBX") == 0)
+    {
         pcb->registros_cpu->ebx = (uint32_t)atoi(valor);
         log_info(cpu_logger, "%d", pcb->registros_cpu->ebx);
-    } else if (strcmp(registro, "ECX") == 0) {
+    }
+    else if (strcmp(registro, "ECX") == 0)
+    {
         pcb->registros_cpu->ecx = (uint32_t)atoi(valor);
         log_info(cpu_logger, "%d", pcb->registros_cpu->ecx);
-    } else if (strcmp(registro, "EDX") == 0) {
+    }
+    else if (strcmp(registro, "EDX") == 0)
+    {
         pcb->registros_cpu->edx = (uint32_t)atoi(valor);
         log_info(cpu_logger, "%d", pcb->registros_cpu->edx);
-    } else if (strcmp(registro, "SI") == 0) {
+    }
+    else if (strcmp(registro, "SI") == 0)
+    {
         pcb->registros_cpu->si = (uint32_t)atoi(valor);
         log_info(cpu_logger, "%d", pcb->registros_cpu->si);
-    } else if (strcmp(registro, "DI") == 0) {
+    }
+    else if (strcmp(registro, "DI") == 0)
+    {
         pcb->registros_cpu->di = (uint32_t)atoi(valor);
         log_info(cpu_logger, "%d", pcb->registros_cpu->di);
-    } else {
+    }
+    else
+    {
         log_error(cpu_logger, "No se hallo el registro");
     }
 }
@@ -115,11 +166,15 @@ void ejecutar_jnz(char registro[20] , char instruccion[20]){
             strcmp(registro, "CX") == 0 || strcmp(registro, "DX") == 0) {
             if (*(uint8_t*)puntero_registro != 0) {
                 pcb->program_counter = nuevo_ip;
+                pcb->registros_cpu->pc = nuevo_ip;
+                pc_modificado = true;
                 log_info(cpu_logger, "%d", pcb->program_counter);
             }
         } else {
             if (*(uint32_t*)puntero_registro != 0) {
                 pcb->program_counter = nuevo_ip;
+                pcb->registros_cpu->pc = nuevo_ip;
+                pc_modificado = true;
                 log_info(cpu_logger, "%d", pcb->program_counter);
             }
         }

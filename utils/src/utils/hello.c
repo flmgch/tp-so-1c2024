@@ -200,6 +200,7 @@ void agregar_uint32_a_buffer(t_buffer *buffer, u_int32_t valor)
 }
 
 void agregar_registros_a_buffer(t_buffer *buffer, t_registros* registros) {
+  agregar_uint32_a_buffer(buffer, registros->pc);
   agregar_uint8_a_buffer(buffer, registros->ax);
   agregar_uint8_a_buffer(buffer, registros->bx);
   agregar_uint8_a_buffer(buffer, registros->cx);
@@ -534,6 +535,7 @@ t_list *extraer_lista_direcciones_de_buffer(t_buffer *buffer)
 
 t_registros* extraer_registros_de_buffer(t_buffer* buffer) {
     t_registros* registros = malloc(sizeof(t_registros));
+    registros->pc = extraer_uint32_de_buffer(buffer);
     registros->ax = extraer_uint8_de_buffer(buffer);
     registros->bx = extraer_uint8_de_buffer(buffer);
     registros->cx = extraer_uint8_de_buffer(buffer);
