@@ -641,4 +641,26 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
     eliminar_paquete(paquete);
 }
 
+// WAIT
+void ejecutar_wait(char recurso[20])
+{
+    t_buffer *un_buffer = crear_buffer();
+    agregar_pcb_a_buffer(un_buffer, pcb);
+    agregar_cop_a_buffer(un_buffer, ATENDER_WAIT);
+    agregar_string_a_buffer(un_buffer, recurso);
+    t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
+    enviar_paquete(paquete, socket_kernel_dispatch);
+    eliminar_paquete(paquete);
+}
 
+// SIGNAL
+void ejecutar_signal(char recurso[20])
+{
+    t_buffer *un_buffer = crear_buffer();
+    agregar_pcb_a_buffer(un_buffer, pcb);
+    agregar_cop_a_buffer(un_buffer, ATENDER_SIGNAL);
+    agregar_string_a_buffer(un_buffer, recurso);
+    t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
+    enviar_paquete(paquete, socket_kernel_dispatch);
+    eliminar_paquete(paquete);
+}

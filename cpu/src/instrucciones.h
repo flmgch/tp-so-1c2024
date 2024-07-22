@@ -25,5 +25,7 @@ void ejecutar_io_fs_delete(char interfaz[20], char nombre_archivo[20]);
 void ejecutar_io_fs_truncate(char interfaz[20], char nombre_archivo[20], char reg_tam[20]);
 void ejecutar_io_fs_write(char interfaz[20], char nombre_archivo[20], char reg_dir_logica[20], char reg_tam[20], char reg_ptr[20]);
 void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_dir_logica[20], char reg_tam[20], char reg_ptr[20]);
+void ejecutar_signal(char recurso[20]);
+void ejecutar_wait(char recurso[20]);
 
 #endif
