@@ -59,14 +59,6 @@ void decode(u_int32_t dir_instruccion){
             ejecutar_mov_out(instruccion.param1, instruccion.param2);
             fetch();
             break;
-        case SIGNAL:
-            ejecutar_mov_out(instruccion.param1);
-            // fetch();
-            break;
-        case WAIT:
-            ejecutar_mov_out(instruccion.param1);
-            // fetch();
-            break;
         case RESIZE:
             ejecutar_resize(instruccion.param1);
             sem_wait(&sem_resize);
@@ -80,6 +72,14 @@ void decode(u_int32_t dir_instruccion){
             ejecutar_copy_string(instruccion.param1);
             fetch();
             break;
+        case SIGNAL:
+            ejecutar_signal(instruccion.param1);
+            // fetch();
+            break;
+        case WAIT:
+            ejecutar_wait(instruccion.param1);
+            // fetch();
+            break;    
         case IO_STDIN_READ:
             ejecutar_io_stdin_read(instruccion.param1, instruccion.param2, instruccion.param3);
             break;
@@ -113,25 +113,15 @@ void decode(u_int32_t dir_instruccion){
 
 void fetch (){ 
     if(flag_execute == true) {
-        u_int32_t instruccion_a_ejecutar = pcb->registros_cpu->pc;
-        log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pcb->pid, instruccion_a_ejecutar);
+    u_int32_t instruccion_a_ejecutar = pcb->program_counter;
+    log_info(cpu_logger, "PID: %d - FETCH - Program Counter: %d", pcb->pid, instruccion_a_ejecutar);
 
-        aux_resize = 0;
-
-        if (pc_modificado == false && primera_instruccion == false)
-        {
-            pcb->registros_cpu->pc += 1;
-            pcb->program_counter = pcb->registros_cpu->pc;
-        }
-
+    aux_resize = 0;
+    pcb->program_counter += 1;
     decode(instruccion_a_ejecutar);
     }
 }
 
 void ejecutar_proceso(){
-    // el pc lo voy a recibir en el program_counter y lo paso al registro pc
-    pcb->registros_cpu->pc = pcb->program_counter;
-    primera_instruccion = true;
     fetch();
 }
-

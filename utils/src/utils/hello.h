@@ -123,7 +123,6 @@ typedef struct {
 } t_direccion_fisica;
 
 typedef struct {
-    uint32_t pc;
     uint8_t ax;   // Registro Numérico de propósito general
     uint8_t bx;   // Registro Numérico de propósito general
     uint8_t cx;   // Registro Numérico de propósito general
