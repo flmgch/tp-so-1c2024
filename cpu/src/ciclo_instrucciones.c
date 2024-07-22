@@ -59,6 +59,14 @@ void decode(u_int32_t dir_instruccion){
             ejecutar_mov_out(instruccion.param1, instruccion.param2);
             fetch();
             break;
+        case SIGNAL:
+            ejecutar_mov_out(instruccion.param1);
+            // fetch();
+            break;
+        case WAIT:
+            ejecutar_mov_out(instruccion.param1);
+            // fetch();
+            break;
         case RESIZE:
             ejecutar_resize(instruccion.param1);
             sem_wait(&sem_resize);
