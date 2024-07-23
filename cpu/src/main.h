@@ -38,6 +38,8 @@ int tlb_entradas;
 int contador_acceso;
 
 // SEMAFOR
+sem_t sem_interrupt_quantum;
+sem_t sem_interrupt_fp;
 sem_t sem_instruccion;
 sem_t sem_resize;
 sem_t sem_resultado_escritura;

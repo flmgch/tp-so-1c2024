@@ -36,6 +36,8 @@ extern int tlb_entradas;
 extern int contador_acceso;
 
 // SEMAFORO
+extern sem_t sem_interrupt_quantum;
+extern sem_t sem_interrupt_fp;
 extern sem_t sem_instruccion;
 extern sem_t sem_resize;
 extern sem_t sem_resultado_escritura;

@@ -34,18 +34,22 @@ void decode(u_int32_t dir_instruccion){
     switch(instruccion.codigo_instruccion){
 		case SET:
 			ejecutar_set(instruccion.param1, instruccion.param2);
+            check_interrupt();
             fetch();
 			break;
         case SUM:
             ejecutar_sum(instruccion.param1, instruccion.param2);
+            check_interrupt();
             fetch();
             break;
         case SUB:
             ejecutar_sub(instruccion.param1, instruccion.param2);
+            check_interrupt();
             fetch();
             break;
         case JNZ:
             ejecutar_jnz(instruccion.param1, instruccion.param2);
+            check_interrupt();
             fetch();
             break;
         case IO_GEN_SLEEP:
@@ -53,10 +57,12 @@ void decode(u_int32_t dir_instruccion){
             break;
         case MOV_IN:
             ejecutar_mov_in(instruccion.param1, instruccion.param2);
+            check_interrupt();
             fetch();
             break;
         case MOV_OUT:
             ejecutar_mov_out(instruccion.param1, instruccion.param2);
+            check_interrupt();
             fetch();
             break;
         case RESIZE:
@@ -64,12 +70,14 @@ void decode(u_int32_t dir_instruccion){
             sem_wait(&sem_resize);
             if (aux_resize == 1)
             {
+                check_interrupt();
                 fetch();
             }
 
             break;
         case COPY_STRING:
             ejecutar_copy_string(instruccion.param1);
+            check_interrupt();
             fetch();
             break;
         case SIGNAL:
@@ -124,4 +132,40 @@ void fetch (){
 
 void ejecutar_proceso(){
     fetch();
+}
+
+void check_interrupt()
+{
+    if (sem_trywait(&sem_interrupt_quantum) == 0)
+    {
+        // OCURRIO UN FIN DE QUANTUM
+        log_info(cpu_logger, "INTERRUPCION POR FIN DE QUANTUM");
+        pthread_mutex_lock(&mutex_flag_execute);
+        flag_execute = false;
+        pthread_mutex_unlock(&mutex_flag_execute);
+        pcb->motivo_exit = FIN_QUANTUM;
+        t_buffer *buffer = crear_buffer();
+        agregar_pcb_a_buffer(buffer, pcb);
+        agregar_cop_a_buffer(buffer, CAMBIAR_ESTADO);
+        agregar_estado_a_buffer(buffer, READY);
+        t_paquete *paquete = crear_super_paquete(ENVIO_PCB, buffer);
+        enviar_paquete(paquete, socket_kernel_dispatch);
+        eliminar_paquete(paquete);
+    }
+    if (sem_trywait(&sem_interrupt_fp) == 0)
+    {
+        // OCURRIO UN FINALIZAR PROCESO
+        log_info(cpu_logger, "INTERRUPCION POR FINALIZAR PROCESO");
+        pthread_mutex_lock(&mutex_flag_execute);
+        flag_execute = false;
+        pthread_mutex_unlock(&mutex_flag_execute);
+        pcb->motivo_exit = INTERRUPTED_BY_USER;
+        t_buffer *buffer = crear_buffer();
+        agregar_pcb_a_buffer(buffer, pcb);
+        agregar_cop_a_buffer(buffer, CAMBIAR_ESTADO);
+        agregar_estado_a_buffer(buffer, FINISH_ERROR);
+        t_paquete *paquete = crear_super_paquete(ENVIO_PCB, buffer);
+        enviar_paquete(paquete, socket_kernel_dispatch);
+        eliminar_paquete(paquete);
+    }
 }

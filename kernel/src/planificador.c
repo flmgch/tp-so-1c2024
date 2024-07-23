@@ -104,20 +104,14 @@ void manejar_quantum(void *quantum_remanente_ptr)
     if(q_rem_ptr != NULL && (strcmp(algoritmo_planificacion, "VRR") == 0)) {
         int quantum_remanente = *q_rem_ptr;
         usleep(quantum_remanente * 1000); // ESPERO EL TIEMPO DEL QUANTUM REMANENTE EN MS
-        t_buffer *buffer_vacio = crear_buffer();
-        agregar_int_a_buffer(buffer_vacio, 1);
-        t_paquete *paquete = crear_super_paquete(INT_FIN_QUANTUM, buffer_vacio);
-        enviar_paquete(paquete, socket_conexion_cpu_interrupt);
-        eliminar_paquete(paquete);
+        op_code codigo = INT_FIN_QUANTUM;
+        send(socket_conexion_cpu_interrupt, &codigo, sizeof(int), 0);
         pthread_cancel(hilo_quantum);
         return;
     } else {
     usleep(quantum * 1000); // ESPERO EL TIEMPO DEL CONFIG EN MS
-    t_buffer *buffer_vacio = crear_buffer();
-    agregar_int_a_buffer(buffer_vacio, 1);
-    t_paquete *paquete = crear_super_paquete(INT_FIN_QUANTUM, buffer_vacio);
-    enviar_paquete(paquete, socket_conexion_cpu_interrupt);
-    eliminar_paquete(paquete);
+    op_code codigo = INT_FIN_QUANTUM;
+    send(socket_conexion_cpu_interrupt, &codigo, sizeof(int), 0);
     pthread_cancel(hilo_quantum);
     return;
     }

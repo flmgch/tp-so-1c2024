@@ -45,6 +45,8 @@ void inicializar_tlb() {
 
 void inicializar_semaforos()
 {
+    sem_init(&sem_interrupt_quantum, 0, 0);
+    sem_init(&sem_interrupt_fp, 0, 0);
     sem_init(&sem_instruccion, 0, 0);
     sem_init(&sem_resize, 0, 0);
     sem_init(&sem_resultado_escritura, 0, 0);
