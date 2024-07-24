@@ -1,5 +1,32 @@
 #include <utils/hello.h>
 
+// Function to find and remove a string from an array of strings
+int remove_string_from_array(char*** array, const char* target) {
+    if (*array == NULL) {
+        return 0; // Array is empty
+    }
+
+    int size = 0;
+    while ((*array)[size] != NULL) {
+        size++;
+    }
+
+    for (int i = 0; i < size; i++) {
+        if (strcmp((*array)[i], target) == 0) {
+            // free((*array)[i]); // Free the memory of the found string
+            // Shift remaining elements
+            for (int j = i; j < size - 1; j++) {
+                (*array)[j] = (*array)[j + 1];
+            }
+            (*array)[size - 1] = NULL; // Null-terminate the array
+            *array = realloc(*array, sizeof(char*) * size); // Resize the array
+            return 1; // Indicate that the string was found and removed
+        }
+    }
+
+    return 0; // Indicate that the string was not found
+}
+
 void decir_hola(char *quien)
 {
   printf("Hola desde %s!!\n", quien);
@@ -189,6 +216,16 @@ void agregar_lista_direcciones_a_buffer(t_buffer *buffer, t_list *valor)
   }
 }
 
+void agregar_array_strings_a_buffer(t_buffer *buffer, char**array_strings)
+{
+  int tam = string_array_size(array_strings);
+  agregar_int_a_buffer(buffer, tam);
+  for (int i = 0; i < tam; i++)
+  {
+    agregar_string_a_buffer(buffer, array_strings[i]);
+  }
+}
+
 void agregar_uint8_a_buffer(t_buffer *buffer, u_int8_t valor)
 {
   agregar_a_buffer(buffer, &valor, sizeof(u_int8_t));
@@ -245,6 +282,7 @@ void agregar_pcb_a_buffer(t_buffer *buffer, t_pcb *pcb)
   agregar_motivo_block_a_buffer(buffer, pcb->motivo_block);
   agregar_motivo_exit_a_buffer(buffer, pcb->motivo_exit);
   agregar_registros_a_buffer(buffer, pcb->registros_cpu);
+  agregar_array_strings_a_buffer(buffer, pcb->recursos_usados);
   agregar_uint32_a_buffer(buffer, pcb->quantum_remanente);
 }
 
@@ -532,6 +570,17 @@ t_list *extraer_lista_direcciones_de_buffer(t_buffer *buffer)
   return lista_direcciones;
 }
 
+char** extraer_array_strings_de_buffer(t_buffer* buffer) {
+  char** array = string_array_new();
+  int tam = extraer_int_de_buffer(buffer);
+  for (int i = 0; i < tam; i++)
+  {
+    char* string = extraer_string_de_buffer(buffer);
+    string_array_push(&array, string);
+  }
+  return array;
+}
+
 t_registros* extraer_registros_de_buffer(t_buffer* buffer) {
     t_registros* registros = malloc(sizeof(t_registros));
     registros->ax = extraer_uint8_de_buffer(buffer);
@@ -556,6 +605,7 @@ t_pcb *extraer_pcb_de_buffer(t_buffer *buffer)
   pcb->motivo_block = extraer_motivo_block_de_buffer(buffer);
   pcb->motivo_exit = extraer_motivo_exit_de_buffer(buffer);
   pcb->registros_cpu = extraer_registros_de_buffer(buffer);
+  pcb->recursos_usados = extraer_array_strings_de_buffer(buffer);
   pcb->quantum_remanente = extraer_uint32_de_buffer(buffer);
   return pcb;
 }
@@ -639,6 +689,7 @@ void enviar_pcb(t_pcb *pcb, int socket_servidor)
   agregar_motivo_block_a_buffer(buffer, pcb->motivo_block);
   agregar_motivo_exit_a_buffer(buffer, pcb->motivo_exit);
   agregar_registros_a_buffer(buffer, pcb->registros_cpu);
+  agregar_array_strings_a_buffer(buffer, pcb->recursos_usados);
   agregar_uint32_a_buffer(buffer, pcb->quantum_remanente);
   t_paquete *paquete = crear_super_paquete(ENVIO_PCB, buffer);
   enviar_paquete(paquete, socket_servidor);

@@ -193,6 +193,7 @@ typedef struct
     motivo_block motivo_block;
     motivo_exit motivo_exit;
     t_registros *registros_cpu;
+    char** recursos_usados;
     u_int32_t quantum_remanente;
 } t_pcb;
 
@@ -277,6 +278,7 @@ t_config *iniciar_config(char *nombreConfig);
 void terminar_programa(t_log *logger, t_config *config);
 char *estado_to_string(estado_proceso estado);
 char *motivo_exit_to_string(motivo_exit motivo);
+int remove_string_from_array(char*** array, const char* target);
 
 // FUNCIONES CLIENTE
 int crear_conexion(char *ip, char *puerto, char *mensaje, t_log *log);
@@ -298,6 +300,7 @@ void agregar_registros_a_buffer(t_buffer *buffer, t_registros* registros);
 void agregar_string_a_buffer(t_buffer *buffer, char *string);
 void agregar_estado_a_buffer(t_buffer *buffer, estado_proceso estado);
 void agregar_lista_a_buffer(t_buffer *buffer, t_list *valor);
+void agregar_array_strings_a_buffer(t_buffer *buffer, char**array_strings);
 void agregar_motivo_block_a_buffer(t_buffer *buffer, motivo_block motivo);
 void agregar_motivo_exit_a_buffer(t_buffer *buffer, motivo_exit motivo);
 void agregar_cop_a_buffer(t_buffer *buffer, op_code cop);
@@ -311,6 +314,7 @@ u_int8_t extraer_uint8_de_buffer(t_buffer *buffer);
 u_int32_t extraer_uint32_de_buffer(t_buffer *buffer);
 int extraer_int_de_buffer(t_buffer *buffer);
 t_list *extraer_lista_de_buffer(t_buffer *buffer);
+char** extraer_array_strings_de_buffer(t_buffer* buffer);
 t_registros* extraer_registros_de_buffer(t_buffer* buffer);
 motivo_exit extraer_motivo_exit_de_buffer(t_buffer *buffer);
 estado_proceso extraer_estado_proceso_de_buffer(t_buffer *buffer);

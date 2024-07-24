@@ -203,7 +203,7 @@ void atender_wait(t_pcb *pcb, char *recurso)
 	{
 		recursobuscado->instancias--;
 		log_info(kernel_logger, "PID: %d - Wait: %s - Instancias: %d", pcb->pid, recurso, recursobuscado->instancias);
-
+        string_array_push(&pcb->recursos_usados, recursobuscado->recurso);
         // ! SI NO HAY SUFICIENTES INSTANCIAS DEL RECURSO DISPONIBLES
 		if (recursobuscado->instancias < 0)
 		{
@@ -255,7 +255,7 @@ void atender_signal(t_pcb *pcb, char *recurso)
 	{
 		recursobuscado->instancias++;
 		log_info(kernel_logger, "PID: %d - Signal: %s - Instancias: %d", pcb->pid, recurso, recursobuscado->instancias);
-
+        remove_string_from_array(&pcb->recursos_usados, recursobuscado->recurso);
         // DESBLOQUEA AL PRIMER PROCESO DE LA COLA DE BLOQUEADOS DEL RECURSO SI CORRESPONDE
 		if (recursobuscado->instancias <= 0)
 		{

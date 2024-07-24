@@ -1,5 +1,6 @@
 #include "consola.h"
 #include "planificador.h"
+#include "kernel_cpu_dispatch.h"
 
 int pid_buscado = 0;
 
@@ -164,7 +165,7 @@ t_pcb *crear_pcb(int pid)
     t_registros *registros = malloc(sizeof(t_registros));
     pcb->registros_cpu = registros;
     inicializar_registros_pcb(pcb);
-    
+    pcb->recursos_usados = string_array_new();
     return pcb;
 }
 
@@ -258,29 +259,92 @@ void finalizar_proceso()
     t_pcb *pcb = (t_pcb *)list_remove_by_condition(cola_new, es_pcb_buscado);
     if (pcb != NULL)
     {
+        cambiar_estado(pcb, FINISH_ERROR);
         pcb->motivo_exit = INTERRUPTED_BY_USER;
         agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
         sem_post(&sem_exit);
         return;
-    } 
+    }
+
     // LUEGO BUSCO EN COLA READY
     pcb = (t_pcb *)list_remove_by_condition(cola_ready, es_pcb_buscado);
     if (pcb != NULL)
     {
+        cambiar_estado(pcb, FINISH_ERROR);
         pcb->motivo_exit = INTERRUPTED_BY_USER;
         agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
         sem_post(&sem_exit);
         return;
     }
-    // SI ESTA EN COLA EXEC, MANDO INTERRUPCION A CPU 
-    pcb = (t_pcb *)list_get(cola_execute, 0);
-    if (pcb->pid == pid_buscado) {
-        op_code codigo = INT_FINALIZAR_PROCESO;
-        send(socket_conexion_cpu_interrupt, &codigo, sizeof(op_code), 0);
+
+    // LUEGO BUSCO EN COLA READY PRIORIDAD
+    pcb = (t_pcb *)list_remove_by_condition(cola_ready_prioridad, es_pcb_buscado);
+    if (pcb != NULL)
+    {
+        cambiar_estado(pcb, FINISH_ERROR);
+        pcb->motivo_exit = INTERRUPTED_BY_USER;
+        agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+        sem_post(&sem_exit);
+        return;
     }
 
-    // TODO BUSCAR EN COLAS DE BLOCK DE CADA RECURSO/IO
+    // SI ESTA EN COLA EXEC, MANDO INTERRUPCION A CPU
+    if (!list_is_empty(cola_execute))
+    {
+        pcb = (t_pcb *)list_get(cola_execute, 0);
+        if (pcb->pid == pid_buscado)
+        {
+            op_code codigo = INT_FINALIZAR_PROCESO;
+            send(socket_conexion_cpu_interrupt, &codigo, sizeof(op_code), 0);
+        }
+    }
 
+    // BUSCO EN COLA DE BLOCK DE LOS RECURSOS
+    for (int i = 0; i < list_size(lista_recursos); i++)
+    {
+        t_recurso *recurso = list_get(lista_recursos, i);
+        pcb = (t_pcb *)list_remove_by_condition(recurso->cola_block_asignada, es_pcb_buscado);
+
+        if (pcb != NULL)
+        {
+            remove_string_from_array(&pcb->recursos_usados, recurso->recurso);
+            recurso->instancias++;
+            for (int i = 0; i < string_array_size(pcb->recursos_usados); i++)
+            {
+                char *nombre_recurso = pcb->recursos_usados[i];
+                t_recurso *recurso = buscar_recurso(nombre_recurso);
+                recurso->instancias++;
+                if (recurso->instancias <= 0)
+                {
+                    t_pcb *pcb_bloqueado = remover_pcb(recurso->cola_block_asignada, &recurso->mutex_asignado);
+                    agregar_pcb(cola_block, pcb_bloqueado, &mutex_cola_block);
+                    sem_post(&sem_block_return);
+                }
+            }
+            cambiar_estado(pcb, FINISH_ERROR);
+            pcb->motivo_exit = INTERRUPTED_BY_USER;
+            agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+            sem_post(&sem_exit);
+            return;
+        }
+    }
+
+    // BUSCO EN COLA DE BLOCK DE LAS IO CONECTADAS
+    for (int i = 0; i < list_size(lista_io_conectadas); i++)
+    {
+        t_interfaz_kernel *interfaz = list_get(lista_io_conectadas, i);
+        pcb = (t_pcb *)list_remove_by_condition(interfaz->cola_block_asignada, es_pcb_buscado);
+        if (pcb != NULL)
+        {
+            cambiar_estado(pcb, FINISH_ERROR);
+            pcb->motivo_exit = INTERRUPTED_BY_USER;
+            agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
+            sem_post(&sem_exit);
+            return;
+        }
+    }
+
+    log_warning(kernel_logger, "No se encontro el pid a finalizar"); // En caso de que la funcion no retorne antes
 };
 
 bool es_pcb_buscado(void *data)
