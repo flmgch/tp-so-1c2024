@@ -13,6 +13,7 @@ t_config *mem_config;
 char *puerto_escucha, *path_instrucciones;
 int tamanio_memoria, tamanio_pagina, retardo_respuesta;
 t_list *lista_de_procesos;
+int cantidad_procesos_creados = 0;
 
 // ESPACIOS MEMORIA
 int cantidad_de_marcos_libres;
@@ -24,9 +25,12 @@ t_bitarray *bitmap;
 // SOCKETS
 int socket_escucha, socket_cpu, socket_kernel;
 
-// SEMAFOROS Y MUTEX
+// SEMAFOROS Y MUTEX, Y VARIABLES RELACIONADAS
 pthread_mutex_t mutex_lista_procesos;
 pthread_mutex_t mutex_bitmap;
 pthread_mutex_t mutex_espacio_usuario;
+pthread_cond_t condicion;
+int procesos_necesarios = 0;
+int aux_condicion = 0;
 
 #endif

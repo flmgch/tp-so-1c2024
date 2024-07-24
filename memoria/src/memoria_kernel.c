@@ -22,6 +22,12 @@ void atender_kernel()
             t_proceso *proceso = atender_crear_proceso(un_buffer);
             pthread_mutex_lock(&mutex_lista_procesos);
             list_add(lista_de_procesos, proceso);
+            // log_info(mem_logger, "%d,%d", list_size(lista_de_procesos), procesos_necesarios);
+            if (cantidad_procesos_creados >= procesos_necesarios && aux_condicion != 0)
+            {
+                pthread_cond_signal(&condicion);
+                aux_condicion = 0;
+            }
             pthread_mutex_unlock(&mutex_lista_procesos);
             // int t = list_size(lista_de_procesos);
             /*for (int i = 0; i < t; i++)

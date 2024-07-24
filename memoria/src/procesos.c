@@ -53,12 +53,19 @@ void atender_program_counter(t_buffer *buffer)
     uint32_t program_counter = extraer_uint32_de_buffer(buffer);
     uint32_t pid_cpu = extraer_uint32_de_buffer(buffer);
     t_proceso *proceso = malloc(sizeof(t_proceso));
-
-    usleep(1000 * retardo_respuesta);
+    procesos_necesarios = pid_cpu;
 
     pthread_mutex_lock(&mutex_lista_procesos);
+    // log_info(mem_logger, "%d,%d", list_size(lista_de_procesos), procesos_necesarios);
+    while (cantidad_procesos_creados < pid_cpu)
+    {
+        aux_condicion = 1;
+        pthread_cond_wait(&condicion, &mutex_lista_procesos);
+    }
     proceso = encontrar_proceso(lista_de_procesos, pid_cpu);
     pthread_mutex_unlock(&mutex_lista_procesos);
+
+    usleep(1000 * retardo_respuesta);
 
     char **instrucciones = proceso->instrucciones;
     char *instruccion = instrucciones[program_counter];
@@ -137,6 +144,7 @@ bool debe_ser_proceso_x(void *elemento, uint32_t pid)
 
 t_proceso *atender_crear_proceso(t_buffer *buffer)
 {
+
     char *path = extraer_string_de_buffer(buffer);
     u_int32_t pid = extraer_uint32_de_buffer(buffer);
 
@@ -156,6 +164,7 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
     proceso->size = 0;
     proceso->filas_tabla_paginas = list_create();
 
+    cantidad_procesos_creados++;
     log_info(mem_logger, "PID:%d - Tamaño: %d", pid, 0);
     free(auxiliar);
     return proceso;
@@ -184,7 +193,7 @@ char **abrir_archivo(const char *file)
         }
         fclose(pseudocodiogo);
 
-        log_info(mem_logger, "%s", instrucciones);
+        log_info(mem_logger, "\n%s", instrucciones);
         return string_split(instrucciones, "\n");
     }
     else

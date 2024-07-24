@@ -9,6 +9,7 @@ extern t_config *mem_config;
 extern char *puerto_escucha, *path_instrucciones;
 extern int tamanio_memoria, tamanio_pagina, retardo_respuesta;
 extern t_list *lista_de_procesos;
+extern int cantidad_procesos_creados;
 
 // ESPACIO USUARIO
 extern int cantidad_de_marcos_libres;
@@ -24,5 +25,8 @@ extern int socket_escucha, socket_cpu, socket_kernel;
 extern pthread_mutex_t mutex_bitmap;
 extern pthread_mutex_t mutex_espacio_usuario;
 extern pthread_mutex_t mutex_lista_procesos;
+extern pthread_cond_t condicion;
+extern int procesos_necesarios;
+extern int aux_condicion;
 
 #endif
