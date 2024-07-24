@@ -2,7 +2,7 @@
 
 void escribir_memoria(t_buffer *buffer, int socket)
 {
-    int pid = extraer_uint32_de_buffer(buffer);
+    u_int32_t pid = extraer_uint32_de_buffer(buffer);
     void *valor = extraer_de_buffer(buffer);
     t_list *lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
 
@@ -35,9 +35,9 @@ void escribir_memoria(t_buffer *buffer, int socket)
 
 void leer_memoria(t_buffer *buffer, int socket)
 {
-    int pid = extraer_uint32_de_buffer(buffer);
+    u_int32_t pid = extraer_uint32_de_buffer(buffer);
     t_list *lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
-    int tam_total = extraer_int_de_buffer(buffer);
+    u_int32_t tam_total = extraer_int_de_buffer(buffer);
     void *valor = malloc(tam_total);
 
     int cant_pag_a_leer = list_size(lista_direcciones);
@@ -57,7 +57,7 @@ void leer_memoria(t_buffer *buffer, int socket)
     pthread_mutex_unlock(&mutex_espacio_usuario);
 
     t_buffer *new_buffer = crear_buffer();
-    agregar_int_a_buffer(new_buffer, tam_total);
+    agregar_uint32_a_buffer(new_buffer, tam_total);
     agregar_a_buffer(new_buffer, valor, tam_total);
     t_paquete *paquete = crear_super_paquete(RESULTADO_LECTURA, new_buffer);
     enviar_paquete(paquete, socket);

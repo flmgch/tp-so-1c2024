@@ -21,7 +21,10 @@ int main(int argc, char *argv[])
   handshake_cliente(socket_kernel, io_logger);
 
   // INICIALIZAR SISTEMA DE ARCHIVOS => ¡¡¡¡¡ PONER LA RUTA ABSOLUTA EN EL CONFIG !!!!! 
-  iniciar_sistema_archivos();
+  if (strcmp(tipo_interfaz, "DIALFS") == 0) 
+  {
+    iniciar_sistema_archivos();
+  }
 
   // ENVIAR NOMBRE Y TIPO DE INTERFAZ A KERNEL
   t_buffer *un_buffer = crear_buffer();

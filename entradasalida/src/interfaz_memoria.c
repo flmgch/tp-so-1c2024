@@ -15,6 +15,11 @@ void atender_memoria()
         case PAQUETE:
             //
             break;
+        case RESULTADO_ESCRITURA:
+            un_buffer = recibir_buffer(socket_memoria);
+            confirmar_escritura(un_buffer);
+            destruir_buffer(un_buffer);
+            break;
         case RESULTADO_LECTURA:
             un_buffer = recibir_buffer(socket_memoria);
             imprimir_resultado_lectura(un_buffer);

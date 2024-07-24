@@ -246,14 +246,14 @@ typedef struct
 {
     u_int32_t pid;
     t_list *lista_direcciones;
-    int tamanio_total;
+    u_int32_t tamanio_total;
 } io_stdin;
 
 typedef struct 
 {
     u_int32_t pid;
     t_list *lista_direcciones; 
-    int tamanio_total;
+    u_int32_t tamanio_total;
 } io_stdout;
 
 typedef struct

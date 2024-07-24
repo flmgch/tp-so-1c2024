@@ -410,7 +410,7 @@ void atender_fs_truncate(t_buffer *buffer)
         } 
         else if (bloques_libres_contiguos_1 < bloques_incremento) 
         {
-            log_info(io_logger, "Se requiere compactar el archivo", nombre_archivo);
+            log_info(io_logger, "Se requiere compactar el archivo");
             // Esta funcion retira el archivo, compacta el resto de archivos y al mismo le asigna un nuevo bloque inicial
             realizar_compactacion(&bloque_inicial, metadata_config, nombre_archivo, pid);
 
