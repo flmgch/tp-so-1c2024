@@ -51,14 +51,15 @@ int buscar_bloques_libres_contiguos(int bloque_inicial, int bloques_actuales, in
             bloques_libres_contiguos++;
             if (bloques_libres_contiguos == bloques_necesarios) 
             {
-                return bloques_libres_contiguos; // Encontre los bloques libres, entonces salgo del bucle
+                break; // Encontre los bloques libres, entonces salgo del bucle
             }
         } else 
         {
             break; // No encontre suficientes bloques libres, entonces salgo del bucle
         }
     }
-    return bloques_libres_contiguos; // No encontre suficientes bloques libres
+
+    return bloques_libres_contiguos;
 }
 
 // SISTEMA DE ARCHIVOS 
@@ -304,6 +305,7 @@ void realizar_compactacion(int *bloque_inicial_trunc, t_config *metadata_config_
         bitarray_clean_bit(bitmap->bitarray, i);
     }
 
+    log_info(io_logger, "Reasignando el resto de archivos...");
     // Reasigno los archivos que no sean el archivo a truncar
     for(i = 0; i < list_size(lista_metadatas); i++)
     {
@@ -342,7 +344,9 @@ void realizar_compactacion(int *bloque_inicial_trunc, t_config *metadata_config_
     int tamanio_original_trunc = atoi(config_get_string_value(metadata_config_trunc, "TAMANIO_ARCHIVO"));
     int bloques_necesarios_trunc = (tamanio_original_trunc + tamanio_bloque - 1) / tamanio_bloque;
 
-    for (j = 0; j < bloques_necesarios_trunc; j++) // Asigno los bloques del archivo a truncar al final de todo
+    log_info(io_logger, "Reasignando el archivo a ampliar...");
+    // Asigno los bloques del archivo a truncar al final de todo
+    for (j = 0; j < bloques_necesarios_trunc; j++) 
     {
         bitarray_set_bit(bitmap->bitarray, bloque_libre + j);
     }
@@ -393,17 +397,24 @@ void atender_fs_truncate(t_buffer *buffer)
     ////////// EN CASO DE QUE AUMENTE EL TAMANIO DEL ARCHIVO
     if(bloques_necesarios > bloques_actuales) 
     {
+        log_info(io_logger, "Se quiere ampliar el archivo");
+
         int bloques_incremento = bloques_necesarios - bloques_actuales;
 
         // Busco comprobar si, al final del archivo, existen suficientes bloques libres o no
-        // Si es que existieran, se los asignan en la funcion buscar_bloques_libres_contiguos
         int bloques_libres_contiguos_1 = buscar_bloques_libres_contiguos(bloque_inicial, bloques_actuales, bloques_necesarios, bitmap->bitarray); 
-        if (bloques_libres_contiguos_1 < bloques_incremento) 
+        
+        if (bloques_libres_contiguos_1 >= bloques_incremento) 
         {
+            log_info(io_logger, "No se requiere compactar el archivo");
+        } 
+        else if (bloques_libres_contiguos_1 < bloques_incremento) 
+        {
+            log_info(io_logger, "Se requiere compactar el archivo", nombre_archivo);
             // Esta funcion retira el archivo, compacta el resto de archivos y al mismo le asigna un nuevo bloque inicial
             realizar_compactacion(&bloque_inicial, metadata_config, nombre_archivo, pid);
 
-            // CASO BORDER: Compruebo si, incluso despues de la compactacion, siguen sin haber bloques libres contiguos
+            // CASO BORDE: Compruebo si, incluso despues de la compactacion, siguen sin haber bloques libres contiguos
             int bloques_libres_contiguos_2 = buscar_bloques_libres_contiguos(bloque_inicial, bloques_actuales, bloques_necesarios, bitmap->bitarray);
             if (bloques_libres_contiguos_2 < bloques_incremento) 
             {
@@ -415,18 +426,21 @@ void atender_fs_truncate(t_buffer *buffer)
         }
         // Ahora si lo agrando :)
         // Rango: Bloque siguiente al ultimo (bloque_inicial + bloques_actuales) - incremento a partir del bloque siguiente al ultimo (bloque_inicial + bloques_actuales + bloques_incremento)
+        log_info(io_logger, "Ampliando el archivo...");
         for(int i = bloque_inicial + bloques_actuales; i < bloque_inicial + bloques_actuales + bloques_incremento; i++)
         {
             bitarray_set_bit(bitmap->bitarray, i);
         }
-
     } 
     ////////// EN CASO DE QUE ACHIQUE EL TAMANIO DEL ARCHIVO
     else if (bloques_necesarios < bloques_actuales) 
     { 
+        log_info(io_logger, "Se quiere reducir el archivo");
+
         int nuevo_tamanio = bloque_inicial + bloques_necesarios;
         int antiguo_tamanio =  bloque_inicial + bloques_actuales;
         // Libero los bloques => Pongo en 0 los bits del nuevo tamanio al antiguo tamanio
+        log_info(io_logger, "Reduciendo el archivo...");
         for (int i = nuevo_tamanio; i < antiguo_tamanio; i++)
         {
             bitarray_clean_bit(bitmap->bitarray, i);
