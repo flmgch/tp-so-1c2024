@@ -47,5 +47,6 @@ int main(int argc, char *argv[])
   // close(socket_kernel);
   // close(socket_memoria);
   // terminar_programa(io_logger, io_config);
+  liberar_sistema_archivos(); 
   return 0;
 }

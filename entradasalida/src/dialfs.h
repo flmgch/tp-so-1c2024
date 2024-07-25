@@ -15,5 +15,6 @@ void atender_fs_write(t_buffer *buffer);
 void escribir_archivo(t_buffer *buffer);
 void atender_fs_read(t_buffer *buffer);
 void confirmar_escritura_fs(t_buffer *buffer);
+void liberar_sistema_archivos();
 
 #endif

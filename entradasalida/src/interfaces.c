@@ -41,27 +41,9 @@ void atender_stdin(t_buffer *buffer)
     char *texto = malloc(una_io->tamanio_total);
     void *texto_aux = malloc(una_io->tamanio_total);
 
-    while (1)
-    {
-        printf("> Ingrese un texto de %d caracteres: ", una_io->tamanio_total);
-        fgets(texto, una_io->tamanio_total + 1, stdin);
+    printf("> Ingrese un texto de %d caracteres: ", una_io->tamanio_total);
 
-        int longitud_texto = string_length(texto);
-        if (longitud_texto > 0 && texto[longitud_texto - 1] == '\n')
-        {
-            texto[longitud_texto - 1] = '\0';
-            longitud_texto--;
-        }
-
-        if (longitud_texto == una_io->tamanio_total) 
-        {
-            break;
-        } 
-        else 
-        {
-            printf("> Intente nuevamente: ");
-        }
-    }
+    fgets(texto, una_io->tamanio_total, stdin);
 
     memcpy(texto_aux, texto, una_io->tamanio_total);
 
@@ -81,8 +63,6 @@ void atender_stdin(t_buffer *buffer)
 
 void confirmar_escritura(t_buffer *buffer)
 {
-    char *escritura_hecha = extraer_string_de_buffer(buffer);
-
     // Le aviso a Kernel que ya termine la operacion
     t_buffer *buffer_kernel = crear_buffer();
     agregar_uint32_a_buffer(buffer_kernel, pid_stdin);

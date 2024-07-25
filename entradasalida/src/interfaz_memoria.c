@@ -17,11 +17,11 @@ void atender_memoria()
             break;
         case RESULTADO_ESCRITURA:
             un_buffer = recibir_buffer(socket_memoria);
-            if(tipo_interfaz == "STDOUT")
+            if(strcmp(tipo_interfaz, "STDOUT") == 0)
             {
                 confirmar_escritura(un_buffer);
             } 
-            else if(tipo_interfaz == "DIALFS")
+            else if(strcmp(tipo_interfaz, "DIALFS") == 0)
             {
                 confirmar_escritura_fs(un_buffer);
             }
@@ -29,11 +29,11 @@ void atender_memoria()
             break;
         case RESULTADO_LECTURA:
             un_buffer = recibir_buffer(socket_memoria);
-            if(tipo_interfaz == "STDOUT")
+            if(strcmp(tipo_interfaz, "STDOUT") == 0)
             {
                 imprimir_resultado_lectura(un_buffer);
             } 
-            else if(tipo_interfaz == "DIALFS")
+            else if(strcmp(tipo_interfaz, "DIALFS") == 0)
             {
                 escribir_archivo(un_buffer);
             }

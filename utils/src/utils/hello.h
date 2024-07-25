@@ -275,6 +275,15 @@ typedef struct
     int file_descriptor;
 } t_bloques_datos;
 
+typedef struct 
+{
+    u_int32_t pid;
+    char *nombre_archivo;
+    t_list *lista_direcciones;
+    u_int32_t tamanio;
+    u_int32_t puntero_archivo;
+} io_fs;
+
 typedef struct
 {
     int pid;
