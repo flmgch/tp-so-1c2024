@@ -3,6 +3,7 @@
 
 #include "gestor_io.h"
 #include "interfaces.h"
+#include "dialfs.h"
 
 void atender_memoria();
 

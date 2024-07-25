@@ -65,7 +65,7 @@ void atender_stdin(t_buffer *buffer)
 
     memcpy(texto_aux, texto, una_io->tamanio_total);
 
-    // Le aviso a memoria para que escriba el texto ingresado
+    // Le pido a Memoria que escriba el texto a partir de las direcciones
     t_buffer *buffer_memo = crear_buffer();
     agregar_uint32_a_buffer(buffer_memo, una_io->pid);
     agregar_a_buffer(buffer_memo, texto_aux, una_io->tamanio_total);
@@ -105,7 +105,7 @@ void atender_stdout(t_buffer *buffer)
 
     log_info(io_logger, "PID: %d - Operacion: STDOUT_WRITE", una_io->pid);
 
-    // le aviso a memoria para que lea el texto pedido
+    // Le pido a Memoria que lea el texto a partir de las direcciones
     t_buffer *buffer_memo = crear_buffer();
     agregar_uint32_a_buffer(buffer_memo, una_io->pid);
     agregar_lista_direcciones_a_buffer(buffer_memo, una_io->lista_direcciones);
@@ -119,7 +119,7 @@ void atender_stdout(t_buffer *buffer)
 
 void imprimir_resultado_lectura(t_buffer *buffer)
 {
-    int tamanio_total = extraer_int_de_buffer(buffer);
+    u_int32_t tamanio_total = extraer_uint32_de_buffer(buffer);
     void *texto_aux = extraer_de_buffer(buffer);
 
     char *texto = malloc(tamanio_total);
