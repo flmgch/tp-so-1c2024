@@ -8,6 +8,7 @@ extern t_log *kernel_logger;
 extern t_config *kernel_config;
 extern int identificador_pid;
 extern bool planif_iniciada;
+extern bool primera_vez_planif;
 
 // VALORES DEL CONFIG
 extern char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *interrupt, *algoritmo_planificacion;

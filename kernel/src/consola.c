@@ -116,14 +116,8 @@ void atender_instruccion(char *leido)
     }
     else if (strcmp(comando_consola[0], "MULTIPROGRAMACION") == 0)
     {
-        size_t comando_length = strlen(comando_consola[1] + 1);
-        char *comando = malloc(comando_length);
-        // TODO: ACTUALIZAR VALOR MAXIMO DEL sem_multiprogramacion cuando se actualiza la var global
-        strcpy(comando, comando_consola[1]); 
-        grado_multiprogramacion = atoi(comando);
-        printf("El grado de multiprogramacion ahora es de %d\n", grado_multiprogramacion);
-
-        free(comando);
+        int valor = atoi(comando_consola[1]);
+        cambiar_grado_multiprogramacion(valor);
     }
     else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0)
     {
@@ -296,6 +290,7 @@ void finalizar_proceso()
         {
             op_code codigo = INT_FINALIZAR_PROCESO;
             send(socket_conexion_cpu_interrupt, &codigo, sizeof(op_code), 0);
+            return;
         }
     }
 
@@ -366,12 +361,46 @@ void detener_planificacion() {
 
 void iniciar_planificacion() {
     planif_iniciada = true;
-    planificar();
-    printf("La planificacion ha sido iniciada. ALGORITMO: %s \n", algoritmo_planificacion);
+    if (primera_vez_planif == true)
+    {
+        planificar();
+    }
+    primera_vez_planif = false;
+    printf("La planificacion ha sido reanudada. ALGORITMO: %s \n", algoritmo_planificacion);
     sem_post(&sem_planif_new);
     sem_post(&sem_planif_ready);
     sem_post(&sem_planif_ready_prioridad);
     sem_post(&sem_planif_exec); // PARA ENTRADA A EXEC
     sem_post(&sem_planif_exec); // PARA VUELTA DE EXEC (ENVIO_PCB)
     sem_post(&sem_planif_block);
+}
+
+void cambiar_grado_multiprogramacion(int valor)
+{
+
+    int grado_actual = grado_multiprogramacion;
+
+    if (grado_actual < valor)
+    {
+
+        for (int i = 0; i < (valor - grado_actual); i++)
+        {
+            sem_post(&sem_multiprogramacion);
+        }
+        grado_multiprogramacion = valor;
+        printf("El grado de multiprogramacion ahora es de %d\n", grado_multiprogramacion);
+        return;
+    }
+
+    if (grado_actual > valor)
+    {
+        for (int i = 0; i < (grado_actual - valor); i++)
+        {
+            sem_wait(&sem_multiprogramacion);
+        }
+        grado_multiprogramacion = valor;
+        printf("El grado de multiprogramacion ahora es de %d\n", grado_multiprogramacion);
+        return;
+    }
+
 }

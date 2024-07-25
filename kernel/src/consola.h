@@ -17,5 +17,6 @@ void finalizar_proceso();
 bool es_pcb_buscado(void *data);
 void detener_planificacion();
 void iniciar_planificacion();
+void cambiar_grado_multiprogramacion(int valor);
 
 #endif

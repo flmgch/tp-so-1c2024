@@ -15,6 +15,7 @@
   t_config *kernel_config;
   int identificador_pid = 1;
   bool planif_iniciada = false;
+  bool primera_vez_planif = true;
 
 // VALORES DEL CONFIG
   char *puerto_escucha, *ip_memoria, *puerto_memoria, *ip_cpu, *dispatch, *interrupt, *algoritmo_planificacion;
