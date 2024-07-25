@@ -29,6 +29,7 @@ int socket_escucha, socket_cpu, socket_kernel;
 pthread_mutex_t mutex_lista_procesos;
 pthread_mutex_t mutex_bitmap;
 pthread_mutex_t mutex_espacio_usuario;
+pthread_mutex_t mutex_cantidad_marcos_libres;
 pthread_cond_t condicion;
 int procesos_necesarios = 0;
 int aux_condicion = 0;

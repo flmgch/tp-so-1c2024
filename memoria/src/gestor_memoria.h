@@ -25,6 +25,7 @@ extern int socket_escucha, socket_cpu, socket_kernel;
 extern pthread_mutex_t mutex_bitmap;
 extern pthread_mutex_t mutex_espacio_usuario;
 extern pthread_mutex_t mutex_lista_procesos;
+extern pthread_mutex_t mutex_cantidad_marcos_libres;
 extern pthread_cond_t condicion;
 extern int procesos_necesarios;
 extern int aux_condicion;

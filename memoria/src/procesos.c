@@ -3,22 +3,21 @@
 // BUSCAR PROCESO
 t_proceso *encontrar_proceso(t_list *lista, uint32_t pid_cpu)
 {
-    t_proceso *proceso_buscado = malloc(sizeof(t_proceso));
+
 
     bool auxiliar_soy_proceso_buscado(void *elemento)
     {
         return soy_proceso_buscado(elemento, pid_cpu);
     }
 
-    proceso_buscado = list_find(lista, auxiliar_soy_proceso_buscado);
+    t_proceso *proceso_buscado = list_find(lista, auxiliar_soy_proceso_buscado);
 
     return proceso_buscado;
 }
 
 bool soy_proceso_buscado(void *elemento, uint32_t pid_cpu)
 {
-    t_proceso *proceso_buscado = malloc(sizeof(t_proceso));
-    proceso_buscado = (t_proceso *)elemento;
+    t_proceso* proceso_buscado = (t_proceso *)elemento;
     return proceso_buscado->pid == pid_cpu;
 }
 
@@ -139,8 +138,8 @@ void atender_finalizar_proceso(t_buffer *buffer)
 
 bool debe_ser_proceso_x(void *elemento, uint32_t pid)
 {
-    t_proceso *proceso = malloc(sizeof(t_proceso));
-    proceso = (t_proceso *)elemento;
+
+    t_proceso *proceso = (t_proceso *)elemento;
     return proceso->pid == pid;
 }
 
@@ -175,6 +174,7 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
     cantidad_procesos_creados++;
     log_info(mem_logger, "PID:%d - Tamaño: %d", pid, 0);
     free(auxiliar);
+    free(archivo);
     return proceso;
 }
 
@@ -256,10 +256,8 @@ void atender_ajustar_tamanio(t_buffer *buffer)
 
     usleep(1000 * retardo_respuesta);
 
-    t_proceso *proceso_a_modificar = malloc(sizeof(t_proceso));
-
     pthread_mutex_lock(&mutex_lista_procesos);
-    proceso_a_modificar = encontrar_proceso(lista_de_procesos, pid);
+    t_proceso *proceso_a_modificar = encontrar_proceso(lista_de_procesos, pid);
     pthread_mutex_unlock(&mutex_lista_procesos);
     int paginas_actuales = proceso_a_modificar->size;
     int paginas_futuras = ceil((double)tamanio_nuevo / tamanio_pagina);
@@ -331,10 +329,10 @@ void atender_reducir_tamanio(t_proceso *proceso, int paginas_futuras, int pagina
         paginas_a_eliminar--;
         paginas_actuales--;
     }
-    for(int i=0;i<cantidad_marcos;i++){
+    /*for(int i=0;i<cantidad_marcos;i++){
         int n=bitarray_test_bit(bitmap,i);
         log_info(mem_logger,"%d",n);
-    }
+    }*/
     proceso->filas_tabla_paginas = list_take(proceso->filas_tabla_paginas, paginas_futuras);
     proceso->size = paginas_futuras;
     enviar_resultado("Ok");

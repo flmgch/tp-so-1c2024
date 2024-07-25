@@ -204,7 +204,17 @@ void procesar_resultado_resize(char* resultado){
 //MOV IN
 void ejecutar_mov_in(char reg_datos[20],char reg_dir_logica[20]){
     //void *direccion_logica = obtener_registro(reg_dir_logica);
-    uint32_t* dir_logica= obtener_registro(reg_dir_logica);
+    uint32_t dir_logica;
+
+    if (strcmp(reg_dir_logica, "AX") == 0 || strcmp(reg_dir_logica, "BX") == 0 ||
+        strcmp(reg_dir_logica, "CX") == 0 || strcmp(reg_dir_logica, "DX") == 0) {
+        uint8_t* aux_dir = obtener_registro(reg_dir_logica);
+        dir_logica=*aux_dir ;
+        } 
+        else {
+        uint32_t* aux_dir = obtener_registro(reg_dir_logica);
+        dir_logica=*aux_dir ;
+        }
     //memcpy(&dir_logica, direccion_logica, sizeof(uint32_t));
     t_buffer *un_buffer = crear_buffer();
     int tam_segun;
@@ -231,7 +241,7 @@ void ejecutar_mov_in(char reg_datos[20],char reg_dir_logica[20]){
         }
         }
 
-        direcciones = separar_en_paginas(*dir_logica, tam_segun);
+        direcciones = separar_en_paginas(dir_logica, tam_segun);
 
         // t_direccion_fisica *d = list_get(direcciones, 0);
 
@@ -272,7 +282,17 @@ void ejecutar_mov_in(char reg_datos[20],char reg_dir_logica[20]){
 //MOV OUT
 void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
     //void *direccion_logica = obtener_registro(reg_destino);
-    uint32_t* dir_logica= obtener_registro(reg_destino);
+    uint32_t dir_logica;
+
+    if (strcmp(reg_destino, "AX") == 0 || strcmp(reg_destino, "BX") == 0 ||
+        strcmp(reg_destino, "CX") == 0 || strcmp(reg_destino, "DX") == 0) {
+        uint8_t* aux_dir = obtener_registro(reg_destino);
+        dir_logica=*aux_dir ;
+        } 
+        else {
+        uint32_t* aux_dir = obtener_registro(reg_destino);
+        dir_logica=*aux_dir ;
+        }
     //memcpy(&dir_logica, direccion_logica, sizeof(uint32_t)); //
     t_list *direcciones;
     void *valor;
@@ -306,7 +326,7 @@ void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
         }
     }
 
-    direcciones = separar_en_paginas(*dir_logica, tam_segun);
+    direcciones = separar_en_paginas(dir_logica, tam_segun);
 
     /*t_direccion_fisica *d = list_get(direcciones, 0);
 
@@ -359,7 +379,17 @@ void ejecutar_copy_string(char ch_tamanio[20])
 //IO_STDIN_READ
 void ejecutar_io_stdin_read(char interfaz[20], char reg_dir_logica[20], char reg_tam [20]){
     //void *direccion_logica = obtener_registro(reg_dir_logica);
-    uint32_t* dir_logica= obtener_registro(reg_dir_logica);
+    uint32_t dir_logica;
+
+    if (strcmp(reg_dir_logica, "AX") == 0 || strcmp(reg_dir_logica, "BX") == 0 ||
+        strcmp(reg_dir_logica, "CX") == 0 || strcmp(reg_dir_logica, "DX") == 0) {
+        uint8_t* aux_dir = obtener_registro(reg_dir_logica);
+        dir_logica=*aux_dir ;
+        } 
+        else {
+        uint32_t* aux_dir= obtener_registro(reg_dir_logica);
+        dir_logica=*aux_dir ;
+        }
     //memcpy(&dir_logica, direccion_logica, sizeof(uint32_t)); // hago void* -> uint32_t*; y *(uint32_t*) para obtener el valor almacenado en la dirección apuntada
 
     //void *direccion_tamaño = obtener_registro(reg_tam);
@@ -385,7 +415,7 @@ void ejecutar_io_stdin_read(char interfaz[20], char reg_dir_logica[20], char reg
             } 
 
 
-    direcciones = separar_en_paginas(*dir_logica, tamaño);
+    direcciones = separar_en_paginas(dir_logica, tamaño);
 
     agregar_lista_direcciones_a_buffer(un_buffer,direcciones);
     agregar_uint32_a_buffer(un_buffer, tamaño);
@@ -398,7 +428,17 @@ void ejecutar_io_stdin_read(char interfaz[20], char reg_dir_logica[20], char reg
 //IO_STDOUT_WRITE
 void ejecutar_io_stdout_write(char interfaz[20], char reg_dir_logica[20], char reg_tam [20]){
     //void *direccion_logica = obtener_registro(reg_dir_logica);
-    uint32_t* dir_logica= obtener_registro(reg_dir_logica);
+    uint32_t dir_logica;
+
+    if (strcmp(reg_dir_logica, "AX") == 0 || strcmp(reg_dir_logica, "BX") == 0 ||
+        strcmp(reg_dir_logica, "CX") == 0 || strcmp(reg_dir_logica, "DX") == 0) {
+        uint8_t* aux_dir = obtener_registro(reg_dir_logica);
+        dir_logica=*aux_dir ;
+        } 
+        else {
+        uint32_t* aux_dir = obtener_registro(reg_dir_logica);
+        dir_logica=*aux_dir ;
+        }
     //memcpy(&dir_logica, direccion_logica, sizeof(uint32_t)); // hago void* -> uint32_t*; y *(uint32_t*) para obtener el valor almacenado en la dirección apuntada
 
     //void *direccion_tamaño = obtener_registro(reg_tam);
@@ -423,7 +463,7 @@ void ejecutar_io_stdout_write(char interfaz[20], char reg_dir_logica[20], char r
         tamaño=*aux_tamaño;
         } 
 
-    direcciones = separar_en_paginas(*dir_logica, tamaño);
+    direcciones = separar_en_paginas(dir_logica, tamaño);
     agregar_lista_direcciones_a_buffer(un_buffer,direcciones);
     agregar_uint32_a_buffer(un_buffer, tamaño);
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
@@ -499,12 +539,17 @@ void ejecutar_io_fs_write(char interfaz[20], char nombre_archivo[20], char reg_d
     
      //obtnego dir_logica
     //void *direccion_logica = obtener_registro(reg_dir_logica);
-    uint32_t* dir_logica=obtener_registro(reg_dir_logica);
-    //memcpy(&dir_logica, direccion_logica, sizeof(uint32_t));
+    uint32_t dir_logica;
 
-    //el tamanio del int a agregar depende del tamanio del registro
-    //obtengo puntero al registro
-    //void *direccion_tamaño = obtener_registro(reg_tam);
+    if (strcmp(reg_dir_logica, "AX") == 0 || strcmp(reg_dir_logica, "BX") == 0 ||
+        strcmp(reg_dir_logica, "CX") == 0 || strcmp(reg_dir_logica, "DX") == 0) {
+        uint8_t* aux_dir = obtener_registro(reg_dir_logica);
+        dir_logica=*aux_dir ;
+        } 
+        else {
+        uint32_t* aux_dir = obtener_registro(reg_dir_logica);
+        dir_logica=*aux_dir ;
+        }
     uint32_t tamaño;
     //memcpy(&tamaño, direccion_tamaño, sizeof(uint32_t));
 
@@ -518,7 +563,7 @@ void ejecutar_io_fs_write(char interfaz[20], char nombre_archivo[20], char reg_d
         tamaño=*aux_tamaño;
         } 
 
-    t_list *direcciones_fisicas = separar_en_paginas(*dir_logica, tamaño);
+    t_list *direcciones_fisicas = separar_en_paginas(dir_logica, tamaño);
 
     agregar_lista_direcciones_a_buffer(un_buffer,direcciones_fisicas);
     agregar_uint32_a_buffer(un_buffer, tamaño);
@@ -556,11 +601,18 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
     agregar_string_a_buffer(un_buffer,nombre_archivo);
     t_list *direcciones_fisicas;
 
-    //void *direccion_logica = obtener_registro(reg_dir_logica);
-    uint32_t* dir_logica=obtener_registro(reg_dir_logica);
-    //memcpy(&dir_logica, direccion_logica, sizeof(uint32_t));
-    //uint32_t direccion_fisica =  traducir_direccion_logica(direccion_logica);
-    //agregar_uint32_a_buffer(un_buffer, direccion_fisica);
+
+    uint32_t dir_logica;
+
+    if (strcmp(reg_dir_logica, "AX") == 0 || strcmp(reg_dir_logica, "BX") == 0 ||
+        strcmp(reg_dir_logica, "CX") == 0 || strcmp(reg_dir_logica, "DX") == 0) {
+        uint8_t* aux_dir = obtener_registro(reg_dir_logica);
+        dir_logica=*aux_dir ;
+        } 
+        else {
+        uint32_t* aux_dir = obtener_registro(reg_dir_logica);
+        dir_logica=*aux_dir ;
+        }
 
     //void *direccion_tamaño = obtener_registro(reg_tam);
     uint32_t tamaño;
@@ -575,7 +627,7 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
         tamaño=*aux_tamaño;
         } 
 
-    direcciones_fisicas = separar_en_paginas(*dir_logica, tamaño);
+    direcciones_fisicas = separar_en_paginas(dir_logica, tamaño);
 
     agregar_lista_direcciones_a_buffer(un_buffer, direcciones_fisicas);
     agregar_uint32_a_buffer(un_buffer, tamaño);
