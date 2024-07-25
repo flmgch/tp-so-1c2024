@@ -15,6 +15,9 @@ void atender_kernel_interrupt()
             //
             break;
         case INT_FIN_QUANTUM:{
+            t_buffer* buffer = recibir_buffer(socket_kernel_interrupt);
+            int pid = extraer_int_de_buffer(buffer);
+            pid_interrupcion = pid;
             sem_post(&sem_interrupt_quantum);
             break;
         }

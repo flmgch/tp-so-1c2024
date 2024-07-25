@@ -270,9 +270,16 @@ typedef struct
     int file_descriptor;
 } t_bloques_datos;
 
+typedef struct
+{
+    int pid;
+    int quantum;
+} t_manejo_quantum;
+
 // UTILIDADES
 
-void decir_hola(char *quien);
+void
+decir_hola(char *quien);
 t_log *iniciar_logger(char *nombreLog, t_log_level level);
 t_config *iniciar_config(char *nombreConfig);
 void terminar_programa(t_log *logger, t_config *config);

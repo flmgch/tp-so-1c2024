@@ -16,6 +16,7 @@ extern bool primera_instruccion;
 extern int tamanio_pagina;
 extern t_instruccion instruccion;
 extern int tam_aux;
+extern int pid_interrupcion;
 extern void *aux_dato;
 extern char *reg_aux;
 extern char *condicion;

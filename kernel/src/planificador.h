@@ -21,7 +21,7 @@ t_pcb *remover_pcb(t_list *list, pthread_mutex_t *mutex);
 t_pcb *pcb_segun_algoritmo();
 
 t_pcb *obtener_pcb_RR();
-void manejar_quantum(void* quantum_remanente_ptr);
+void manejar_quantum(void *void_arg);
 t_pcb *obtener_pcb_VRR();
 
 #endif

@@ -93,29 +93,51 @@ void dispatch_pcb(t_pcb *pcb)
 }
 
 t_pcb *obtener_pcb_RR() {
-    pthread_create(&hilo_quantum, NULL, (void*)manejar_quantum, NULL);
+    t_pcb *pcb = remover_pcb(cola_ready, &mutex_cola_ready);
+    t_manejo_quantum *args = malloc(sizeof(t_manejo_quantum));
+    args->pid = pcb->pid;
+    args->quantum = pcb->quantum_remanente;
+    pthread_create(&hilo_quantum, NULL, (void *)manejar_quantum, (void *)args);
     pthread_detach(hilo_quantum);
-    return remover_pcb(cola_ready, &mutex_cola_ready);
+    return pcb;
 };
 
-void manejar_quantum(void *quantum_remanente_ptr)
-{   
-    int* q_rem_ptr = (int *)quantum_remanente_ptr;
-    if(q_rem_ptr != NULL && (strcmp(algoritmo_planificacion, "VRR") == 0)) {
-        int quantum_remanente = *q_rem_ptr;
-        usleep(quantum_remanente * 1000); // ESPERO EL TIEMPO DEL QUANTUM REMANENTE EN MS
-        op_code codigo = INT_FIN_QUANTUM;
-        send(socket_conexion_cpu_interrupt, &codigo, sizeof(int), 0);
-        pthread_cancel(hilo_quantum);
-        return;
-    } else {
-    usleep(quantum * 1000); // ESPERO EL TIEMPO DEL CONFIG EN MS
-    op_code codigo = INT_FIN_QUANTUM;
-    send(socket_conexion_cpu_interrupt, &codigo, sizeof(int), 0);
-    pthread_cancel(hilo_quantum);
-    return;
+void manejar_quantum(void *void_arg)
+{
+    t_manejo_quantum *args = (t_manejo_quantum *)void_arg;
+    if (args->quantum != quantum && (strcmp(algoritmo_planificacion, "VRR") == 0))
+    {
+        usleep(args->quantum * 1000); // ESPERO EL TIEMPO DEL QUANTUM REMANENTE EN MS
     }
+    else
+    {
+        usleep(quantum * 1000); // ESPERO EL TIEMPO DEL CONFIG EN MS
+    }
+    t_buffer *buffer = crear_buffer();
+    agregar_int_a_buffer(buffer, args->pid);
+    t_paquete *paquete = crear_super_paquete(INT_FIN_QUANTUM, buffer);
+    enviar_paquete(paquete, socket_conexion_cpu_interrupt);
+    eliminar_paquete(paquete);
 }
+
+// void manejar_quantum(void *quantum_remanente_ptr)
+// {
+//     int* q_rem_ptr = (int *)quantum_remanente_ptr;
+//     if(q_rem_ptr != NULL && (strcmp(algoritmo_planificacion, "VRR") == 0)) {
+//         int quantum_remanente = *q_rem_ptr;
+//         usleep(quantum_remanente * 1000); // ESPERO EL TIEMPO DEL QUANTUM REMANENTE EN MS
+//         op_code codigo = INT_FIN_QUANTUM;
+//         send(socket_conexion_cpu_interrupt, &codigo, sizeof(int), 0);
+//         pthread_cancel(hilo_quantum);
+//         return;
+//     } else {
+//     usleep(quantum * 1000); // ESPERO EL TIEMPO DEL CONFIG EN MS
+//     op_code codigo = INT_FIN_QUANTUM;
+//     send(socket_conexion_cpu_interrupt, &codigo, sizeof(int), 0);
+//     pthread_cancel(hilo_quantum);
+//     return;
+//     }
+// }
 
 // void manejar_quantum_remanente(void *quantum_remanente_ptr)
 // {
@@ -139,18 +161,23 @@ t_pcb *obtener_pcb_VRR()
     {
         sem_wait(&sem_ready_prioridad);
         t_pcb *pcb = remover_pcb(cola_ready_prioridad, &mutex_cola_ready_prioridad);
-        int *quantum_remanente_ptr = malloc(sizeof(int));
-        *quantum_remanente_ptr = pcb->quantum_remanente;
-        pthread_create(&hilo_quantum, NULL, (void *)manejar_quantum, (void *)quantum_remanente_ptr);
+        t_manejo_quantum *args = malloc(sizeof(t_manejo_quantum));
+        args->pid = pcb->pid;
+        args->quantum = pcb->quantum_remanente;
+        pthread_create(&hilo_quantum, NULL, (void *)manejar_quantum, (void *)args);
         pthread_detach(hilo_quantum);
         return pcb;
     }
     else
     {
         sem_wait(&sem_ready);
-        pthread_create(&hilo_quantum, NULL, (void *)manejar_quantum, NULL);
+        t_pcb *pcb = remover_pcb(cola_ready, &mutex_cola_ready);
+        t_manejo_quantum *args = malloc(sizeof(t_manejo_quantum));
+        args->pid = pcb->pid;
+        args->quantum = pcb->quantum_remanente;
+        pthread_create(&hilo_quantum, NULL, (void *)manejar_quantum, (void *)args);
         pthread_detach(hilo_quantum);
-        return remover_pcb(cola_ready, &mutex_cola_ready);
+        return pcb;
     }
 };
 
