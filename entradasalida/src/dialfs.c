@@ -40,28 +40,6 @@ char *crear_path(char *path_base, char *nombre_archivo)
     return path_absoluto;
 }
 
-int buscar_bloques_libres_contiguos(int bloque_inicial, int bloques_actuales, int bloques_necesarios, t_bitarray *bitarray)
-{
-    int bloques_libres_contiguos = 0;
-
-    for (int i = bloque_inicial + bloques_actuales; i < cantidad_bloque; i++)
-    {
-        if (bitarray_test_bit(bitmap->bitarray, i) == 0) 
-        {
-            bloques_libres_contiguos++;
-            if (bloques_libres_contiguos == bloques_necesarios) 
-            {
-                break; // Encontre los bloques libres, entonces salgo del bucle
-            }
-        } else 
-        {
-            break; // No encontre suficientes bloques libres, entonces salgo del bucle
-        }
-    }
-
-    return bloques_libres_contiguos;
-}
-
 // SISTEMA DE ARCHIVOS 
 
 void iniciar_bitmap(){
@@ -170,6 +148,8 @@ void iniciar_sistema_archivos(){
 
 // FUNCIONES DEL FILESYSTEM
 
+//////////////////// FS_CREATE
+
 void atender_fs_create(t_buffer *buffer)
 {   
     usleep(tiempo_unidad_trabajo * 1000);
@@ -233,6 +213,8 @@ void atender_fs_create(t_buffer *buffer)
     free(path_metadata);
 }
 
+//////////////////// FS_DELETE
+
 void atender_fs_delete(t_buffer *buffer)
 {
     usleep(tiempo_unidad_trabajo * 1000);
@@ -289,6 +271,31 @@ void atender_fs_delete(t_buffer *buffer)
     config_destroy(metadata_config);
 }
 
+//////////////////// FS_TRUNCATE
+
+int buscar_bloques_libres_contiguos(int bloque_inicial, int bloques_actuales, int bloques_necesarios, t_bitarray *bitarray)
+{
+    int bloques_libres_contiguos = 0;
+
+    for (int i = bloque_inicial + bloques_actuales; i < cantidad_bloque; i++)
+    {
+        if (bitarray_test_bit(bitmap->bitarray, i) == 0) 
+        {
+            bloques_libres_contiguos++;
+            if (bloques_libres_contiguos == bloques_necesarios) 
+            {
+                break; // Encontre los bloques libres, entonces salgo del bucle
+            }
+        } else 
+        {
+            break; // No encontre suficientes bloques libres, entonces salgo del bucle
+        }
+    }
+
+    return bloques_libres_contiguos;
+}
+
+
 void realizar_compactacion(int *bloque_inicial_trunc, t_config *metadata_config_trunc, char* nombre_archivo_trunc, u_int32_t pid)
 {   
     log_info(io_logger, "PID: %d - Inicio Compactación.", pid);
@@ -296,8 +303,6 @@ void realizar_compactacion(int *bloque_inicial_trunc, t_config *metadata_config_
     int i; // Contador general
     int j; // Contador de bloques asignados
     int bloque_libre = 0; // Posiciones de inicio de los archivos
-
-    char *path_metadata;
 
     // Pongo todo el bitarray en 0
     for(i = 0; i < cantidad_bloque; i++)
@@ -310,11 +315,12 @@ void realizar_compactacion(int *bloque_inicial_trunc, t_config *metadata_config_
     for(i = 0; i < list_size(lista_metadatas); i++)
     {
         char *nombre_archivo = list_get(lista_metadatas, i);
-        path_metadata = crear_path(path_base_dialfs, nombre_archivo);
+        char *path_metadata = crear_path(path_base_dialfs, nombre_archivo);
 
         // Si se trata del archivo truncado, lo dejo para lo ultimo
         if(strcmp(nombre_archivo, nombre_archivo_trunc) == 0) 
         { 
+            free(path_metadata);
             continue; // Es para que salte a la siguiente iteracion sin tener que englobar todo lo siguiente en un if(strcmp(nombre_archivo,nombre_archivo_trunc)==1)
         }
 
@@ -327,9 +333,13 @@ void realizar_compactacion(int *bloque_inicial_trunc, t_config *metadata_config_
 
         int tamanio_archivo = atoi(config_get_string_value(metadata_config,"TAMANIO_ARCHIVO"));
         int bloques_necesarios = (tamanio_archivo + tamanio_bloque - 1) / tamanio_bloque;
+        if (bloques_necesarios == 0)
+        {
+            bloques_necesarios = 1;
+        }
 
         for(j = 0; j < bloques_necesarios; j++) // Asigno los bloques necesarios...
-        {                      
+        {                  
             bitarray_set_bit(bitmap->bitarray, bloque_libre + j); // Partiendo de la posicion del bloque libre
         }
 
@@ -339,10 +349,16 @@ void realizar_compactacion(int *bloque_inicial_trunc, t_config *metadata_config_
         config_destroy(metadata_config);
 
         bloque_libre = bloque_libre + bloques_necesarios; // Actualizo la posicion de inicio del proximo archivo
+
+        free(path_metadata);
     }
 
     int tamanio_original_trunc = atoi(config_get_string_value(metadata_config_trunc, "TAMANIO_ARCHIVO"));
     int bloques_necesarios_trunc = (tamanio_original_trunc + tamanio_bloque - 1) / tamanio_bloque;
+    if (bloques_necesarios_trunc == 0)
+    {
+        bloques_necesarios_trunc = 1;
+    }
 
     log_info(io_logger, "Reasignando el archivo a ampliar...");
     // Asigno los bloques del archivo a truncar al final de todo
@@ -351,17 +367,18 @@ void realizar_compactacion(int *bloque_inicial_trunc, t_config *metadata_config_
         bitarray_set_bit(bitmap->bitarray, bloque_libre + j);
     }
 
-    // Actualizo los datos del archivo a truncar
-    config_set_value(metadata_config_trunc, "BLOQUE_INICIAL", string_itoa(bloque_libre));
-    config_save(metadata_config_trunc);
-    *bloque_inicial_trunc = bloque_libre;
-
     // Sincronizo la reasignacion
     if (msync(bitmap->direccion, bitmap->tamanio, MS_SYNC) == -1)
     {
         perror("Error al sincronizar el bitmap despues de la compactacion");
         exit(EXIT_FAILURE);
-    }
+    }    
+
+    // Actualizo los datos del archivo a truncar
+    config_set_value(metadata_config_trunc, "BLOQUE_INICIAL", string_itoa(bloque_libre));
+    config_save(metadata_config_trunc);
+
+    *bloque_inicial_trunc = bloque_libre;
 
     usleep(retraso_compactacion * 1000);
 
@@ -392,6 +409,11 @@ void atender_fs_truncate(t_buffer *buffer)
     int tamanio_actual = atoi(config_get_string_value(metadata_config, "TAMANIO_ARCHIVO"));
 
     int bloques_actuales = (tamanio_actual + tamanio_bloque - 1) / tamanio_bloque; // Cantidad de bloques ocupados actualmente
+    if (bloques_actuales == 0)
+    {
+        bloques_actuales = 1;
+    }
+    
     int bloques_necesarios = (tamanio + tamanio_bloque - 1) / tamanio_bloque; // Cantidad de bloques que ocuparia despues del truncate
 
     ////////// EN CASO DE QUE AUMENTE EL TAMANIO DEL ARCHIVO
@@ -403,7 +425,7 @@ void atender_fs_truncate(t_buffer *buffer)
 
         // Busco comprobar si, al final del archivo, existen suficientes bloques libres o no
         int bloques_libres_contiguos_1 = buscar_bloques_libres_contiguos(bloque_inicial, bloques_actuales, bloques_necesarios, bitmap->bitarray); 
-        
+
         if (bloques_libres_contiguos_1 >= bloques_incremento) 
         {
             log_info(io_logger, "No se requiere compactar el archivo");
@@ -416,6 +438,7 @@ void atender_fs_truncate(t_buffer *buffer)
 
             // CASO BORDE: Compruebo si, incluso despues de la compactacion, siguen sin haber bloques libres contiguos
             int bloques_libres_contiguos_2 = buscar_bloques_libres_contiguos(bloque_inicial, bloques_actuales, bloques_necesarios, bitmap->bitarray);
+
             if (bloques_libres_contiguos_2 < bloques_incremento) 
             {
                 perror("No se encontraron suficientes bloques contiguos incluso despues de la compactacion");
@@ -470,10 +493,14 @@ void atender_fs_truncate(t_buffer *buffer)
     eliminar_paquete(paquete);
 }
 
+//////////////////// FS_WRITE
+
 void atender_fs_write(t_buffer *buffer)
 {
     //
 }
+
+//////////////////// FS_READ
 
 void atender_fs_read(t_buffer *buffer)
 {
