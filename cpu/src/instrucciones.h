@@ -15,7 +15,7 @@ void ejecutar_exit();
 // void recibir_dato(void* dato_recibido);
 void ejecutar_resize(char tamanio [20]);
 void procesar_resultado_resize(char* resultado);
-void ejecutar_mov_in(char reg_dir_logica[20], char reg_datos[20]);
+void ejecutar_mov_in(char reg_datos[20],char reg_dir_logica[20]);
 void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]);
 void ejecutar_copy_string(char ch_tamanio[20]);
 void ejecutar_io_stdin_read(char interfaz[20], char reg_dir_logica[20], char reg_tam [20]);
