@@ -17,6 +17,7 @@ extern char **recursos;
 extern int *instancias_recursos;
 extern t_list *lista_recursos;
 extern t_list *lista_io_conectadas;
+extern t_list *lista_global_pcb;
 
 // SOCKETS
 extern int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha;
@@ -31,6 +32,9 @@ extern pthread_t hilo_quantum_remanente;
 // CRONOMENTRO PARA VRR
 extern t_temporal *tiempo_exec;
 
+// PARA PROCESO_ESTADO
+extern estado_proceso estado_filtrado;
+
 // SEMAFOROS
 extern pthread_mutex_t mutex_pid;
 extern pthread_mutex_t mutex_cola_new;
@@ -40,6 +44,7 @@ extern pthread_mutex_t mutex_cola_exec;
 extern pthread_mutex_t mutex_cola_block;
 extern pthread_mutex_t mutex_cola_exit;
 extern pthread_mutex_t mutex_lista_io;
+extern pthread_mutex_t mutex_lista_global_pcb;
 extern sem_t sem_multiprogramacion;
 extern sem_t sem_new;
 extern sem_t sem_ready;

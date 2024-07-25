@@ -121,7 +121,7 @@ void atender_instruccion(char *leido)
     }
     else if (strcmp(comando_consola[0], "PROCESO_ESTADO") == 0)
     {
-        //   TODO
+        listar_procesos_por_estado();
     }
 }
 
@@ -160,6 +160,7 @@ t_pcb *crear_pcb(int pid)
     pcb->registros_cpu = registros;
     inicializar_registros_pcb(pcb);
     pcb->recursos_usados = string_array_new();
+    agregar_pcb(lista_global_pcb, pcb, &mutex_lista_global_pcb);
     return pcb;
 }
 
@@ -403,4 +404,41 @@ void cambiar_grado_multiprogramacion(int valor)
         return;
     }
 
+}
+
+void listar_procesos_por_estado() {
+    pthread_mutex_lock(&mutex_lista_global_pcb);
+
+    printf("Procesos en estado NEW:\n");
+    estado_filtrado = NEW;
+    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+
+    printf("Procesos en estado READY:\n");
+    estado_filtrado = READY;
+    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+
+    printf("Procesos en estado READY-PRIORIDAD:\n");
+    estado_filtrado = READY_PRIORIDAD;
+    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+
+    printf("Procesos en estado EXECUTE:\n");
+    estado_filtrado = EXEC;
+    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+
+    printf("Procesos en estado BLOCK:\n");
+    estado_filtrado = BLOCK;
+    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+
+    printf("Procesos en estado EXIT:\n");
+    estado_filtrado = EXIT;
+    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+
+    pthread_mutex_unlock(&mutex_lista_global_pcb);
+};
+
+void imprimir_pcb_estado(void* data) {
+    t_pcb* pcb = (t_pcb*) data;
+    if (pcb->estado == estado_filtrado) {
+        printf("PID: %d\n", pcb->pid);
+    }
 }

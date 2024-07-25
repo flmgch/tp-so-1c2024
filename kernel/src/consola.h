@@ -18,5 +18,7 @@ bool es_pcb_buscado(void *data);
 void detener_planificacion();
 void iniciar_planificacion();
 void cambiar_grado_multiprogramacion(int valor);
+void imprimir_pcb_estado(void* data);
+void listar_procesos_por_estado();
 
 #endif

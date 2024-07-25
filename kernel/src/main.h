@@ -24,6 +24,7 @@
   int *instancias_recursos;
   t_list *lista_recursos;
   t_list *lista_io_conectadas;
+  t_list *lista_global_pcb;
 
 // SOCKETS
   int socket_conexion_cpu_dispatch, socket_conexion_cpu_interrupt, socket_conexion_memoria, socket_escucha;
@@ -38,6 +39,9 @@
 // CRONOMENTRO PARA VRR
   t_temporal* tiempo_exec;
 
+// PARA PROCESO_ESTADO
+estado_proceso estado_filtrado;
+
 // SEMAFOROS
   pthread_mutex_t mutex_pid;
   pthread_mutex_t mutex_cola_new;
@@ -47,6 +51,7 @@
   pthread_mutex_t mutex_cola_block;
   pthread_mutex_t mutex_cola_exit;
   pthread_mutex_t mutex_lista_io;
+  pthread_mutex_t mutex_lista_global_pcb;
   sem_t sem_multiprogramacion;
   sem_t sem_new;
   sem_t sem_ready;
