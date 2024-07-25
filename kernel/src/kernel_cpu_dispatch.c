@@ -18,12 +18,13 @@ void atender_cpu_dispatch() {
             // OBTENGO EL CONTEXTO DE LA CPU
             t_buffer *buffer = recibir_buffer(socket_conexion_cpu_dispatch);
             t_pcb *contexto_recibido = extraer_pcb_de_buffer(buffer);
+            if (chequear_quantum(contexto_recibido))
+            {
+                pthread_cancel(hilo_quantum);
+            }
             if (strcmp(algoritmo_planificacion, "VRR") == 0)
             {
                 temporal_stop(tiempo_exec);
-            }
-            if(chequear_quantum(contexto_recibido)) {
-                pthread_cancel(hilo_quantum);
             }
             log_info(kernel_logger, "Recibi un PCB que me envio el CPU");
             if(contexto_recibido->motivo_exit == FIN_QUANTUM) {

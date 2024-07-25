@@ -25,6 +25,7 @@ int numero_pagina = 0;
 int desplazamiento = 0;
 uint32_t dir_fisica_inicial = 0;
 int tam_aux = 0;
+int pid_interrupcion = -1;
 void *aux_dato;
 char *reg_aux;
 char *condicion;

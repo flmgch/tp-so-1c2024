@@ -139,18 +139,25 @@ void check_interrupt()
     if (sem_trywait(&sem_interrupt_quantum) == 0)
     {
         // OCURRIO UN FIN DE QUANTUM
-        log_info(cpu_logger, "INTERRUPCION POR FIN DE QUANTUM");
-        pthread_mutex_lock(&mutex_flag_execute);
-        flag_execute = false;
-        pthread_mutex_unlock(&mutex_flag_execute);
-        pcb->motivo_exit = FIN_QUANTUM;
-        t_buffer *buffer = crear_buffer();
-        agregar_pcb_a_buffer(buffer, pcb);
-        agregar_cop_a_buffer(buffer, CAMBIAR_ESTADO);
-        agregar_estado_a_buffer(buffer, READY);
-        t_paquete *paquete = crear_super_paquete(ENVIO_PCB, buffer);
-        enviar_paquete(paquete, socket_kernel_dispatch);
-        eliminar_paquete(paquete);
+        if (pcb->pid == pid_interrupcion)
+        {
+            log_info(cpu_logger, "INTERRUPCION POR FIN DE QUANTUM");
+            pthread_mutex_lock(&mutex_flag_execute);
+            flag_execute = false;
+            pthread_mutex_unlock(&mutex_flag_execute);
+            pcb->motivo_exit = FIN_QUANTUM;
+            t_buffer *buffer = crear_buffer();
+            agregar_pcb_a_buffer(buffer, pcb);
+            agregar_cop_a_buffer(buffer, CAMBIAR_ESTADO);
+            agregar_estado_a_buffer(buffer, READY);
+            t_paquete *paquete = crear_super_paquete(ENVIO_PCB, buffer);
+            enviar_paquete(paquete, socket_kernel_dispatch);
+            eliminar_paquete(paquete);
+        }
+        else
+        {
+            log_info(cpu_logger, "INTERRUPCION DESCARTADA, PID != PID EJECUTANDO");
+        }
     }
     if (sem_trywait(&sem_interrupt_fp) == 0)
     {
