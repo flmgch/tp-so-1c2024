@@ -254,6 +254,7 @@ void finalizar_proceso()
     t_pcb *pcb = (t_pcb *)list_remove_by_condition(cola_new, es_pcb_buscado);
     if (pcb != NULL)
     {
+        sem_wait(&sem_new);
         cambiar_estado(pcb, FINISH_ERROR);
         pcb->motivo_exit = INTERRUPTED_BY_USER;
         agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
@@ -265,6 +266,7 @@ void finalizar_proceso()
     pcb = (t_pcb *)list_remove_by_condition(cola_ready, es_pcb_buscado);
     if (pcb != NULL)
     {
+        sem_wait(&sem_ready);
         cambiar_estado(pcb, FINISH_ERROR);
         pcb->motivo_exit = INTERRUPTED_BY_USER;
         agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
@@ -276,6 +278,7 @@ void finalizar_proceso()
     pcb = (t_pcb *)list_remove_by_condition(cola_ready_prioridad, es_pcb_buscado);
     if (pcb != NULL)
     {
+        sem_wait(&sem_ready_prioridad);
         cambiar_estado(pcb, FINISH_ERROR);
         pcb->motivo_exit = INTERRUPTED_BY_USER;
         agregar_pcb(cola_exit, pcb, &mutex_cola_exit);
@@ -407,33 +410,37 @@ void cambiar_grado_multiprogramacion(int valor)
 }
 
 void listar_procesos_por_estado() {
-    pthread_mutex_lock(&mutex_lista_global_pcb);
 
     printf("Procesos en estado NEW:\n");
     estado_filtrado = NEW;
-    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+    list_iterate(cola_new, imprimir_pcb_estado);
 
     printf("Procesos en estado READY:\n");
     estado_filtrado = READY;
-    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+    list_iterate(cola_ready, imprimir_pcb_estado);
 
     printf("Procesos en estado READY-PRIORIDAD:\n");
     estado_filtrado = READY_PRIORIDAD;
-    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+    list_iterate(cola_ready_prioridad, imprimir_pcb_estado);
 
     printf("Procesos en estado EXECUTE:\n");
     estado_filtrado = EXEC;
-    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+    list_iterate(cola_execute, imprimir_pcb_estado);
 
     printf("Procesos en estado BLOCK:\n");
     estado_filtrado = BLOCK;
-    list_iterate(lista_global_pcb, imprimir_pcb_estado);
+    list_iterate(cola_block, imprimir_pcb_estado);
+    for (int i = 0; i < list_size(lista_recursos); i++)
+    {
+        t_recurso* elemento = list_get(lista_recursos, i);
+        list_iterate(elemento->cola_block_asignada, imprimir_pcb_estado);
+    }
+    for (int i = 0; i < list_size(lista_io_conectadas); i++)
+    {
+        t_interfaz_kernel* elemento = list_get(lista_io_conectadas, i);
+        list_iterate(elemento->cola_block_asignada, imprimir_pcb_estado);
+    }
 
-    printf("Procesos en estado EXIT:\n");
-    estado_filtrado = EXIT;
-    list_iterate(lista_global_pcb, imprimir_pcb_estado);
-
-    pthread_mutex_unlock(&mutex_lista_global_pcb);
 };
 
 void imprimir_pcb_estado(void* data) {

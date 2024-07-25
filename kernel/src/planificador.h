@@ -16,6 +16,7 @@ void pasar_a_ready_prioridad(t_pcb *pcb);
 void block_pcb();
 void new_pcb();
 void exit_pcb();
+void destroy_pcb(t_pcb* pcb);
 void execute_pcb();
 t_pcb *remover_pcb(t_list *list, pthread_mutex_t *mutex);
 t_pcb *pcb_segun_algoritmo();

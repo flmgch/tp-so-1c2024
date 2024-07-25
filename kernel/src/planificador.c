@@ -208,11 +208,15 @@ void exit_pcb()
         agregar_uint32_a_buffer(buffer, pcb->pid);
         t_paquete *paquete = crear_super_paquete(FINALIZAR_PROCESO, buffer);
         enviar_paquete(paquete, socket_conexion_memoria);
-        free(pcb);
-        free(buffer);
-        free(paquete);
+        destroy_pcb(pcb);
+        eliminar_paquete(paquete);
         sem_post(&sem_multiprogramacion);
     }
+}
+
+void destroy_pcb(t_pcb* pcb){
+    string_array_destroy(pcb->recursos_usados);
+    free(pcb);
 }
 
 void pasar_a_ready(t_pcb *pcb)

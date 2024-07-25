@@ -9,12 +9,12 @@ void inicializar_kernel()
 
 void inicializar_logs()
 {
-    kernel_logger = iniciar_logger("Kernel.log", LOG_LEVEL_DEBUG);
+    kernel_logger = iniciar_logger("/home/utnso/tp-2024-1c-CMMNJ/kernel/Kernel.log", LOG_LEVEL_DEBUG);
 };
 
 void inicializar_configs()
 {
-    kernel_config = iniciar_config("./Kernel.config");
+    kernel_config = iniciar_config("/home/utnso/tp-2024-1c-CMMNJ/kernel/Kernel.config");
 
     // INICIALIZAR VARIABLES DE CONEXIÓN
     puerto_escucha = config_get_string_value(kernel_config, "PUERTO_ESCUCHA");
