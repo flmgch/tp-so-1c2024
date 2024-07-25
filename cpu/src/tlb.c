@@ -4,6 +4,7 @@ int tlb_buscar(uint32_t pid, int numero_pagina){
     contador_acceso++;
     for (int i = 0; i < tlb_entradas; ++i) {
         if (tlb[i].pid == pid && tlb[i].pagina == numero_pagina) {
+            tlb[i].ultimo_acceso=contador_acceso;
             return i; 
         }
     }
@@ -19,6 +20,7 @@ void tlb_agregar(uint32_t pid, int pagina, int marco) {
         tlb[tlb_entradas].ultimo_acceso = contador_acceso; // para el lru
         tlb_entradas++;
     } else {
+        contador_acceso++;
         //no tengo espacio, sacrifico una entrada
         int index_reemplazo; //q entrada voy a sacrificar
         if(strcmp(algoritmo_tlb,"LRU")==0){ //si es lru, sacrifico el q tiene menos accesos
@@ -46,7 +48,7 @@ int encontrar_entrada_lru() {
     { // busco la entrada cn menor acceso (accedido hace mas) para sacrificar
         if (tlb[i].ultimo_acceso < min_acceso) {
             min_acceso = tlb[i].ultimo_acceso;
-            lru_index = min_acceso;
+            lru_index = i;
         }
     }
 

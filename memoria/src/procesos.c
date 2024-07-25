@@ -111,10 +111,9 @@ void atender_finalizar_proceso(t_buffer *buffer)
 
             int frame = list_get(proceso_a_eliminar->filas_tabla_paginas, i);
             bitarray_clean_bit(bitmap, frame);
-            cantidad_marcos++;
-            /*int n = bitarray_test_bit(bitmap, *frame);
-            log_info(mem_logger, "%d ", n);*/
+            cantidad_de_marcos_libres++;
         }
+
         pthread_mutex_unlock(&mutex_bitmap);
 
         list_destroy(proceso_a_eliminar->filas_tabla_paginas);
@@ -129,7 +128,7 @@ void atender_finalizar_proceso(t_buffer *buffer)
     list_remove_by_condition(lista_de_procesos, auxiliar_no_ser_proceso_x);
     pthread_mutex_unlock(&mutex_lista_procesos);
     tam_lista_procesos = list_size(lista_de_procesos);
-    log_info(mem_logger, "%d", tam_lista_procesos);
+    //log_info(mem_logger, "%d", tam_lista_procesos);
     free(proceso_a_eliminar);
 }
 
@@ -258,12 +257,12 @@ void atender_ajustar_tamanio(t_buffer *buffer)
 
     if (paginas_futuras > paginas_actuales)
     {
-        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Ampliar: %d", pid, proceso_a_modificar->size, tamanio_nuevo - tamanio_pagina * proceso_a_modificar->size);
+        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Ampliar: %d", pid, proceso_a_modificar->size*tamanio_pagina, tamanio_nuevo - tamanio_pagina * proceso_a_modificar->size);
         atender_aumentar_tamanio(proceso_a_modificar, tamanio_nuevo, paginas_actuales, paginas_futuras);
     }
     else if (paginas_futuras < paginas_actuales)
     {
-        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Reducir: %d", pid, proceso_a_modificar->size, tamanio_pagina * proceso_a_modificar->size - tamanio_nuevo);
+        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Reducir: %d", pid, proceso_a_modificar->size*tamanio_pagina, tamanio_pagina * proceso_a_modificar->size - tamanio_nuevo);
         atender_reducir_tamanio(proceso_a_modificar, paginas_futuras, paginas_actuales);
     }
 }
@@ -284,7 +283,7 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
     }
     else
     {
-        log_info(mem_logger, "%d", cantidad_de_marcos_libres);
+        log_info(mem_logger, "Marcos Libres: %d", cantidad_de_marcos_libres);
         int paginas_a_agregar = paginas_futuras - paginas_actuales;
         if (paginas_a_agregar <= cantidad_de_marcos_libres)
         {
@@ -296,7 +295,7 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
 
             /*for (int i = 0; i < 128; i++)
             {
-                int n = list_get(proceso->filas_tabla_paginas, i);
+                int n = bitarray_test_bit(bitmap,i);
                 log_info(mem_logger, "%d", n);
             }*/
 
@@ -323,7 +322,7 @@ void atender_reducir_tamanio(t_proceso *proceso, int paginas_futuras, int pagina
         paginas_a_eliminar--;
         paginas_actuales--;
     }
-    proceso->filas_tabla_paginas = list_take_and_remove(proceso->filas_tabla_paginas, paginas_futuras);
+    proceso->filas_tabla_paginas = list_take(proceso->filas_tabla_paginas, paginas_futuras);
     proceso->size = paginas_futuras;
     enviar_resultado("Ok");
     ///
@@ -345,7 +344,7 @@ void enviar_resultado(char *resultado)
 void agregar_frames(t_proceso *proceso, int numero_pagina)
 {
     int frame = buscar_frame_libre();
-    list_add_in_index(proceso->filas_tabla_paginas, numero_pagina, frame);
+    list_add(proceso->filas_tabla_paginas, frame);
     cantidad_de_marcos_libres--;
 }
 
