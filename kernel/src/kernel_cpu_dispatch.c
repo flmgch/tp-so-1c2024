@@ -388,11 +388,35 @@ void atender_io_stdin_read(t_pcb* pcb, char* nombre_interfaz, t_list* direccione
     cambiar_estado(pcb, BLOCK);
     pcb->motivo_block = IO_BLOCK;
     list_add(interfaz->cola_block_asignada, pcb);
-    log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
+    log_info(kernel_logger, "PID: %d esta en la cola de block de la interfaz %s", pcb->pid, interfaz->nombre);
     sem_post(&sem_exec);
 
-    t_buffer* buffer = crear_buffer();
-    agregar_int_a_buffer(buffer, pcb->pid);
+    t_manejo_io *args = malloc(sizeof(t_manejo_io));
+    args->pid = pcb->pid;
+    args->interfaz = interfaz;
+    args->direcciones_fisicas = direcciones_fisicas;
+    args->tamanio = tamanio;
+
+    pthread_t hilo_io;
+    pthread_create(&hilo_io, NULL, (void*)manejar_stdin_read, (void *)args);
+    pthread_detach(hilo_io);
+}
+
+void manejar_stdin_read(void *parametros)
+{
+    t_manejo_io *args = (t_manejo_io *)parametros;
+    int pid = args->pid;
+    t_interfaz_kernel *interfaz = args->interfaz;
+    t_list* direcciones_fisicas = args->direcciones_fisicas;
+    uint32_t tamanio = args->tamanio;
+
+    // Esperar a que la interfaz de I/O esté libre
+    sem_wait(&interfaz->interfaz_libre);
+    log_info(kernel_logger, "PID: %d - Bloqueado por %s", pid, interfaz->nombre);
+
+    // Realizar la operación de I/O
+    t_buffer *buffer = crear_buffer();
+    agregar_int_a_buffer(buffer, pid);
     agregar_lista_direcciones_a_buffer(buffer, direcciones_fisicas);   
     agregar_uint32_a_buffer(buffer, tamanio);
     t_paquete* paquete = crear_super_paquete(STDIN, buffer);

@@ -204,13 +204,18 @@ typedef struct
     int socket;
     t_list *cola_block_asignada;
     pthread_mutex_t mutex_asignado;
+    sem_t interfaz_libre;
 } t_interfaz_kernel;
 
 typedef struct
 {
-    char *nombre;
-    char *tipo;
-    int socket;
+    int pid;
+    t_interfaz_kernel* interfaz;
+    int unidades_de_trabajo; // PARA GENERICA
+    t_list* direcciones_fisicas; // PARA STDOUT/STDIN/FS
+    u_int32_t tamanio; // PARA STDOUT/STDIN/FS
+    char* nombre_archivo; // PARA FS
+    u_int32_t puntero; // PARA FS READ/WRITE
 } t_manejo_io;
 
 typedef struct

@@ -1,5 +1,6 @@
 #include "kernel_interfaz.h"
 #include "planificador.h"
+#include "kernel_cpu_dispatch.h"
 
 char* interfaz_a_eliminar;
 
@@ -36,6 +37,7 @@ void atender_modulo_interfaz(void* socket)
             agregar_pcb(cola_block, pcb, &mutex_cola_block);
             sem_post(&sem_block_return);
             log_info(kernel_logger, "PID: %d ha finalizado su uso de la interfaz: %s", pid, nombre_interfaz);
+            liberar_interfaz(nombre_interfaz);
             break;
         case -1:
             log_error(kernel_logger, "Se desconecto Interfaz");
@@ -64,6 +66,7 @@ void crear_interfaz (char* nombre_interfaz, char* tipo_interfaz, int fd_interfaz
     interfaz->socket = fd_interfaz;
     interfaz->cola_block_asignada = cola_block;
     pthread_mutex_init(&interfaz->mutex_asignado, NULL);
+    sem_init(&interfaz->interfaz_libre, 0, 1);
 
     pthread_mutex_lock(&mutex_lista_io);
     list_add(lista_io_conectadas, interfaz);
@@ -95,4 +98,20 @@ t_pcb* remover_pcb_lista_io(char* nombre_io) {
 
     return NULL;
     
+}
+
+void liberar_interfaz(char* nombre_io) {
+
+    int longitudLista = list_size(lista_io_conectadas);
+    t_interfaz_kernel* elemento;
+
+    for (size_t i = 0; i < longitudLista; i++)
+    {
+        elemento = (t_interfaz_kernel*) list_get(lista_io_conectadas, i);
+
+        if ((strcmp(elemento->nombre, nombre_io) == 0)) {
+            sem_post(&elemento->interfaz_libre);
+        }
+    }
+
 }
