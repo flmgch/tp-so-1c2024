@@ -91,15 +91,14 @@ void enviar_instruccion(char *instruccion)
 
 void atender_finalizar_proceso(t_buffer *buffer)
 {
-    t_proceso *proceso_a_eliminar = malloc(sizeof(t_proceso));
-    int tam_lista_procesos;
+    //int tam_lista_procesos;
     uint32_t pid = extraer_uint32_de_buffer(buffer);
 
     usleep(1000 * retardo_respuesta);
 
     pthread_mutex_lock(&mutex_lista_procesos);
-    proceso_a_eliminar = encontrar_proceso(lista_de_procesos, pid);
-    tam_lista_procesos = list_size(lista_de_procesos);
+    t_proceso *proceso_a_eliminar = encontrar_proceso(lista_de_procesos, pid);
+    //tam_lista_procesos = list_size(lista_de_procesos);
     pthread_mutex_unlock(&mutex_lista_procesos);
 
     int tamanio = proceso_a_eliminar->size;
@@ -108,11 +107,17 @@ void atender_finalizar_proceso(t_buffer *buffer)
         pthread_mutex_lock(&mutex_bitmap);
         for (int i = 0; i < tamanio; i++)
         {
-
-            int frame = list_get(proceso_a_eliminar->filas_tabla_paginas, i);
+            void* aux_frame=list_get(proceso_a_eliminar->filas_tabla_paginas, i);
+            int frame;
+            memcpy(&frame,aux_frame,sizeof(int));
             bitarray_clean_bit(bitmap, frame);
             cantidad_de_marcos_libres++;
         }
+
+        /*for(int i;i<cantidad_marcos;i++){
+        int n=bitarray_test_bit(bitmap,i);
+        log_info(mem_logger,"%d",n);
+    }*/
 
         pthread_mutex_unlock(&mutex_bitmap);
 
@@ -127,7 +132,7 @@ void atender_finalizar_proceso(t_buffer *buffer)
     pthread_mutex_lock(&mutex_lista_procesos);
     list_remove_by_condition(lista_de_procesos, auxiliar_no_ser_proceso_x);
     pthread_mutex_unlock(&mutex_lista_procesos);
-    tam_lista_procesos = list_size(lista_de_procesos);
+    //tam_lista_procesos = list_size(lista_de_procesos);
     //log_info(mem_logger, "%d", tam_lista_procesos);
     free(proceso_a_eliminar);
 }
@@ -157,7 +162,11 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
 
     strcpy(auxiliar, path_instrucciones);
 
-    char *archivo = strcat(auxiliar, path);
+    char *archivo = malloc(strlen(auxiliar) + strlen(path) + 1);
+
+    strcpy(archivo, auxiliar);
+    strcat(archivo, path);
+
 
     proceso->instrucciones = abrir_archivo(archivo);
     proceso->size = 0;
@@ -223,13 +232,13 @@ void atender_acceso_tabla_paginas(t_buffer *buffer)
         log_info(mem_logger, "%d", n);
     }*/
 
-        int frame = list_get(proceso_buscado->filas_tabla_paginas, numero_pagina);
+        int* frame = list_get(proceso_buscado->filas_tabla_paginas, numero_pagina);
 
-    log_info(mem_logger, "PID:%d - Pagina: %d - Frame: %d", pid, numero_pagina, frame);
+    log_info(mem_logger, "PID:%d - Pagina: %d - Frame: %d", pid, numero_pagina, *frame);
 
     t_buffer *new_buffer = crear_buffer();
 
-    agregar_int_a_buffer(new_buffer, frame);
+    agregar_int_a_buffer(new_buffer, *frame);
 
     t_paquete *paquete = crear_super_paquete(ENIVIAR_FRAME, new_buffer);
 
@@ -322,6 +331,10 @@ void atender_reducir_tamanio(t_proceso *proceso, int paginas_futuras, int pagina
         paginas_a_eliminar--;
         paginas_actuales--;
     }
+    for(int i=0;i<cantidad_marcos;i++){
+        int n=bitarray_test_bit(bitmap,i);
+        log_info(mem_logger,"%d",n);
+    }
     proceso->filas_tabla_paginas = list_take(proceso->filas_tabla_paginas, paginas_futuras);
     proceso->size = paginas_futuras;
     enviar_resultado("Ok");
@@ -344,15 +357,23 @@ void enviar_resultado(char *resultado)
 void agregar_frames(t_proceso *proceso, int numero_pagina)
 {
     int frame = buscar_frame_libre();
-    list_add(proceso->filas_tabla_paginas, frame);
+    int* aux_frame=malloc(sizeof(int));
+    memcpy(aux_frame,&frame,sizeof(int));
+    list_add(proceso->filas_tabla_paginas,aux_frame);
+    /*for(int i;i<cantidad_marcos;i++){
+        int* n=list_get(proceso->filas_tabla_paginas,i);
+        log_info(mem_logger,"%d",*n);
+    }*/
     cantidad_de_marcos_libres--;
 }
 
+
 void quitar_frames(t_proceso *proceso, int paginas_actuales)
 {
-    int frame = list_get(proceso->filas_tabla_paginas, (paginas_actuales - 1));
+    
+    int* frame = list_get(proceso->filas_tabla_paginas, (paginas_actuales - 1));
     pthread_mutex_lock(&mutex_bitmap);
-    bitarray_clean_bit(bitmap, frame);
+    bitarray_clean_bit(bitmap, *frame);
     pthread_mutex_unlock(&mutex_bitmap);
     cantidad_de_marcos_libres++;
 }

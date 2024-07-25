@@ -13,6 +13,7 @@ int tlb_buscar(uint32_t pid, int numero_pagina){
 
 void tlb_agregar(uint32_t pid, int pagina, int marco) {
     //si hay espacio, lo agrego de una
+    if(cantidad_entradas_tlb!=0){
     if (tlb_entradas < cantidad_entradas_tlb) {
         tlb[tlb_entradas].pid = pid;
         tlb[tlb_entradas].pagina = pagina;
@@ -37,6 +38,7 @@ void tlb_agregar(uint32_t pid, int pagina, int marco) {
         tlb[index_reemplazo].marco = marco;
         tlb[index_reemplazo].ultimo_acceso = contador_acceso;                        // para el lru
         tlb_proximo_reemplazo = (tlb_proximo_reemplazo + 1) % cantidad_entradas_tlb; // para el fifo
+    }
     }
 }
 

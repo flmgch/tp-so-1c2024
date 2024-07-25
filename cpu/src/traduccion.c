@@ -17,7 +17,13 @@ void traducir_direccion_logica(uint32_t direccion_logica)
 }
 
 int obtener_marco(int numero_pagina,int desplazamiento){
-    int index_tlb = tlb_buscar(pcb->pid, numero_pagina);
+    int index_tlb=0;
+    if(cantidad_entradas_tlb!=0){
+      index_tlb = tlb_buscar(pcb->pid, numero_pagina);
+    }
+    else{
+       index_tlb=-1;
+    }
     if (index_tlb != -1) {
         // tlb Hit
         log_info(cpu_logger, "PID: %d - TLB HIT - Pagina: %d",pcb->pid,numero_pagina);
