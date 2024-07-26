@@ -9,6 +9,10 @@ void escribir_memoria(t_buffer *buffer, int socket)
     int cant_pag_a_escribir = list_size(lista_direcciones);
     int tam_actual = 0;
 
+    char* aux=malloc(20);
+    memcpy(aux,valor,20);
+    log_info(mem_logger,"Recibo de IO: %s",aux);
+
     pthread_mutex_lock(&mutex_espacio_usuario);
 
     for (int i = 0; i < cant_pag_a_escribir; i++)

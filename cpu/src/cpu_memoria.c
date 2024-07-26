@@ -44,14 +44,14 @@ void atender_memoria()
             {
                 uint8_t resultado;
                 memcpy(&resultado, aux_resultado, sizeof(uint8_t));
-                reg_aux=malloc(5);
+                reg_aux=malloc(10);
                 sprintf(reg_aux, "%u", resultado);
             }
             else if (strcmp(condicion, "Uint32") == 0)
             {
                 uint32_t resultado;
                 memcpy(&resultado, aux_resultado, sizeof(uint32_t));
-                reg_aux=malloc(5);
+                reg_aux=malloc(10);
                 sprintf(reg_aux, "%u", resultado);
             }
             else

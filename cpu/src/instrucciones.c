@@ -76,16 +76,34 @@ void ejecutar_sum(char registro_destino[20] , char registro_origen[20] ){
     void* puntero_origen = obtener_registro(registro_origen);
 
 
+    uint32_t destino=0;
+    uint32_t origen=0;
+
     if (puntero_destino != NULL && puntero_origen != NULL) {
         //determino si los registros son de 1 o 4 bytes
         if (strcmp(registro_destino, "AX") == 0 || strcmp(registro_destino, "BX") == 0 ||
             strcmp(registro_destino, "CX") == 0 || strcmp(registro_destino, "DX") == 0) {
-            *(uint8_t*)puntero_destino += *(uint8_t*)puntero_origen;
-            log_info(cpu_logger, "Resultado de la suma: %d", *(uint8_t *)puntero_destino);
+            uint8_t valor;
+            memcpy(&valor,puntero_destino,sizeof(uint8_t));
+            destino=valor;
         } else {
-            *(uint32_t*)puntero_destino += *(uint32_t*)puntero_origen;
-            log_info(cpu_logger, "Resultado de la suma: %d", *(uint32_t *)puntero_destino);
+            memcpy(&destino,puntero_destino,sizeof(uint8_t));
         }
+
+        if (strcmp(registro_origen, "AX") == 0 || strcmp(registro_origen, "BX") == 0 ||
+            strcmp(registro_origen, "CX") == 0 || strcmp(registro_origen, "DX") == 0) {
+            uint8_t valor=0;
+            memcpy(&valor,puntero_origen,sizeof(uint8_t));
+            origen=valor;
+        } else {
+            memcpy(&origen,puntero_origen,sizeof(uint8_t));
+        }
+
+        destino+=origen;
+        char* resultado_suma=malloc(20);
+        sprintf(resultado_suma, "%u", destino);
+        ejecutar_set(registro_destino,resultado_suma);
+        free(resultado_suma);
     } else {
         log_error(cpu_logger, "Registro invalido");
     }
@@ -96,18 +114,34 @@ void ejecutar_sum(char registro_destino[20] , char registro_origen[20] ){
 void ejecutar_sub(char registro_destino[20] , char registro_origen[20] ){
         void* puntero_destino = obtener_registro(registro_destino);
     void* puntero_origen = obtener_registro(registro_origen);
-
+    uint32_t destino=0;
+    uint32_t origen=0;
 
     if (puntero_destino != NULL && puntero_origen != NULL) {
         //determino si los registros son de 1 o 4 bytes
         if (strcmp(registro_destino, "AX") == 0 || strcmp(registro_destino, "BX") == 0 ||
             strcmp(registro_destino, "CX") == 0 || strcmp(registro_destino, "DX") == 0) {
-            *(uint8_t*)puntero_destino -= *(uint8_t*)puntero_origen;
-            log_info(cpu_logger, "Resultado de la Resta: %d", *(uint8_t *)puntero_destino);
+            uint8_t valor=0;
+            memcpy(&valor,puntero_destino,sizeof(uint8_t));
+            destino=valor;
         } else {
-            *(uint32_t*)puntero_destino -= *(uint32_t*)puntero_origen;
-            log_info(cpu_logger, "Resultado de la Resta: %d", *(uint32_t *)puntero_destino);
+            memcpy(&destino,puntero_destino,sizeof(uint8_t));
         }
+
+        if (strcmp(registro_origen, "AX") == 0 || strcmp(registro_origen, "BX") == 0 ||
+            strcmp(registro_origen, "CX") == 0 || strcmp(registro_origen, "DX") == 0) {
+            uint8_t valor=0;
+            memcpy(&valor,puntero_origen,sizeof(uint8_t));
+            origen=valor;
+        } else {
+            memcpy(&origen,puntero_origen,sizeof(uint8_t));
+        }
+
+        destino-=origen;
+        char* resultado_resta=malloc(20);
+        sprintf(resultado_resta, "%u", destino);
+        ejecutar_set(registro_destino,resultado_resta);
+        free(resultado_resta);
     } else {
         log_error(cpu_logger, "Registro invalido");
     }

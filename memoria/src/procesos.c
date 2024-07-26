@@ -246,13 +246,13 @@ void atender_acceso_tabla_paginas(t_buffer *buffer)
         log_info(mem_logger, "%d", n);
     }*/
 
-    int* frame = list_get(proceso_buscado->filas_tabla_paginas, numero_pagina);
+    int frame = *(int*)list_get(proceso_buscado->filas_tabla_paginas, numero_pagina);
 
-    log_info(mem_logger, "PID:%d - Pagina: %d - Frame: %d", pid, numero_pagina, *frame);
+    log_info(mem_logger, "PID:%d - Pagina: %d - Frame: %d", pid, numero_pagina, frame);
 
     t_buffer *new_buffer = crear_buffer();
 
-    agregar_int_a_buffer(new_buffer, *frame);
+    agregar_int_a_buffer(new_buffer, frame);
 
     t_paquete *paquete = crear_super_paquete(ENIVIAR_FRAME, new_buffer);
 

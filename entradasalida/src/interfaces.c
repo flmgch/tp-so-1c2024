@@ -38,12 +38,12 @@ void atender_stdin(t_buffer *buffer)
 
     log_info(io_logger, "PID: %d - Operacion: STDIN_READ", una_io->pid);
         
-    char *texto = malloc(una_io->tamanio_total);
+    char *texto = malloc(una_io->tamanio_total+1);
     void *texto_aux = malloc(una_io->tamanio_total);
 
     printf("> Ingrese un texto de %d caracteres: ", una_io->tamanio_total);
 
-    fgets(texto, una_io->tamanio_total, stdin);
+    fgets(texto, una_io->tamanio_total+1, stdin);
 
     memcpy(texto_aux, texto, una_io->tamanio_total);
 
@@ -102,7 +102,7 @@ void imprimir_resultado_lectura(t_buffer *buffer)
     u_int32_t tamanio_total = extraer_uint32_de_buffer(buffer);
     void *texto_aux = extraer_de_buffer(buffer);
 
-    char *texto = malloc(tamanio_total);
+    char *texto = malloc(tamanio_total+1);
     memcpy(texto, texto_aux, tamanio_total);
     // Le agrego el caracter nulo 
     texto[tamanio_total] = '\0';
