@@ -132,7 +132,7 @@ void atender_finalizar_proceso(t_buffer *buffer)
     }
     else{
         list_destroy(proceso_a_eliminar->filas_tabla_paginas);
-        proceso_a_eliminar->filas_tabla_paginas->he
+        
     }
 
     bool auxiliar_no_ser_proceso_x(void *elemento)
@@ -299,7 +299,7 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
         return;
     }
     pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
-    else if (tamanio_memoria < new_size)
+    if (tamanio_memoria < new_size)
     {
         log_error(mem_logger, "No hay espacio de memoria suficiente para agregar mas paginas");
         enviar_resultado("Out of Memory");
@@ -328,13 +328,13 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
             proceso->size = paginas_futuras;
             // LO
         }
-        pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
         else
         {
             log_error(mem_logger, "No hay frames suficientes para agregar mas paginas");
             enviar_resultado("Out of Memory");
             return;
         }
+        pthread_mutex_unlock(&mutex_cantidad_marcos_libres); 
     }
 }
 
