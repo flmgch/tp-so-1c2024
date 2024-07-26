@@ -40,9 +40,9 @@ int main(int argc, char *argv[])
     pthread_detach(hilo_interfaz);
   }
 
-  // borrar_espacio_usuario();
-  // borrar_semaforos();
-  // list_destroy_and_destroy_elements(lista_de_procesos,eliminar_lista);
+  //  borrar_espacio_usuario();
+  //  borrar_semaforos();
+  //  list_destroy_and_destroy_elements(lista_de_procesos,eliminar_lista);
   //  close(socket_escucha);
   //  close(socket_interfaz);
   //  close(socket_cpu);

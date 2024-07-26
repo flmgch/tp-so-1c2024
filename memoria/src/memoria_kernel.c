@@ -5,8 +5,8 @@ void atender_kernel()
 
     bool control_key = 1;
     while (control_key)
-    {
-        t_buffer *un_buffer = crear_buffer();
+    {  
+        t_buffer* un_buffer;
         int cod_op = recibir_operacion(socket_kernel);
         usleep(retardo_respuesta);
         switch (cod_op)
@@ -35,11 +35,12 @@ void atender_kernel()
                 t_proceso *m = list_get(lista_de_procesos, i);
                 log_info(mem_logger, "PID: %d", m->pid);
             }*/
-
+            destruir_buffer(un_buffer);
             break;
         case FINALIZAR_PROCESO:
             un_buffer = recibir_buffer(socket_kernel);
             atender_finalizar_proceso(un_buffer);
+            destruir_buffer(un_buffer);
             break;
         case -1:
             log_error(mem_logger, "Se desconecto kernel");
@@ -51,6 +52,5 @@ void atender_kernel()
             control_key = 0;
             break;
         }
-        destruir_buffer(un_buffer);
     }
 };

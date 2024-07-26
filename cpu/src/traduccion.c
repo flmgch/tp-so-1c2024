@@ -45,7 +45,7 @@ t_list *separar_en_paginas(uint32_t direccion_logica, int tamanio_dato)
 { // devuelve lista de direcciones fisicas, con el tamanio a l/e en c/u
   //  = direccion_logica - numero_pagina * tamanio_pagina;
 
-    t_list *lista_dir_fis = malloc(sizeof(t_list));
+    t_list *lista_dir_fis = list_create();
 
     //= traducir_direccion_logica (direccion_logica);
 
@@ -59,7 +59,6 @@ t_list *separar_en_paginas(uint32_t direccion_logica, int tamanio_dato)
         direccion->tamanio_dato = espacio_restante;
 
         list_add(lista_dir_fis, direccion);
-
         int queda_escribir = tamanio_dato - espacio_restante;
 
         int paginas_restantes = ceil((double)queda_escribir / tamanio_pagina);
@@ -83,7 +82,6 @@ t_list *separar_en_paginas(uint32_t direccion_logica, int tamanio_dato)
                 //
             }
             list_add(lista_dir_fis, nueva_direccion);
-            //
         }
     }
     else

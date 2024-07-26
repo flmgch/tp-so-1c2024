@@ -5,7 +5,8 @@ t_instruccion atender_instrucciones(t_buffer *buffer)
     char *inst = extraer_string_de_buffer(buffer);
 
     t_instruccion instruccion = formular_instruccion(inst);
-
+    
+    free(inst);
     return instruccion;
 }
 

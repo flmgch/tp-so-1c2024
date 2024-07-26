@@ -1,10 +1,11 @@
 #include "cpu_kernel_interrupt.h"
 
 void atender_kernel_interrupt()
-{
+{   
+    t_buffer* buffer;
     bool control_key = 1;
     while (control_key)
-    {
+    {   
         int cod_op = recibir_operacion(socket_kernel_interrupt);
         switch (cod_op)
         {
@@ -15,10 +16,11 @@ void atender_kernel_interrupt()
             //
             break;
         case INT_FIN_QUANTUM:{
-            t_buffer* buffer = recibir_buffer(socket_kernel_interrupt);
+            buffer = recibir_buffer(socket_kernel_interrupt);
             int pid = extraer_int_de_buffer(buffer);
             pid_interrupcion = pid;
             sem_post(&sem_interrupt_quantum);
+            destruir_buffer(buffer);
             break;
         }
         case INT_FINALIZAR_PROCESO:{

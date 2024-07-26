@@ -218,8 +218,6 @@ void ejecutar_mov_in(char reg_datos[20],char reg_dir_logica[20]){
     //memcpy(&dir_logica, direccion_logica, sizeof(uint32_t));
     t_buffer *un_buffer = crear_buffer();
     int tam_segun;
-    t_list *direcciones;
-    condicion = malloc(15);
 
     //datos=&reg_datos;
 
@@ -228,20 +226,18 @@ void ejecutar_mov_in(char reg_datos[20],char reg_dir_logica[20]){
         if (strcmp(reg_datos, "AX") == 0 || strcmp(reg_datos, "BX") == 0 ||
             strcmp(reg_datos, "CX") == 0 || strcmp(reg_datos, "DX") == 0) {
             tam_segun = sizeof(uint8_t);
-            reg_aux = malloc(tam_segun);
-            condicion = "Uint8";
+            condicion = strdup("Uint8");
             // agregar_string_a_buffer(un_buffer, condicion);
         }
         else
         {
             tam_segun = sizeof(uint32_t);
-            reg_aux = malloc(tam_segun);
-            condicion = "Uint32";
+            condicion = strdup("Uint32");
             // agregar_string_a_buffer(un_buffer, condicion);
         }
         }
 
-        direcciones = separar_en_paginas(dir_logica, tam_segun);
+        t_list *direcciones = separar_en_paginas(dir_logica, tam_segun);
 
         // t_direccion_fisica *d = list_get(direcciones, 0);
 
@@ -271,7 +267,8 @@ void ejecutar_mov_in(char reg_datos[20],char reg_dir_logica[20]){
             log_info(cpu_logger, "Estado registro al final: %d", *aux_resultado);
         }
         free(reg_aux);
-        list_destroy(direcciones);
+        free(condicion);
+        list_destroy_and_destroy_elements(direcciones,(void*)free);
 }
 
 /*void recibir_dato(void* dato_recibido){
@@ -294,7 +291,7 @@ void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
         dir_logica=*aux_dir ;
         }
     //memcpy(&dir_logica, direccion_logica, sizeof(uint32_t)); //
-    t_list *direcciones;
+    
     void *valor;
     int tam_segun;
 
@@ -326,7 +323,7 @@ void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
         }
     }
 
-    direcciones = separar_en_paginas(dir_logica, tam_segun);
+    t_list *direcciones = separar_en_paginas(dir_logica, tam_segun);
 
     /*t_direccion_fisica *d = list_get(direcciones, 0);
 
@@ -336,7 +333,8 @@ void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
     t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_ESCRITURA, un_buffer);
     enviar_paquete(paquete, socket_memoria);
     eliminar_paquete(paquete);
-    list_destroy(direcciones);
+    free(valor);
+    list_destroy_and_destroy_elements(direcciones,(void*)free);
 }
 // COPY STRING
 void ejecutar_copy_string(char ch_tamanio[20])
@@ -372,8 +370,8 @@ void ejecutar_copy_string(char ch_tamanio[20])
     eliminar_paquete(paquete2);
 
     free(reg_aux);
-    list_destroy(direcciones_destino);
-    list_destroy(direcciones_origen);
+    list_destroy_and_destroy_elements(direcciones_destino,(void*)free);
+    list_destroy_and_destroy_elements(direcciones_origen,(void*)free);
 }
 
 //IO_STDIN_READ
@@ -396,7 +394,7 @@ void ejecutar_io_stdin_read(char interfaz[20], char reg_dir_logica[20], char reg
     uint32_t tamaño;
     //memcpy(&tamaño, direccion_tamaño, sizeof(uint32_t));
 
-    t_list* direcciones;
+    
     t_buffer *un_buffer = crear_buffer();
     agregar_pcb_a_buffer(un_buffer, pcb);
     agregar_cop_a_buffer(un_buffer, OP_IO_STDIN_READ);
@@ -415,14 +413,14 @@ void ejecutar_io_stdin_read(char interfaz[20], char reg_dir_logica[20], char reg
             } 
 
 
-    direcciones = separar_en_paginas(dir_logica, tamaño);
+    t_list* direcciones= separar_en_paginas(dir_logica, tamaño);
 
     agregar_lista_direcciones_a_buffer(un_buffer,direcciones);
     agregar_uint32_a_buffer(un_buffer, tamaño);
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
-    list_destroy(direcciones);
+    list_destroy_and_destroy_elements(direcciones,(void*)free);
 }
 
 //IO_STDOUT_WRITE
@@ -445,7 +443,7 @@ void ejecutar_io_stdout_write(char interfaz[20], char reg_dir_logica[20], char r
     uint32_t tamaño;
     //memcpy(&tamaño, direccion_tamaño, sizeof(uint32_t));
 
-    t_list* direcciones;
+  
     t_buffer *un_buffer = crear_buffer();
     agregar_pcb_a_buffer(un_buffer, pcb);
     agregar_cop_a_buffer(un_buffer, OP_IO_STDOUT_WRITE);
@@ -463,13 +461,13 @@ void ejecutar_io_stdout_write(char interfaz[20], char reg_dir_logica[20], char r
         tamaño=*aux_tamaño;
         } 
 
-    direcciones = separar_en_paginas(dir_logica, tamaño);
+    t_list* direcciones = separar_en_paginas(dir_logica, tamaño);
     agregar_lista_direcciones_a_buffer(un_buffer,direcciones);
     agregar_uint32_a_buffer(un_buffer, tamaño);
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
-    list_destroy(direcciones);
+    list_destroy_and_destroy_elements(direcciones,(void*)free);
 }
 
 //IO_FS_CREATE
@@ -588,7 +586,7 @@ void ejecutar_io_fs_write(char interfaz[20], char nombre_archivo[20], char reg_d
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
-    list_destroy(direcciones_fisicas);
+    list_destroy_and_destroy_elements(direcciones_fisicas,(void*)free);
 }
 
 
@@ -599,7 +597,6 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
     agregar_cop_a_buffer(un_buffer, OP_IO_FS_READ);
     agregar_string_a_buffer(un_buffer,interfaz);
     agregar_string_a_buffer(un_buffer,nombre_archivo);
-    t_list *direcciones_fisicas;
 
 
     uint32_t dir_logica;
@@ -627,7 +624,7 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
         tamaño=*aux_tamaño;
         } 
 
-    direcciones_fisicas = separar_en_paginas(dir_logica, tamaño);
+   t_list *direcciones_fisicas = separar_en_paginas(dir_logica, tamaño);
 
     agregar_lista_direcciones_a_buffer(un_buffer, direcciones_fisicas);
     agregar_uint32_a_buffer(un_buffer, tamaño);
@@ -649,7 +646,7 @@ void ejecutar_io_fs_read(char interfaz[20], char nombre_archivo[20], char reg_di
     t_paquete *paquete = crear_super_paquete(ENVIO_PCB, un_buffer);
     enviar_paquete(paquete, socket_kernel_dispatch);
     eliminar_paquete(paquete);
-    list_destroy(direcciones_fisicas);
+    list_destroy_and_destroy_elements(direcciones_fisicas,(void*)free);
 }
 
 // WAIT

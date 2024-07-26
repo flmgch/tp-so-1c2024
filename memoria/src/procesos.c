@@ -51,7 +51,6 @@ void atender_program_counter(t_buffer *buffer)
 
     uint32_t program_counter = extraer_uint32_de_buffer(buffer);
     uint32_t pid_cpu = extraer_uint32_de_buffer(buffer);
-    t_proceso *proceso = malloc(sizeof(t_proceso));
     procesos_necesarios = pid_cpu;
 
     pthread_mutex_lock(&mutex_lista_procesos);
@@ -61,7 +60,7 @@ void atender_program_counter(t_buffer *buffer)
         aux_condicion = 1;
         pthread_cond_wait(&condicion, &mutex_lista_procesos);
     }
-    proceso = encontrar_proceso(lista_de_procesos, pid_cpu);
+    t_proceso *proceso = encontrar_proceso(lista_de_procesos, pid_cpu);
     pthread_mutex_unlock(&mutex_lista_procesos);
 
     usleep(1000 * retardo_respuesta);
@@ -107,7 +106,7 @@ void atender_finalizar_proceso(t_buffer *buffer)
         for (int i = 0; i < tamanio; i++)
         {
             void* aux_frame=list_get(proceso_a_eliminar->filas_tabla_paginas, i);
-            int frame;
+            int frame=0;
             memcpy(&frame,aux_frame,sizeof(int));
             bitarray_clean_bit(bitmap, frame);
             cantidad_de_marcos_libres++;
@@ -119,8 +118,13 @@ void atender_finalizar_proceso(t_buffer *buffer)
     }*/
 
         pthread_mutex_unlock(&mutex_bitmap);
-
+        
+        if(proceso_a_eliminar->filas_tabla_paginas==NULL){
         list_destroy(proceso_a_eliminar->filas_tabla_paginas);
+        }
+        else{
+            list_destroy_and_destroy_elements(proceso_a_eliminar->filas_tabla_paginas,(void*)free);
+        }
 
         bool auxiliar_no_ser_proceso_x(void *elemento)
         {
@@ -133,6 +137,8 @@ void atender_finalizar_proceso(t_buffer *buffer)
     pthread_mutex_unlock(&mutex_lista_procesos);
     //tam_lista_procesos = list_size(lista_de_procesos);
     //log_info(mem_logger, "%d", tam_lista_procesos);
+    string_array_destroy(proceso_a_eliminar->instrucciones);
+    free(proceso_a_eliminar->path);
     free(proceso_a_eliminar);
 }
 
@@ -151,7 +157,6 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
     char *path = extraer_string_de_buffer(buffer);
     u_int32_t pid = extraer_uint32_de_buffer(buffer);
 
-    usleep(1000 * retardo_respuesta);
 
     t_proceso *proceso = malloc(sizeof(t_proceso));
     proceso->pid = pid;
@@ -166,6 +171,7 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
     strcpy(archivo, auxiliar);
     strcat(archivo, path);
 
+    usleep(1000 * retardo_respuesta);
 
     proceso->instrucciones = abrir_archivo(archivo);
     proceso->size = 0;
@@ -181,7 +187,6 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
 char **abrir_archivo(const char *file)
 {
     FILE *pseudocodiogo = fopen(file, "r");
-    char *instrucciones = NULL;
     if (pseudocodiogo != NULL)
     {
 
@@ -191,7 +196,7 @@ char **abrir_archivo(const char *file)
 
         fseek(pseudocodiogo, 0, SEEK_SET);
 
-        instrucciones = malloc(length + 1);
+        char *instrucciones = malloc(length + 1);
         if (instrucciones != NULL)
         {
 
@@ -202,7 +207,9 @@ char **abrir_archivo(const char *file)
         fclose(pseudocodiogo);
 
         log_info(mem_logger, "\n%s", instrucciones);
-        return string_split(instrucciones, "\n");
+        char** arreglo_instrucciones=string_split(instrucciones, "\n");
+        free(instrucciones);
+        return arreglo_instrucciones;
     }
     else
     {
@@ -220,10 +227,9 @@ void atender_acceso_tabla_paginas(t_buffer *buffer)
 
     usleep(1000 * retardo_respuesta);
 
-    t_proceso *proceso_buscado = malloc(sizeof(t_proceso));
 
     pthread_mutex_lock(&mutex_lista_procesos);
-    proceso_buscado = encontrar_proceso(lista_de_procesos, pid);
+    t_proceso *proceso_buscado = encontrar_proceso(lista_de_procesos, pid);
     pthread_mutex_unlock(&mutex_lista_procesos);
 
     /*for (int i = 0; i < 128; i++)
@@ -232,7 +238,7 @@ void atender_acceso_tabla_paginas(t_buffer *buffer)
         log_info(mem_logger, "%d", n);
     }*/
 
-        int* frame = list_get(proceso_buscado->filas_tabla_paginas, numero_pagina);
+    int* frame = list_get(proceso_buscado->filas_tabla_paginas, numero_pagina);
 
     log_info(mem_logger, "PID:%d - Pagina: %d - Frame: %d", pid, numero_pagina, *frame);
 
@@ -245,6 +251,7 @@ void atender_acceso_tabla_paginas(t_buffer *buffer)
     enviar_paquete(paquete, socket_cpu);
 
     eliminar_paquete(paquete);
+
 }
 
 // CAMBIAR TAMANIO PROCESO
@@ -356,7 +363,7 @@ void agregar_frames(t_proceso *proceso, int numero_pagina)
 {
     int frame = buscar_frame_libre();
     int* aux_frame=malloc(sizeof(int));
-    memcpy(aux_frame,&frame,sizeof(int));
+    *aux_frame=frame;
     list_add(proceso->filas_tabla_paginas,aux_frame);
     /*for(int i;i<cantidad_marcos;i++){
         int* n=list_get(proceso->filas_tabla_paginas,i);
