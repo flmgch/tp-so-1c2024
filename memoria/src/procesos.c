@@ -89,55 +89,63 @@ void enviar_instruccion(char *instruccion)
 
 void atender_finalizar_proceso(t_buffer *buffer)
 {
-    //int tam_lista_procesos;
     uint32_t pid = extraer_uint32_de_buffer(buffer);
 
     usleep(1000 * retardo_respuesta);
 
     pthread_mutex_lock(&mutex_lista_procesos);
     t_proceso *proceso_a_eliminar = encontrar_proceso(lista_de_procesos, pid);
-    //tam_lista_procesos = list_size(lista_de_procesos);
     pthread_mutex_unlock(&mutex_lista_procesos);
+
+    if (proceso_a_eliminar == NULL) {
+        log_error(mem_logger, "Proceso con PID:%d no encontrado para finalizar", pid);
+        return;
+    }
 
     int tamanio = proceso_a_eliminar->size;
     log_info(mem_logger, "PID:%d - Tamaño: %d", pid, tamanio);
 
-        pthread_mutex_lock(&mutex_bitmap);
-        for (int i = 0; i < tamanio; i++)
-        {
-            void* aux_frame=list_get(proceso_a_eliminar->filas_tabla_paginas, i);
-            int frame=0;
-            memcpy(&frame,aux_frame,sizeof(int));
-            bitarray_clean_bit(bitmap, frame);
-            cantidad_de_marcos_libres++;
+    pthread_mutex_lock(&mutex_bitmap);
+    for (int i = 0; i < tamanio; i++)
+    {
+        void* aux_frame = list_get(proceso_a_eliminar->filas_tabla_paginas, i);
+        if (aux_frame == NULL) {
+            log_error(mem_logger, "Elemento de la lista de páginas nulo en la posición %d", i);
+            continue; // O manejar el error según sea necesario
         }
+        int frame = 0;
+        memcpy(&frame, aux_frame, sizeof(int));
+        bitarray_clean_bit(bitmap, frame);
+    }
+    pthread_mutex_unlock(&mutex_bitmap);
 
-        /*for(int i;i<cantidad_marcos;i++){
-        int n=bitarray_test_bit(bitmap,i);
-        log_info(mem_logger,"%d",n);
-    }*/
+    pthread_mutex_lock(&mutex_cantidad_marcos_libres);
+     for (int i = 0; i < tamanio; i++){
+       cantidad_de_marcos_libres++;
+     }
+    pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
 
-        pthread_mutex_unlock(&mutex_bitmap);
+    if (proceso_a_eliminar->filas_tabla_paginas != NULL) {
+        list_destroy_and_destroy_elements(proceso_a_eliminar->filas_tabla_paginas, (void*)free);
+        proceso_a_eliminar->filas_tabla_paginas=NULL;
         
-        if(proceso_a_eliminar->filas_tabla_paginas==NULL){
+    }
+    else{
         list_destroy(proceso_a_eliminar->filas_tabla_paginas);
-        }
-        else{
-            list_destroy_and_destroy_elements(proceso_a_eliminar->filas_tabla_paginas,(void*)free);
-        }
+        proceso_a_eliminar->filas_tabla_paginas->he
+    }
 
-        bool auxiliar_no_ser_proceso_x(void *elemento)
-        {
-
-            return debe_ser_proceso_x(elemento, pid);
-        }
+    bool auxiliar_no_ser_proceso_x(void *elemento)
+    {
+        return debe_ser_proceso_x(elemento, pid);
+    }
 
     pthread_mutex_lock(&mutex_lista_procesos);
     list_remove_by_condition(lista_de_procesos, auxiliar_no_ser_proceso_x);
     pthread_mutex_unlock(&mutex_lista_procesos);
-    //tam_lista_procesos = list_size(lista_de_procesos);
-    //log_info(mem_logger, "%d", tam_lista_procesos);
-    string_array_destroy(proceso_a_eliminar->instrucciones);
+    
+    proceso_a_eliminar->size=0;
+    string_array_destroy(proceso_a_eliminar->instrucciones); // Verifica que `string_array_destroy` maneje bien los punteros
     free(proceso_a_eliminar->path);
     free(proceso_a_eliminar);
 }
@@ -283,12 +291,14 @@ void atender_ajustar_tamanio(t_buffer *buffer)
 
 void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actuales, int paginas_futuras)
 {
+    pthread_mutex_lock(&mutex_cantidad_marcos_libres);
     if (cantidad_de_marcos_libres == 0)
-    {
+    {  pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
         log_error(mem_logger, "No hay frames suficientes para agregar mas paginas");
         enviar_resultado("Out of Memory");
         return;
     }
+    pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
     else if (tamanio_memoria < new_size)
     {
         log_error(mem_logger, "No hay espacio de memoria suficiente para agregar mas paginas");
@@ -299,14 +309,15 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
     {
         log_info(mem_logger, "Marcos Libres: %d", cantidad_de_marcos_libres);
         int paginas_a_agregar = paginas_futuras - paginas_actuales;
+        pthread_mutex_lock(&mutex_cantidad_marcos_libres);
         if (paginas_a_agregar <= cantidad_de_marcos_libres)
-        {
-
+        {  
+            pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
             for (int i = 0; i < paginas_a_agregar; i++)
             {
                 agregar_frames(proceso, i);
             }
-
+           
             /*for (int i = 0; i < 128; i++)
             {
                 int n = bitarray_test_bit(bitmap,i);
@@ -317,6 +328,7 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
             proceso->size = paginas_futuras;
             // LO
         }
+        pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
         else
         {
             log_error(mem_logger, "No hay frames suficientes para agregar mas paginas");
@@ -369,7 +381,9 @@ void agregar_frames(t_proceso *proceso, int numero_pagina)
         int* n=list_get(proceso->filas_tabla_paginas,i);
         log_info(mem_logger,"%d",*n);
     }*/
+     pthread_mutex_lock(&mutex_cantidad_marcos_libres);
     cantidad_de_marcos_libres--;
+     pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
 }
 
 
@@ -380,7 +394,9 @@ void quitar_frames(t_proceso *proceso, int paginas_actuales)
     pthread_mutex_lock(&mutex_bitmap);
     bitarray_clean_bit(bitmap, *frame);
     pthread_mutex_unlock(&mutex_bitmap);
+     pthread_mutex_lock(&mutex_cantidad_marcos_libres);
     cantidad_de_marcos_libres++;
+     pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
 }
 
 // TAMAÑO DE PAGINA

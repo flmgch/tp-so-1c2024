@@ -49,7 +49,8 @@ void inicializar_semaforos()
     pthread_mutex_init(&mutex_lista_procesos, NULL);
     pthread_mutex_init(&mutex_bitmap, NULL);
     pthread_mutex_init(&mutex_espacio_usuario, NULL);
-    // pthread_cond_init(&condicion, NULL);
+    pthread_mutex_init(&mutex_cantidad_marcos_libres, NULL);
+    pthread_cond_init(&condicion, NULL);
 }
 
 void borrar_espacio_usuario()
@@ -64,5 +65,6 @@ void borrar_semaforos()
     pthread_mutex_destroy(&mutex_bitmap);
     pthread_mutex_destroy(&mutex_espacio_usuario);
     pthread_mutex_destroy(&mutex_lista_procesos);
-    // pthread_cond_destroy(&condicion);
+    pthread_mutex_destroy(&mutex_cantidad_marcos_libres);
+    pthread_cond_destroy(&condicion);
 }
