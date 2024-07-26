@@ -11,12 +11,12 @@ void inicializar_cpu()
 
 void inicializar_logger()
 {
-    cpu_logger = iniciar_logger("CPU.log", LOG_LEVEL_DEBUG);
+    cpu_logger = iniciar_logger("/home/utnso/tp-2024-1c-CMMNJ/cpu/CPU.log", LOG_LEVEL_DEBUG);
 }
 
 void inicializar_config()
 {
-    cpu_config = iniciar_config("./CPU.config");
+    cpu_config = iniciar_config("/home/utnso/tp-2024-1c-CMMNJ/cpu/CPU.config");
 
     // INICIALIZAR VARIABLES GLOBALES
     cantidad_entradas_tlb = config_get_int_value(cpu_config, "CANTIDAD_ENTRADAS_TLB");
