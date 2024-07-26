@@ -17,7 +17,7 @@ void atender_memoria()
             break;
         case RESULTADO_ESCRITURA:
             un_buffer = recibir_buffer(socket_memoria);
-            if(strcmp(tipo_interfaz, "STDOUT") == 0)
+            if(strcmp(tipo_interfaz, "STDIN") == 0)
             {
                 confirmar_escritura(un_buffer);
             } 
