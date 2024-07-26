@@ -11,12 +11,12 @@ void inicializar_memoria()
 
 void inicializar_logger()
 {
-    mem_logger = iniciar_logger("Memoria.log", LOG_LEVEL_DEBUG);
+    mem_logger = iniciar_logger("/home/utnso/tp-2024-1c-CMMNJ/memoria/Memoria.log", LOG_LEVEL_DEBUG);
 };
 
 void inicializar_config()
 {
-    mem_config = iniciar_config("./Memoria.config");
+    mem_config = iniciar_config("/home/utnso/tp-2024-1c-CMMNJ/memoria/Memoria.config");
 
     // INICIALIZAR VARIABLES GLOBALES (CONFIG)
     puerto_escucha = config_get_string_value(mem_config, "PUERTO_ESCUCHA");
