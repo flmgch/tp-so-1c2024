@@ -13,6 +13,7 @@ void planificar_largo_plazo();
 void agregar_pcb(t_list *list, t_pcb *pcb, pthread_mutex_t *mutex);
 void pasar_a_ready(t_pcb *pcb);
 void pasar_a_ready_prioridad(t_pcb *pcb);
+char *list_pids_to_string(t_list *list);
 void block_pcb();
 void new_pcb();
 void exit_pcb();

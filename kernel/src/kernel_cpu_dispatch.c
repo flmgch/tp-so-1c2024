@@ -309,8 +309,30 @@ void atender_io_gen_sleep(t_pcb *pcb, char* nombre_interfaz, u_int32_t unidades)
     log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
     sem_post(&sem_exec);
 
+    t_manejo_io *args = malloc(sizeof(t_manejo_io));
+    args->pid = pcb->pid;
+    args->interfaz = interfaz;
+    args->unidades_de_trabajo = unidades;
+
+    pthread_t hilo_io;
+    pthread_create(&hilo_io, NULL, (void *)manejar_io_gen_sleep, (void *)args);
+    pthread_detach(hilo_io);
+}
+
+void manejar_io_gen_sleep(void *parametros)
+{
+    t_manejo_io *args = (t_manejo_io *)parametros;
+    int pid = args->pid;
+    t_interfaz_kernel *interfaz = args->interfaz;
+    int unidades = args->unidades_de_trabajo;
+
+    // Esperar a que la interfaz de I/O esté libre
+    sem_wait(&interfaz->interfaz_libre);
+    log_info(kernel_logger, "PID: %d - Bloqueado por %s", pid, interfaz->nombre);
+
+    // Realizar la operación de I/O
     t_buffer* buffer = crear_buffer();
-    agregar_int_a_buffer(buffer, pcb->pid);
+    agregar_int_a_buffer(buffer, pid);
     agregar_uint32_a_buffer(buffer, unidades);    
     t_paquete* paquete = crear_super_paquete(GENERICA, buffer);
     enviar_paquete(paquete, interfaz->socket);
@@ -462,8 +484,32 @@ void atender_io_stdout_write(t_pcb* pcb, char* nombre_interfaz, t_list* direccio
     log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
     sem_post(&sem_exec);
 
-    t_buffer* buffer = crear_buffer();
-    agregar_int_a_buffer(buffer, pcb->pid);
+    t_manejo_io *args = malloc(sizeof(t_manejo_io));
+    args->pid = pcb->pid;
+    args->interfaz = interfaz;
+    args->direcciones_fisicas = direcciones_fisicas;
+    args->tamanio = tamanio;
+
+    pthread_t hilo_io;
+    pthread_create(&hilo_io, NULL, (void *)manejar_stdout_write, (void *)args);
+    pthread_detach(hilo_io);
+}
+
+void manejar_stdout_write(void *parametros)
+{
+    t_manejo_io *args = (t_manejo_io *)parametros;
+    int pid = args->pid;
+    t_interfaz_kernel *interfaz = args->interfaz;
+    t_list *direcciones_fisicas = args->direcciones_fisicas;
+    uint32_t tamanio = args->tamanio;
+
+    // Esperar a que la interfaz de I/O esté libre
+    sem_wait(&interfaz->interfaz_libre);
+    log_info(kernel_logger, "PID: %d - Bloqueado por %s", pid, interfaz->nombre);
+
+    // Realizar la operación de I/O
+    t_buffer *buffer = crear_buffer();
+    agregar_int_a_buffer(buffer, pid);
     agregar_lista_direcciones_a_buffer(buffer, direcciones_fisicas);   
     agregar_uint32_a_buffer(buffer, tamanio);
     t_paquete* paquete = crear_super_paquete(STDOUT, buffer);
@@ -512,8 +558,30 @@ void atender_io_fs_create(t_pcb *pcb, char *nombre_interfaz, char *nombre_archiv
     log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
     sem_post(&sem_exec);
 
+    t_manejo_io *args = malloc(sizeof(t_manejo_io));
+    args->pid = pcb->pid;
+    args->interfaz = interfaz;
+    args->nombre_archivo = nombre_archivo;
+
+    pthread_t hilo_io;
+    pthread_create(&hilo_io, NULL, (void *)manejar_fs_create, (void *)args);
+    pthread_detach(hilo_io);
+}
+
+void manejar_fs_create(void *parametros)
+{
+    t_manejo_io *args = (t_manejo_io *)parametros;
+    int pid = args->pid;
+    t_interfaz_kernel *interfaz = args->interfaz;
+    char *nombre_archivo = args->nombre_archivo;
+
+    // Esperar a que la interfaz de I/O esté libre
+    sem_wait(&interfaz->interfaz_libre);
+    log_info(kernel_logger, "PID: %d - Bloqueado por %s", pid, interfaz->nombre);
+
+    // Realizar la operación de I/O
     t_buffer *buffer = crear_buffer();
-    agregar_int_a_buffer(buffer, pcb->pid);
+    agregar_int_a_buffer(buffer, pid);
     agregar_string_a_buffer(buffer, nombre_archivo);
     t_paquete *paquete = crear_super_paquete(FS_CREATE, buffer);
     enviar_paquete(paquete, interfaz->socket);
@@ -561,19 +629,43 @@ void atender_io_fs_delete(t_pcb *pcb, char *nombre_interfaz, char *nombre_archiv
     log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
     sem_post(&sem_exec);
 
+    t_manejo_io *args = malloc(sizeof(t_manejo_io));
+    args->pid = pcb->pid;
+    args->interfaz = interfaz;
+    args->nombre_archivo = nombre_archivo;
+
+    pthread_t hilo_io;
+    pthread_create(&hilo_io, NULL, (void *)manejar_fs_delete, (void *)args);
+    pthread_detach(hilo_io);
+}
+
+void manejar_fs_delete(void *parametros)
+{
+    t_manejo_io *args = (t_manejo_io *)parametros;
+    int pid = args->pid;
+    t_interfaz_kernel *interfaz = args->interfaz;
+    char *nombre_archivo = args->nombre_archivo;
+
+    // Esperar a que la interfaz de I/O esté libre
+    sem_wait(&interfaz->interfaz_libre);
+    log_info(kernel_logger, "PID: %d - Bloqueado por %s", pid, interfaz->nombre);
+
+    // Realizar la operación de I/O
     t_buffer *buffer = crear_buffer();
-    agregar_int_a_buffer(buffer, pcb->pid);
+    agregar_int_a_buffer(buffer, pid);
     agregar_string_a_buffer(buffer, nombre_archivo);
     t_paquete *paquete = crear_super_paquete(FS_DELETE, buffer);
     enviar_paquete(paquete, interfaz->socket);
     eliminar_paquete(paquete);
 }
 
-bool chequear_quantum(t_pcb* pcb) {
+bool chequear_quantum(t_pcb *pcb)
+{
     return (((strcmp(algoritmo_planificacion, "RR") == 0) || (strcmp(algoritmo_planificacion, "VRR") == 0)) && pcb->motivo_exit != FIN_QUANTUM);
 }
 
-void atender_io_fs_truncate(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo, u_int32_t tamanio) {
+void atender_io_fs_truncate(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo, u_int32_t tamanio)
+{
     t_interfaz_kernel *interfaz = buscar_interfaz(nombre_interfaz);
 
     // TODO implementar: En el caso de que exista algún proceso haciendo uso de la Interfaz de I/O, el proceso que acaba de solicitar la operación de I/O deberá esperar la finalización del anterior antes de poder hacer uso de la misma.
@@ -613,8 +705,32 @@ void atender_io_fs_truncate(t_pcb *pcb, char *nombre_interfaz, char *nombre_arch
     log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
     sem_post(&sem_exec);
 
+    t_manejo_io *args = malloc(sizeof(t_manejo_io));
+    args->pid = pcb->pid;
+    args->interfaz = interfaz;
+    args->nombre_archivo = nombre_archivo;
+    args->tamanio = tamanio;
+
+    pthread_t hilo_io;
+    pthread_create(&hilo_io, NULL, (void *)manejar_fs_truncate, (void *)args);
+    pthread_detach(hilo_io);
+}
+
+void manejar_fs_truncate(void *parametros)
+{
+    t_manejo_io *args = (t_manejo_io *)parametros;
+    int pid = args->pid;
+    t_interfaz_kernel *interfaz = args->interfaz;
+    char *nombre_archivo = args->nombre_archivo;
+    uint32_t tamanio = args->tamanio;
+
+    // Esperar a que la interfaz de I/O esté libre
+    sem_wait(&interfaz->interfaz_libre);
+    log_info(kernel_logger, "PID: %d - Bloqueado por %s", pid, interfaz->nombre);
+
+    // Realizar la operación de I/O
     t_buffer *buffer = crear_buffer();
-    agregar_int_a_buffer(buffer, pcb->pid);
+    agregar_int_a_buffer(buffer, pid);
     agregar_string_a_buffer(buffer, nombre_archivo);
     agregar_uint32_a_buffer(buffer, tamanio);
     t_paquete *paquete = crear_super_paquete(FS_TRUNCATE, buffer);
@@ -622,7 +738,8 @@ void atender_io_fs_truncate(t_pcb *pcb, char *nombre_interfaz, char *nombre_arch
     eliminar_paquete(paquete);
 }
 
-void atender_io_fs_write(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo, t_list* lista_direcciones, u_int32_t tamanio, u_int32_t puntero) {
+void atender_io_fs_write(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo, t_list *lista_direcciones, u_int32_t tamanio, u_int32_t puntero)
+{
     t_interfaz_kernel *interfaz = buscar_interfaz(nombre_interfaz);
 
     // TODO implementar: En el caso de que exista algún proceso haciendo uso de la Interfaz de I/O, el proceso que acaba de solicitar la operación de I/O deberá esperar la finalización del anterior antes de poder hacer uso de la misma.
@@ -662,8 +779,36 @@ void atender_io_fs_write(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo
     log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
     sem_post(&sem_exec);
 
+    t_manejo_io *args = malloc(sizeof(t_manejo_io));
+    args->pid = pcb->pid;
+    args->interfaz = interfaz;
+    args->nombre_archivo = nombre_archivo;
+    args->direcciones_fisicas = lista_direcciones;
+    args->tamanio = tamanio;
+    args->puntero = puntero;
+
+    pthread_t hilo_io;
+    pthread_create(&hilo_io, NULL, (void *)manejar_fs_write, (void *)args);
+    pthread_detach(hilo_io);
+}
+
+void manejar_fs_write(void *parametros)
+{
+    t_manejo_io *args = (t_manejo_io *)parametros;
+    int pid = args->pid;
+    t_interfaz_kernel *interfaz = args->interfaz;
+    char *nombre_archivo = args->nombre_archivo;
+    t_list *lista_direcciones = args->direcciones_fisicas;
+    uint32_t tamanio = args->tamanio;
+    uint32_t puntero = args->puntero;
+
+    // Esperar a que la interfaz de I/O esté libre
+    sem_wait(&interfaz->interfaz_libre);
+    log_info(kernel_logger, "PID: %d - Bloqueado por %s", pid, interfaz->nombre);
+
+    // Realizar la operación de I/O
     t_buffer *buffer = crear_buffer();
-    agregar_int_a_buffer(buffer, pcb->pid);
+    agregar_int_a_buffer(buffer, pid);
     agregar_string_a_buffer(buffer, nombre_archivo);
     agregar_lista_direcciones_a_buffer(buffer, lista_direcciones);
     agregar_uint32_a_buffer(buffer, tamanio);
@@ -673,7 +818,8 @@ void atender_io_fs_write(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo
     eliminar_paquete(paquete);
 }
 
-void atender_io_fs_read(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo, t_list* lista_direcciones, u_int32_t tamanio, u_int32_t puntero) {
+void atender_io_fs_read(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo, t_list *lista_direcciones, u_int32_t tamanio, u_int32_t puntero)
+{
     t_interfaz_kernel *interfaz = buscar_interfaz(nombre_interfaz);
 
     // TODO implementar: En el caso de que exista algún proceso haciendo uso de la Interfaz de I/O, el proceso que acaba de solicitar la operación de I/O deberá esperar la finalización del anterior antes de poder hacer uso de la misma.
@@ -713,8 +859,36 @@ void atender_io_fs_read(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo,
     log_info(kernel_logger, "PID: %d se bloqueo usando la interfaz %s", pcb->pid, interfaz->nombre);
     sem_post(&sem_exec);
 
+    t_manejo_io *args = malloc(sizeof(t_manejo_io));
+    args->pid = pcb->pid;
+    args->interfaz = interfaz;
+    args->nombre_archivo = nombre_archivo;
+    args->direcciones_fisicas = lista_direcciones;
+    args->tamanio = tamanio;
+    args->puntero = puntero;
+
+    pthread_t hilo_io;
+    pthread_create(&hilo_io, NULL, (void *)manejar_fs_read, (void *)args);
+    pthread_detach(hilo_io);
+}
+
+void manejar_fs_read(void *parametros)
+{
+    t_manejo_io *args = (t_manejo_io *)parametros;
+    int pid = args->pid;
+    t_interfaz_kernel *interfaz = args->interfaz;
+    char *nombre_archivo = args->nombre_archivo;
+    t_list *lista_direcciones = args->direcciones_fisicas;
+    uint32_t tamanio = args->tamanio;
+    uint32_t puntero = args->puntero;
+
+    // Esperar a que la interfaz de I/O esté libre
+    sem_wait(&interfaz->interfaz_libre);
+    log_info(kernel_logger, "PID: %d - Bloqueado por %s", pid, interfaz->nombre);
+
+    // Realizar la operación de I/O
     t_buffer *buffer = crear_buffer();
-    agregar_int_a_buffer(buffer, pcb->pid);
+    agregar_int_a_buffer(buffer, pid);
     agregar_string_a_buffer(buffer, nombre_archivo);
     agregar_lista_direcciones_a_buffer(buffer, lista_direcciones);
     agregar_uint32_a_buffer(buffer, tamanio);

@@ -225,8 +225,35 @@ void pasar_a_ready(t_pcb *pcb)
     pthread_mutex_lock(&mutex_cola_ready);
     cambiar_estado(pcb, READY);
     list_add(cola_ready, pcb);
+    char *ready_pids = list_pids_to_string(cola_ready);
+    log_info(kernel_logger, "Cola Ready: %s", ready_pids);
+    free(ready_pids); 
     pthread_mutex_unlock(&mutex_cola_ready);
     sem_post(&sem_planif_ready);
+}
+
+char *list_pids_to_string(t_list *list)
+{
+    char *result = malloc(1024); 
+    strcpy(result, "[");         
+
+    for (int i = 0; i < list_size(list); i++)
+    {
+        t_pcb *pcb = (t_pcb *)list_get(list, i);
+        char pid_str[12]; 
+        snprintf(pid_str, 12, "%d", pcb->pid);
+
+        strcat(result, pid_str); 
+
+        if (i < list_size(list) - 1)
+        {
+            strcat(result, ", "); 
+        }
+    }
+
+    strcat(result, "]"); 
+
+    return result;
 }
 
 void new_pcb()
@@ -273,6 +300,9 @@ void pasar_a_ready_prioridad(t_pcb *pcb)
     pthread_mutex_lock(&mutex_cola_ready_prioridad);
     cambiar_estado(pcb, READY_PRIORIDAD);
     list_add(cola_ready_prioridad, pcb);
+    char *ready_prioridad_pids = list_pids_to_string(cola_ready_prioridad);
+    log_info(kernel_logger, "Cola Ready Prioridad: %s", ready_prioridad_pids);
+    free(ready_prioridad_pids);
     pthread_mutex_unlock(&mutex_cola_ready_prioridad);
     sem_post(&sem_planif_ready_prioridad);
 }
