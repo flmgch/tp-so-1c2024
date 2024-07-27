@@ -195,13 +195,13 @@ char **abrir_archivo(const char *file)
         fseek(pseudocodiogo, 0, SEEK_SET);
 
         char *instrucciones = malloc(length + 1);
-        if (instrucciones != NULL)
-        {
+        //if (instrucciones != NULL)
+        //{
 
             fread(instrucciones, 1, length, pseudocodiogo);
 
             instrucciones[length] = '\0';
-        }
+       //}
         fclose(pseudocodiogo);
 
         log_info(mem_logger, "\n%s", instrucciones);
