@@ -807,7 +807,7 @@ void manejar_fs_write(void *parametros)
 
     // Esperar a que la interfaz de I/O esté libre
     sem_wait(&interfaz->interfaz_libre);
-    log_info(kernel_logger, "PID: %d - Bloqueado por %s", pid, interfaz->nombre);
+    log_info(kernel_logger, "PID: %d - Bloqueado por %s", args->pid, interfaz->nombre);
 
     // Realizar la operación de I/O
     t_buffer *buffer = crear_buffer();
