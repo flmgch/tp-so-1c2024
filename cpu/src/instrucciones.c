@@ -33,39 +33,39 @@ void* obtener_registro(char registro[20]) {
 void ejecutar_set(char registro[20], char valor[20]) {
     if(strcmp(registro, "PC") == 0) {
         pcb->program_counter = atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->program_counter);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->program_counter);
     } else if (strcmp(registro, "AX") == 0) {
         pcb->registros_cpu->ax = (uint8_t)atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->ax);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->ax);
     } else if (strcmp(registro, "BX") == 0) {
         pcb->registros_cpu->bx = (uint8_t)atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->bx);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->bx);
     } else if (strcmp(registro, "CX") == 0) {
         pcb->registros_cpu->cx = (uint8_t)atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->cx);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->cx);
     } else if (strcmp(registro, "DX") == 0) {
         pcb->registros_cpu->dx = (uint8_t)atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->dx);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->dx);
     } else if (strcmp(registro, "EAX") == 0) {
         pcb->registros_cpu->eax = (uint32_t)atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->eax);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->eax);
     } else if (strcmp(registro, "EBX") == 0) {
         pcb->registros_cpu->ebx = (uint32_t)atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->ebx);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->ebx);
     } else if (strcmp(registro, "ECX") == 0) {
         pcb->registros_cpu->ecx = (uint32_t)atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->ecx);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->ecx);
     } else if (strcmp(registro, "EDX") == 0) {
         pcb->registros_cpu->edx = (uint32_t)atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->edx);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->edx);
     } else if (strcmp(registro, "SI") == 0) {
         pcb->registros_cpu->si = (uint32_t)atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->si);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->si);
     } else if (strcmp(registro, "DI") == 0) {
         pcb->registros_cpu->di = (uint32_t)atoi(valor);
-        log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->di);
+        // log_info(cpu_logger, "Seteado de: %d", pcb->registros_cpu->di);
     } else {
-        log_error(cpu_logger, "No se hallo el registro");
+        // log_error(cpu_logger, "No se hallo el registro");
     }
     //
 }
@@ -103,6 +103,7 @@ void ejecutar_sum(char registro_destino[20] , char registro_origen[20] ){
         char* resultado_suma=malloc(20);
         sprintf(resultado_suma, "%u", destino);
         ejecutar_set(registro_destino,resultado_suma);
+        log_info(cpu_logger, "Resultado suma: %d", destino);
         free(resultado_suma);
     } else {
         log_error(cpu_logger, "Registro invalido");
@@ -141,6 +142,7 @@ void ejecutar_sub(char registro_destino[20] , char registro_origen[20] ){
         char* resultado_resta=malloc(20);
         sprintf(resultado_resta, "%u", destino);
         ejecutar_set(registro_destino,resultado_resta);
+        log_info(cpu_logger, "Resultado resta: %d", destino);
         free(resultado_resta);
     } else {
         log_error(cpu_logger, "Registro invalido");

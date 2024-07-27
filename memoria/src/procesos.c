@@ -97,22 +97,13 @@ void atender_finalizar_proceso(t_buffer *buffer)
     t_proceso *proceso_a_eliminar = encontrar_proceso(lista_de_procesos, pid);
     pthread_mutex_unlock(&mutex_lista_procesos);
 
-    if (proceso_a_eliminar == NULL) {
-        log_error(mem_logger, "Proceso con PID:%d no encontrado para finalizar", pid);
-        return;
-    }
-
     int tamanio = proceso_a_eliminar->size;
     log_info(mem_logger, "PID:%d - Tamaño: %d", pid, tamanio);
 
     pthread_mutex_lock(&mutex_bitmap);
     for (int i = 0; i < tamanio; i++)
     {
-        void* aux_frame = list_get(proceso_a_eliminar->filas_tabla_paginas, i);
-        if (aux_frame == NULL) {
-            log_error(mem_logger, "Elemento de la lista de páginas nulo en la posición %d", i);
-            continue; // O manejar el error según sea necesario
-        }
+        void *aux_frame = list_get(proceso_a_eliminar->filas_tabla_paginas, i);
         int frame = 0;
         memcpy(&frame, aux_frame, sizeof(int));
         bitarray_clean_bit(bitmap, frame);
@@ -165,6 +156,7 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
     char *path = extraer_string_de_buffer(buffer);
     u_int32_t pid = extraer_uint32_de_buffer(buffer);
 
+    usleep(1000 * retardo_respuesta);
 
     t_proceso *proceso = malloc(sizeof(t_proceso));
     proceso->pid = pid;
@@ -178,8 +170,6 @@ t_proceso *atender_crear_proceso(t_buffer *buffer)
 
     strcpy(archivo, auxiliar);
     strcat(archivo, path);
-
-    usleep(1000 * retardo_respuesta);
 
     proceso->instrucciones = abrir_archivo(archivo);
     proceso->size = 0;
@@ -307,7 +297,7 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
     }
     else
     {
-        log_info(mem_logger, "Marcos Libres: %d", cantidad_de_marcos_libres);
+        // log_info(mem_logger, "Marcos Libres: %d", cantidad_de_marcos_libres);
         int paginas_a_agregar = paginas_futuras - paginas_actuales;
         pthread_mutex_lock(&mutex_cantidad_marcos_libres);
         if (paginas_a_agregar <= cantidad_de_marcos_libres)
