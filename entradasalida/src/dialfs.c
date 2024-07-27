@@ -417,7 +417,7 @@ void atender_fs_truncate(t_buffer *buffer)
     int bloques_necesarios = (tamanio + tamanio_bloque - 1) / tamanio_bloque; // Cantidad de bloques que ocuparia despues del truncate
 
     ////////// EN CASO DE QUE AUMENTE EL TAMANIO DEL ARCHIVO
-    if(bloques_necesarios > bloques_actuales) 
+    if (tamanio > tamanio_actual)
     {
         log_info(io_logger, "Se quiere ampliar el archivo");
 
@@ -456,7 +456,7 @@ void atender_fs_truncate(t_buffer *buffer)
         }
     } 
     ////////// EN CASO DE QUE ACHIQUE EL TAMANIO DEL ARCHIVO
-    else if (bloques_necesarios < bloques_actuales) 
+    else if (tamanio < tamanio_actual)
     { 
         log_info(io_logger, "Se quiere reducir el archivo");
 
