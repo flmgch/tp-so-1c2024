@@ -89,7 +89,6 @@ void atender_cpu_dispatch() {
                     char* nombre_archivo = extraer_string_de_buffer(buffer);
                     atender_io_fs_create(pcb, nombre_interfaz, nombre_archivo);
                     free(nombre_interfaz);
-                    free(nombre_archivo);
                     break;
                 }
                 case OP_IO_FS_DELETE:{
@@ -98,7 +97,6 @@ void atender_cpu_dispatch() {
                     char* nombre_archivo = extraer_string_de_buffer(buffer);
                     atender_io_fs_delete(pcb, nombre_interfaz, nombre_archivo);
                     free(nombre_interfaz);
-                    free(nombre_archivo);
                     break;
                 }
                 case OP_IO_FS_TRUNCATE:{
@@ -108,7 +106,6 @@ void atender_cpu_dispatch() {
                     u_int32_t tamanio = extraer_uint32_de_buffer(buffer);
                     atender_io_fs_truncate(pcb, nombre_interfaz, nombre_archivo, tamanio);
                     free(nombre_interfaz);
-                    free(nombre_archivo);
                     break;
                 }
                 case OP_IO_FS_WRITE:{
@@ -120,7 +117,6 @@ void atender_cpu_dispatch() {
                     u_int32_t puntero = extraer_uint32_de_buffer(buffer);
                     atender_io_fs_write(pcb, nombre_interfaz, nombre_archivo, lista_direcciones, tamanio, puntero);
                     free(nombre_interfaz);
-                    free(nombre_archivo);
                     break;
                 }
                 case OP_IO_FS_READ:{
@@ -132,7 +128,6 @@ void atender_cpu_dispatch() {
                     u_int32_t puntero = extraer_uint32_de_buffer(buffer);
                     atender_io_fs_read(pcb, nombre_interfaz, nombre_archivo, lista_direcciones, tamanio, puntero);
                     free(nombre_interfaz);
-                    free(nombre_archivo);
                     break;
                 }
                 default:
@@ -442,6 +437,8 @@ void manejar_stdin_read(void *parametros)
     t_paquete* paquete = crear_super_paquete(STDIN, buffer);
     enviar_paquete(paquete, interfaz->socket);
     eliminar_paquete(paquete);
+
+    free(args);
 }
 
 void atender_io_stdout_write(t_pcb* pcb, char* nombre_interfaz, t_list* direcciones_fisicas, u_int32_t tamanio) {
@@ -513,6 +510,8 @@ void manejar_stdout_write(void *parametros)
     t_paquete* paquete = crear_super_paquete(STDOUT, buffer);
     enviar_paquete(paquete, interfaz->socket);
     eliminar_paquete(paquete);
+
+    free(args);
 }
 
 void atender_io_fs_create(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo)
@@ -584,6 +583,8 @@ void manejar_fs_create(void *parametros)
     t_paquete *paquete = crear_super_paquete(FS_CREATE, buffer);
     enviar_paquete(paquete, interfaz->socket);
     eliminar_paquete(paquete);
+
+    free(args);
 }
 
 void atender_io_fs_delete(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo)
@@ -655,6 +656,8 @@ void manejar_fs_delete(void *parametros)
     t_paquete *paquete = crear_super_paquete(FS_DELETE, buffer);
     enviar_paquete(paquete, interfaz->socket);
     eliminar_paquete(paquete);
+
+    free(args);
 }
 
 bool chequear_quantum(t_pcb *pcb)
@@ -734,6 +737,8 @@ void manejar_fs_truncate(void *parametros)
     t_paquete *paquete = crear_super_paquete(FS_TRUNCATE, buffer);
     enviar_paquete(paquete, interfaz->socket);
     eliminar_paquete(paquete);
+
+    free(args);
 }
 
 void atender_io_fs_write(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo, t_list *lista_direcciones, u_int32_t tamanio, u_int32_t puntero)
@@ -814,6 +819,8 @@ void manejar_fs_write(void *parametros)
     t_paquete *paquete = crear_super_paquete(FS_WRITE, buffer);
     enviar_paquete(paquete, interfaz->socket);
     eliminar_paquete(paquete);
+
+    free(args);
 }
 
 void atender_io_fs_read(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo, t_list *lista_direcciones, u_int32_t tamanio, u_int32_t puntero)
@@ -894,4 +901,6 @@ void manejar_fs_read(void *parametros)
     t_paquete *paquete = crear_super_paquete(FS_READ, buffer);
     enviar_paquete(paquete, interfaz->socket);
     eliminar_paquete(paquete);
+
+    free(args);
 }
