@@ -118,7 +118,7 @@ void atender_finalizar_proceso(t_buffer *buffer)
 
     if (proceso_a_eliminar->filas_tabla_paginas != NULL) {
         list_destroy_and_destroy_elements(proceso_a_eliminar->filas_tabla_paginas, (void*)free);
-        proceso_a_eliminar->filas_tabla_paginas=NULL;
+        //proceso_a_eliminar->filas_tabla_paginas=NULL;
         
     }
     else{
