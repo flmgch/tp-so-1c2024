@@ -292,7 +292,7 @@ void ejecutar_mov_in(char reg_datos[20],char reg_dir_logica[20]){
         sem_wait(&sem_resultado_lectura);
 
         t_direccion_fisica primera_direccion = *(t_direccion_fisica *)list_get(direcciones, 0);
-        log_info(cpu_logger, "“PID: %d - Acción: Leer- Dirección Física: %d - Valor: %s", pcb->pid, primera_direccion.direccion_fisica, reg_aux);
+        log_info(cpu_logger, "PID: %d - Acción: Leer- Dirección Física: %d - Valor: %s", pcb->pid, primera_direccion.direccion_fisica, reg_aux);
         free(reg_aux);
         free(condicion);
         list_destroy_and_destroy_elements(direcciones,(void*)free);
@@ -340,7 +340,7 @@ void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
             agregar_a_buffer(un_buffer, valor, tam_segun);
             direcciones = separar_en_paginas(dir_logica, tam_segun);
             t_direccion_fisica primera_direccion = *(t_direccion_fisica *)list_get(direcciones, 0);
-            log_info(cpu_logger, "“PID: %d - Acción: Escribir- Dirección Física: %d - Valor: %d", pcb->pid, primera_direccion.direccion_fisica, *aux_valor);
+            log_info(cpu_logger, "PID: %d - Acción: Escribir- Dirección Física: %d - Valor: %d", pcb->pid, primera_direccion.direccion_fisica, *aux_valor);
         }
         else
         {
@@ -353,7 +353,7 @@ void ejecutar_mov_out(char reg_destino[20], char reg_datos[20]){
             agregar_a_buffer(un_buffer, valor, tam_segun);
             direcciones = separar_en_paginas(dir_logica, tam_segun);
             t_direccion_fisica primera_direccion = *(t_direccion_fisica *)list_get(direcciones, 0);
-            log_info(cpu_logger, "“PID: %d - Acción: Escribir- Dirección Física: %d - Valor: %d", pcb->pid, primera_direccion.direccion_fisica, *aux_valor);
+            log_info(cpu_logger, "PID: %d - Acción: Escribir- Dirección Física: %d - Valor: %d", pcb->pid, primera_direccion.direccion_fisica, *aux_valor);
         }
     }
 
@@ -390,10 +390,10 @@ void ejecutar_copy_string(char ch_tamanio[20])
 
     sem_wait(&sem_resultado_lectura);
     t_direccion_fisica primera_direccion_origen = *(t_direccion_fisica *)list_get(direcciones_origen, 0);
-    log_info(cpu_logger, "“PID: %d - Acción: Leer- Dirección Física: %d - Valor: %s", pcb->pid, primera_direccion_origen.direccion_fisica, reg_aux);
+    log_info(cpu_logger, "PID: %d - Acción: Leer- Dirección Física: %d - Valor: %s", pcb->pid, primera_direccion_origen.direccion_fisica, reg_aux);
     memcpy(valor, reg_aux, tamanio);
     t_direccion_fisica primera_direccion_destino = *(t_direccion_fisica *)list_get(direcciones_destino, 0);
-    log_info(cpu_logger, "“PID: %d - Acción: Escribir- Dirección Física: %d - Valor: %s", pcb->pid, primera_direccion_destino.direccion_fisica, reg_aux);
+    log_info(cpu_logger, "PID: %d - Acción: Escribir- Dirección Física: %d - Valor: %s", pcb->pid, primera_direccion_destino.direccion_fisica, reg_aux);
 
     t_buffer *otro_buffer = crear_buffer();
     agregar_uint32_a_buffer(otro_buffer, pcb->pid);

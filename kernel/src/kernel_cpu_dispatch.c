@@ -798,12 +798,12 @@ void atender_io_fs_write(t_pcb *pcb, char *nombre_interfaz, char *nombre_archivo
 void manejar_fs_write(void *parametros)
 {
     t_manejo_io *args = (t_manejo_io *)parametros;
-    int pid = args->pid;
+    // int pid = args->pid;
     t_interfaz_kernel *interfaz = args->interfaz;
-    char *nombre_archivo = args->nombre_archivo;
-    t_list *lista_direcciones = args->direcciones_fisicas;
-    uint32_t tamanio = args->tamanio;
-    uint32_t puntero = args->puntero;
+    // char *nombre_archivo = args->nombre_archivo;
+    // t_list *lista_direcciones = args->direcciones_fisicas;
+    // uint32_t tamanio = args->tamanio;
+    // uint32_t puntero = args->puntero;
 
     // Esperar a que la interfaz de I/O esté libre
     sem_wait(&interfaz->interfaz_libre);
@@ -811,11 +811,11 @@ void manejar_fs_write(void *parametros)
 
     // Realizar la operación de I/O
     t_buffer *buffer = crear_buffer();
-    agregar_int_a_buffer(buffer, pid);
-    agregar_string_a_buffer(buffer, nombre_archivo);
-    agregar_lista_direcciones_a_buffer(buffer, lista_direcciones);
-    agregar_uint32_a_buffer(buffer, tamanio);
-    agregar_uint32_a_buffer(buffer, puntero);
+    agregar_int_a_buffer(buffer, args->pid);
+    agregar_string_a_buffer(buffer, args->nombre_archivo);
+    agregar_lista_direcciones_a_buffer(buffer, args->direcciones_fisicas);
+    agregar_uint32_a_buffer(buffer, args->tamanio);
+    agregar_uint32_a_buffer(buffer, args->puntero);
     t_paquete *paquete = crear_super_paquete(FS_WRITE, buffer);
     enviar_paquete(paquete, interfaz->socket);
     eliminar_paquete(paquete);

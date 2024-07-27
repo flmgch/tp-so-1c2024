@@ -26,7 +26,7 @@ void escribir_memoria(t_buffer *buffer, int socket)
 
     pthread_mutex_unlock(&mutex_espacio_usuario);
 
-    free(valor);
+    // free(valor);
 
     list_destroy_and_destroy_elements(lista_direcciones, (void *)free);
 
@@ -71,6 +71,6 @@ void leer_memoria(t_buffer *buffer, int socket)
     enviar_paquete(paquete, socket);
     eliminar_paquete(paquete);
 
-    free(valor);
+    // free(valor);
     list_destroy_and_destroy_elements(lista_direcciones, (void *)free);
 }

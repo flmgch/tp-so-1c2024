@@ -495,25 +495,24 @@ void atender_fs_truncate(t_buffer *buffer)
 
 //////////////////// FS_WRITE
 
-io_fs *fs_write;
+io_fs fs_write;
 
 void atender_fs_write(t_buffer *buffer)
 {
     usleep(tiempo_unidad_trabajo * 1000);
+    fs_write.pid = extraer_uint32_de_buffer(buffer);
+    fs_write.nombre_archivo = extraer_string_de_buffer(buffer);
+    fs_write.lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
+    fs_write.tamanio = extraer_uint32_de_buffer(buffer);
+    fs_write.puntero_archivo = extraer_uint32_de_buffer(buffer);
 
-    fs_write->pid = extraer_uint32_de_buffer(buffer);
-    fs_write->nombre_archivo = extraer_string_de_buffer(buffer);
-    fs_write->lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
-    fs_write->tamanio = extraer_uint32_de_buffer(buffer);
-    fs_write->puntero_archivo = extraer_uint32_de_buffer(buffer);
-
-    log_info(io_logger, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", fs_write->pid, fs_write->nombre_archivo, fs_write->tamanio, fs_write->puntero_archivo);
+    log_info(io_logger, "PID: %d - Escribir Archivo: %s - Tamaño a Escribir: %d - Puntero Archivo: %d", fs_write.pid, fs_write.nombre_archivo, fs_write.tamanio, fs_write.puntero_archivo);
 
     // Le aviso a Memoria para leer 
     t_buffer *un_buffer = crear_buffer();
-    agregar_uint32_a_buffer(un_buffer, fs_write->pid);
-    agregar_lista_direcciones_a_buffer(un_buffer, fs_write->lista_direcciones);
-    agregar_uint32_a_buffer(un_buffer, fs_write->tamanio);
+    agregar_uint32_a_buffer(un_buffer, fs_write.pid);
+    agregar_lista_direcciones_a_buffer(un_buffer, fs_write.lista_direcciones);
+    agregar_uint32_a_buffer(un_buffer, fs_write.tamanio);
     t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_LECTURA, un_buffer);
     enviar_paquete(paquete, socket_memoria);
 
@@ -531,15 +530,15 @@ void escribir_archivo(t_buffer *buffer)
     texto[tamanio] = '\0';
 
     // Leo lo necesario del archivo de metadata
-    char *path_metadata = crear_path(path_base_dialfs, fs_write->nombre_archivo);
+    char *path_metadata = crear_path(path_base_dialfs, fs_write.nombre_archivo);
     t_config *metadata_config = config_create(path_metadata);
     int bloque_inicial = atoi(config_get_string_value(metadata_config, "BLOQUE_INICIAL"));
     
-    log_info(io_logger, "Escribiendo en el archivo %s...", fs_write->nombre_archivo);
+    log_info(io_logger, "Escribiendo en el archivo %s...", fs_write.nombre_archivo);
 
     // Hago los calculos necesarios para saber desde donde escribir en bloques.dat
     int posicion_inicial = tamanio_bloque * bloque_inicial;
-    int posicion_desplazada = posicion_inicial + fs_write->puntero_archivo;
+    int posicion_desplazada = posicion_inicial + fs_write.puntero_archivo;
 
     memcpy(bloques_datos->direccion + posicion_desplazada, texto, tamanio);
 
@@ -554,58 +553,57 @@ void escribir_archivo(t_buffer *buffer)
 
     // Le aviso a Kernel que ya termine la operacion
     t_buffer *un_buffer = crear_buffer();
-    agregar_uint32_a_buffer(un_buffer, fs_write->pid);
+    agregar_uint32_a_buffer(un_buffer, fs_write.pid);
     t_paquete *paquete = crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, un_buffer);
     enviar_paquete(paquete, socket_kernel);
 
-    log_info(io_logger, "Operacion FS_WRITE con %s finalizada", fs_write->nombre_archivo);
+    log_info(io_logger, "Operacion FS_WRITE con %s finalizada", fs_write.nombre_archivo);
 
     free(texto);
     free(path_metadata);
     config_destroy(metadata_config);
     eliminar_paquete(paquete);
-    free(fs_write);
 }
 
 //////////////////// FS_READ
 
-io_fs *fs_read;
+io_fs fs_read;
 
 void atender_fs_read(t_buffer *buffer)
 {
     usleep(tiempo_unidad_trabajo * 1000);
 
-    fs_read->pid = extraer_uint32_de_buffer(buffer);
-    fs_read->nombre_archivo = extraer_string_de_buffer(buffer);
-    fs_read->lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
-    fs_read->tamanio = extraer_uint32_de_buffer(buffer);
-    fs_read->puntero_archivo = extraer_uint32_de_buffer(buffer);
+    fs_read.pid = extraer_uint32_de_buffer(buffer);
+    fs_read.nombre_archivo = extraer_string_de_buffer(buffer);
+    fs_read.lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
+    fs_read.tamanio = extraer_uint32_de_buffer(buffer);
+    fs_read.puntero_archivo = extraer_uint32_de_buffer(buffer);
 
-    log_info(io_logger, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", fs_read->pid, fs_read->nombre_archivo, fs_read->tamanio, fs_read->puntero_archivo);
+    log_info(io_logger, "PID: %d - Leer Archivo: %s - Tamaño a Leer: %d - Puntero Archivo: %d", fs_read.pid, fs_read.nombre_archivo, fs_read.tamanio, fs_read.puntero_archivo);
     
     // Leo lo necesario del archivo de metadata
-    char *path_metadata = crear_path(path_base_dialfs, fs_read->nombre_archivo);
+    char *path_metadata = crear_path(path_base_dialfs, fs_read.nombre_archivo);
     t_config *metadata_config = config_create(path_metadata);
     int bloque_inicial = atoi(config_get_string_value(metadata_config, "BLOQUE_INICIAL"));
     
-    log_info(io_logger, "Leyendo el archivo %s...", fs_read->nombre_archivo);
+    log_info(io_logger, "Leyendo el archivo %s...", fs_read.nombre_archivo);
 
     // Hago los calculos necesarios para saber desde donde escribir en bloques.dat
     int posicion_inicial = tamanio_bloque * bloque_inicial;
-    int posicion_desplazada = posicion_inicial + fs_read->puntero_archivo;
+    int posicion_desplazada = posicion_inicial + fs_read.puntero_archivo;
 
-    char *texto = malloc(fs_read->tamanio);
-    void *texto_aux = malloc(fs_read->tamanio);
+    char *texto = malloc(fs_read.tamanio);
+    void *texto_aux = malloc(fs_read.tamanio);
 
-    memcpy(texto, bloques_datos->direccion + posicion_desplazada, fs_read->tamanio);
+    memcpy(texto, bloques_datos->direccion + posicion_desplazada, fs_read.tamanio);
 
-    memcpy(texto_aux, texto, fs_read->tamanio);
+    memcpy(texto_aux, texto, fs_read.tamanio);
 
     // Le pido a Memoria que escriba el texto a partir de las direcciones
     t_buffer *un_buffer = crear_buffer();
-    agregar_uint32_a_buffer(un_buffer, fs_read->pid);
-    agregar_a_buffer(un_buffer, texto_aux, fs_read->tamanio);
-    agregar_lista_direcciones_a_buffer(un_buffer, fs_read->lista_direcciones);
+    agregar_uint32_a_buffer(un_buffer, fs_read.pid);
+    agregar_a_buffer(un_buffer, texto_aux, fs_read.tamanio);
+    agregar_lista_direcciones_a_buffer(un_buffer, fs_read.lista_direcciones);
     t_paquete *paquete = crear_super_paquete(ACCESO_ESPACIO_USUARIO_ESCRITURA, un_buffer);
     enviar_paquete(paquete, socket_memoria);
 
@@ -620,14 +618,13 @@ void confirmar_escritura_fs(t_buffer *buffer)
 {
     // Le aviso a Kernel que ya termine la operacion
     t_buffer *buffer_kernel = crear_buffer();
-    agregar_uint32_a_buffer(buffer_kernel, fs_read->pid);
+    agregar_uint32_a_buffer(buffer_kernel, fs_read.pid);
     t_paquete *paquete_kernel = crear_super_paquete(FIN_INSTRUCCION_INTERFAZ, buffer_kernel);
     enviar_paquete(paquete_kernel, socket_kernel);
 
-    log_info(io_logger, "Operacion FS_READ con %s finalizada", fs_read->nombre_archivo);
+    log_info(io_logger, "Operacion FS_READ con %s finalizada", fs_read.nombre_archivo);
 
     eliminar_paquete(paquete_kernel);
-    free(fs_read);
 }
 
 //////////////////// LIBERO LAS ESTRUCTURAS CREADAS
