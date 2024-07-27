@@ -301,13 +301,13 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
         int paginas_a_agregar = paginas_futuras - paginas_actuales;
         pthread_mutex_lock(&mutex_cantidad_marcos_libres);
         if (paginas_a_agregar <= cantidad_de_marcos_libres)
-        {  
-            pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
+        {
+
             for (int i = 0; i < paginas_a_agregar; i++)
             {
                 agregar_frames(proceso, i);
             }
-           
+            pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
             /*for (int i = 0; i < 128; i++)
             {
                 int n = bitarray_test_bit(bitmap,i);
@@ -320,11 +320,11 @@ void atender_aumentar_tamanio(t_proceso *proceso, int new_size, int paginas_actu
         }
         else
         {
+            pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
             log_error(mem_logger, "No hay frames suficientes para agregar mas paginas");
             enviar_resultado("Out of Memory");
             return;
         }
-        pthread_mutex_unlock(&mutex_cantidad_marcos_libres); 
     }
 }
 
@@ -371,9 +371,7 @@ void agregar_frames(t_proceso *proceso, int numero_pagina)
         int* n=list_get(proceso->filas_tabla_paginas,i);
         log_info(mem_logger,"%d",*n);
     }*/
-     pthread_mutex_lock(&mutex_cantidad_marcos_libres);
     cantidad_de_marcos_libres--;
-     pthread_mutex_unlock(&mutex_cantidad_marcos_libres);
 }
 
 
