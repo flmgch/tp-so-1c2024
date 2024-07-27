@@ -46,7 +46,9 @@ void atender_stdin(t_buffer *buffer)
     printf("> Ingrese un texto de %d caracteres: ", una_io->tamanio_total);
 
     fgets(texto, una_io->tamanio_total+1, stdin);
-    texto[una_io->tamanio_total] = NULL;
+    // texto[una_io->tamanio_total] = NULL;
+
+    clear_stdin();
 
     memcpy(texto_aux, texto, una_io->tamanio_total);
 
@@ -67,6 +69,13 @@ void atender_stdin(t_buffer *buffer)
     free(texto);
     free(texto_aux);
     free(una_io);
+}
+
+void clear_stdin() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {
+        // Discard characters
+    }
 }
 
 void confirmar_escritura(t_buffer *buffer)

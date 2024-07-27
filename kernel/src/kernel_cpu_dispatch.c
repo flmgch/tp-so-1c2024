@@ -72,7 +72,6 @@ void atender_cpu_dispatch() {
                     u_int32_t tamanio = extraer_uint32_de_buffer(buffer);
                     atender_io_stdin_read(pcb, nombre_interfaz, direcciones_fisicas, tamanio);
                     free(nombre_interfaz);
-                    list_destroy(direcciones_fisicas);
                     break;
                 }
                 case OP_IO_STDOUT_WRITE:{
@@ -82,7 +81,6 @@ void atender_cpu_dispatch() {
                     u_int32_t tamanio = extraer_uint32_de_buffer(buffer);
                     atender_io_stdout_write(pcb, nombre_interfaz, direcciones_fisicas, tamanio);
                     free(nombre_interfaz);
-                    list_destroy(direcciones_fisicas);
                     break;
                 }
                 case OP_IO_FS_CREATE:{
