@@ -26,6 +26,7 @@ void atender_memoria()
                 confirmar_escritura_fs(un_buffer);
             }
             destruir_buffer(un_buffer);
+            sem_post(&sem_stdin);
             break;
         case RESULTADO_LECTURA:
             un_buffer = recibir_buffer(socket_memoria);
@@ -38,6 +39,7 @@ void atender_memoria()
                 escribir_archivo(un_buffer);
             }
             destruir_buffer(un_buffer);
+            sem_post(&sem_stdout);
             break;
         case -1:
             log_error(io_logger, "Se desconecto Memoria");

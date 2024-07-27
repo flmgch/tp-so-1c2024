@@ -17,4 +17,8 @@ int tiempo_unidad_trabajo, tamanio_bloque, cantidad_bloque, retraso_compactacion
 // SOCKETS
 int socket_memoria, socket_kernel;
 
+// SEMAFOROS
+sem_t sem_stdin;
+sem_t sem_stdout;
+
 #endif

@@ -34,6 +34,8 @@ void atender_stdin(t_buffer *buffer)
     una_io->lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
     una_io->tamanio_total = extraer_uint32_de_buffer(buffer);
 
+    sem_wait(&sem_stdin);
+
     pid_stdout = una_io->pid;
 
     log_info(io_logger, "PID: %d - Operacion: STDIN_READ", una_io->pid);
@@ -44,8 +46,13 @@ void atender_stdin(t_buffer *buffer)
     printf("> Ingrese un texto de %d caracteres: ", una_io->tamanio_total);
 
     fgets(texto, una_io->tamanio_total+1, stdin);
+    texto[una_io->tamanio_total] = NULL;
 
     memcpy(texto_aux, texto, una_io->tamanio_total);
+
+    char *aux = malloc(20);
+    memcpy(aux, texto_aux, 20);
+    log_info(io_logger, "Envio de IO: %s", aux);
 
     // Le pido a Memoria que escriba el texto a partir de las direcciones
     t_buffer *buffer_memo = crear_buffer();
@@ -58,6 +65,7 @@ void atender_stdin(t_buffer *buffer)
 
     eliminar_paquete(paquete_memo);
     free(texto);
+    free(texto_aux);
     free(una_io);
 }
 
@@ -80,6 +88,8 @@ void atender_stdout(t_buffer *buffer)
     una_io->pid = extraer_uint32_de_buffer(buffer);
     una_io->lista_direcciones = extraer_lista_direcciones_de_buffer(buffer);
     una_io->tamanio_total = extraer_int_de_buffer(buffer);
+
+    sem_wait(&sem_stdout);
 
     pid_stdout = una_io->pid;
 

@@ -12,4 +12,8 @@ extern int tiempo_unidad_trabajo, tamanio_bloque, cantidad_bloque, retraso_compa
 // SOCKETS
 extern int socket_memoria, socket_kernel;
 
+// SEMAFOROS
+extern sem_t sem_stdin;
+extern sem_t sem_stdout;
+
 #endif

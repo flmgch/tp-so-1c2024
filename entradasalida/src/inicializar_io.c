@@ -3,6 +3,7 @@
 void inicializar_io(char *nombre_interfaz, char* archivo_configuracion){
     inicializar_logger(nombre_interfaz);
     inicializar_config(archivo_configuracion);
+    inicializar_semaforos();
 }
 
 void inicializar_logger(char *nombre_interfaz) {
@@ -27,4 +28,10 @@ void inicializar_config(char *archivo_configuracion) {
     puerto_kernel = config_get_string_value(io_config, "PUERTO_KERNEL");
     ip_memoria = config_get_string_value(io_config, "IP_MEMORIA");
     puerto_memoria = config_get_string_value(io_config, "PUERTO_MEMORIA");
+}
+
+void inicializar_semaforos()
+{
+    sem_init(&sem_stdin, 0, 1);
+    sem_init(&sem_stdout, 0, 1);
 }
