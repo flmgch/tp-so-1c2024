@@ -59,7 +59,7 @@ t_instruccion formular_instruccion(char *string)
 
     memset(&instruccion, 0, sizeof(t_instruccion));
     // armo un array de string con cada palabra de la instruccion en modo string
-    char **lineas = string_n_split(string, 5, " ");
+    char **lineas = string_n_split(string, 6, " ");
 
     // busco el codigo de instruccion a partir del elemento 0
     instruccion.codigo_instruccion = obtener_codigo_instruccion(lineas[0]);
@@ -75,7 +75,7 @@ t_instruccion formular_instruccion(char *string)
     (cant_registros != 0) ? strcpy(instruccion.param1, lineas[1]) : strcpy(instruccion.param1, "");
     (cant_registros > 1) ? strcpy(instruccion.param2, lineas[2]) : strcpy(instruccion.param2, "");
     (cant_registros > 2) ? strcpy(instruccion.param3, lineas[3]) : strcpy(instruccion.param3, "");
-    if (cant_registros == 5)
+    if (cant_registros > 3)
     {
         strcpy(instruccion.param4, lineas[4]);
         strcpy(instruccion.param5, lineas[5]);

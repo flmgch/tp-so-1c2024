@@ -238,7 +238,7 @@ void atender_acceso_tabla_paginas(t_buffer *buffer)
 
     int frame = *(int*)list_get(proceso_buscado->filas_tabla_paginas, numero_pagina);
 
-    log_info(mem_logger, "PID:%d - Pagina: %d - Frame: %d", pid, numero_pagina, frame);
+    log_info(mem_logger, "PID:%d - Pagina: %d - Marco: %d", pid, numero_pagina, frame);
 
     t_buffer *new_buffer = crear_buffer();
 
@@ -269,12 +269,12 @@ void atender_ajustar_tamanio(t_buffer *buffer)
 
     if (paginas_futuras > paginas_actuales)
     {
-        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Ampliar: %d", pid, proceso_a_modificar->size*tamanio_pagina, tamanio_nuevo - tamanio_pagina * proceso_a_modificar->size);
+        log_info(mem_logger, "PID:%d - Tamaño Actual: %d - Tamaño a Ampliar: %d", pid, proceso_a_modificar->size * tamanio_pagina, tamanio_nuevo - tamanio_pagina * proceso_a_modificar->size);
         atender_aumentar_tamanio(proceso_a_modificar, tamanio_nuevo, paginas_actuales, paginas_futuras);
     }
     else if (paginas_futuras < paginas_actuales)
     {
-        log_info(mem_logger, "PID:%d - Tamanio Actual: %d - Tamanio a Reducir: %d", pid, proceso_a_modificar->size*tamanio_pagina, tamanio_pagina * proceso_a_modificar->size - tamanio_nuevo);
+        log_info(mem_logger, "PID:%d - Tamaño Actual: %d - Tamaño a Reducir: %d", pid, proceso_a_modificar->size * tamanio_pagina, tamanio_pagina * proceso_a_modificar->size - tamanio_nuevo);
         atender_reducir_tamanio(proceso_a_modificar, paginas_futuras, paginas_actuales);
     }
 }

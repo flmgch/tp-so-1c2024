@@ -19,7 +19,7 @@ void escribir_memoria(t_buffer *buffer, int socket)
     {
         t_direccion_fisica *direccion = list_get(lista_direcciones, i);
         usleep(1000 * retardo_respuesta);
-        log_info(mem_logger, "PID: %d - Accion: Escribir - Direccion Fisica: %d - Tamanio: %d", pid, direccion->direccion_fisica, direccion->tamanio_dato);
+        log_info(mem_logger, "PID: %d - Accion: Escribir - Direccion Fisica: %d - Tamaño: %d", pid, direccion->direccion_fisica, direccion->tamanio_dato);
         memcpy(espacio_usuario + direccion->direccion_fisica, valor + tam_actual, direccion->tamanio_dato);
         tam_actual += direccion->tamanio_dato;
     }
