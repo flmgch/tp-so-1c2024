@@ -60,6 +60,10 @@ void leer_memoria(t_buffer *buffer, int socket)
 
     pthread_mutex_unlock(&mutex_espacio_usuario);
 
+    char *aux = malloc(20);
+    memcpy(aux, valor, 20);
+    log_info(mem_logger, "Leido: %s", aux);
+
     t_buffer *new_buffer = crear_buffer();
     agregar_uint32_a_buffer(new_buffer, tam_total);
     agregar_a_buffer(new_buffer, valor, tam_total);

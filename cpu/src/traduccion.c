@@ -11,8 +11,8 @@ void traducir_direccion_logica(uint32_t direccion_logica)
 
     int marco = obtener_marco(numero_pagina, desplazamiento);
 
-    dir_fisica_inicial = desplazamiento + marco * tamanio_pagina;
-    uint32_t dir_fi = dir_fisica_inicial;
+    uint32_t dir_fi = desplazamiento + marco * tamanio_pagina;
+    dir_fisica_inicial = dir_fi;
     //
 }
 
