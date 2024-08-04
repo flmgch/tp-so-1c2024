@@ -46,15 +46,12 @@ void atender_stdin(t_buffer *buffer)
     printf("> Ingrese un texto de %d caracteres: ", una_io->tamanio_total);
 
     fgets(texto, una_io->tamanio_total+1, stdin);
-    // texto[una_io->tamanio_total] = NULL;
 
-    clear_stdin();
+    // Limpiar la consola
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF){}
 
     memcpy(texto_aux, texto, una_io->tamanio_total);
-
-    char *aux = malloc(20);
-    memcpy(aux, texto_aux, 20);
-    log_info(io_logger, "Envio de IO: %s", aux);
 
     // Le pido a Memoria que escriba el texto a partir de las direcciones
     t_buffer *buffer_memo = crear_buffer();
@@ -69,13 +66,6 @@ void atender_stdin(t_buffer *buffer)
     free(texto);
     free(texto_aux);
     free(una_io);
-}
-
-void clear_stdin() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF) {
-        // Discard characters
-    }
 }
 
 void confirmar_escritura(t_buffer *buffer)

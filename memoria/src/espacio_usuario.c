@@ -72,5 +72,7 @@ void leer_memoria(t_buffer *buffer, int socket)
     eliminar_paquete(paquete);
 
     // free(valor);
+
+    // Es probable que este list_destroy llegue a dar problemas en alguna prueba de IO o FILESYSTEM
     list_destroy_and_destroy_elements(lista_direcciones, (void *)free);
 }

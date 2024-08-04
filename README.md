@@ -10,10 +10,10 @@ Trabajo práctico realizado para la materia Sistemas Operativos durante el prime
 
 ## Grupo de trabajo
 
-Joaquín Rossi ([@Joaquinnicolasrossi](https://github.com/Joaquinnicolasrossi))
+Joaquín Rossi - [@Joaquinnicolasrossi](https://github.com/Joaquinnicolasrossi)
 
-Mateo Spadoni ([@mSpadoni](https://github.com/mSpadoni))
+Mateo Spadoni - [@mSpadoni](https://github.com/mSpadoni)
 
-Manuel Di Bucci ([@manudibu7](https://github.com/manudibu7))
+Manuel Di Bucci - [@manudibu7](https://github.com/manudibu7)
 
-Nicole Velasco ([@flmgch](https://github.com/flmgch))
+Nicole Velasco - [@flmgch](https://github.com/flmgch)

@@ -1,36 +1,14 @@
 #include "dialfs.h"
 
 // VARIABLES GLOBALES
-//t_log *io_logger;
-//t_config *io_config;
-//char *ip_kernel, *puerto_kernel, *ip_memoria, *puerto_memoria, *tipo_interfaz, *path_base_dialfs;
-//int tiempo_unidad_trabajo, tamanio_bloque, cantidad_bloque, retraso_compactacion;
-
-//VARIABLES ARCHIVOS DE BLOQUES
-//int tamanio_archivo_bloques;
-//void* buffer_bitmap;
-//void* buffer_bloques;
-
-// typedef struct
-// {
-//     void* direccion; 
-//     int file_descriptor;
-//     int tamanio;
-//     t_bitarray *bitarray;
-// } t_bitmap;
-
-// typedef struct
-// {
-//     void *direccion;
-//     int file_descriptor;
-// } t_bloques_datos;
-
-// VARIABLES GLOBALES
 t_bitmap *bitmap;
 t_bloques_datos *bloques_datos;
 t_list *lista_metadatas;
 
-// FUNCIONES AUXILIARES
+/*
+ACLARACION IMPORTANTE:
+El directorio de los path_base_dialfs debe estar creado de antemano
+*/
 
 char *crear_path(char *path_base, char *nombre_archivo)
 {
@@ -295,6 +273,14 @@ int buscar_bloques_libres_contiguos(int bloque_inicial, int bloques_actuales, in
     return bloques_libres_contiguos;
 }
 
+/*
+ACLARACION IMPORTANTE:
+Al realizar la compactacion, ademas de actualizar el archivo de bitmap.dat con las nuevas posiciones,
+tambien deberiamos haberlo hecho con el bloques.dat, ya que de otra forma las pruebas no darian los
+resultados esperados.
+La forma de implementarlo seria moviendo los datos del archivo bloques.dat a otro archivo auxiliar,
+a medida que tratamos con cada archivo de metadata de la lista.
+*/
 
 void realizar_compactacion(int *bloque_inicial_trunc, t_config *metadata_config_trunc, char* nombre_archivo_trunc, u_int32_t pid)
 {   
